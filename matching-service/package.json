@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
@@ -16,7 +15,10 @@
     "nodemon": "^2.0.19"
   },
   "dependencies": {
+    "axios": "^0.27.2",
     "express": "^4.18.1",
+    "mongoose": "^6.5.4",
+    "requirejs": "^2.3.6",
     "sequelize": "^6.21.3",
     "socket.io": "^4.5.1",
     "sqlite3": "^5.0.10",
