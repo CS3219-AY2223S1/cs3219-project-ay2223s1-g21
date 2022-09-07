@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 var Schema = mongoose.Schema
 let UserModelSchema = new Schema({
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -12,5 +12,5 @@ let UserModelSchema = new Schema({
     }
 })
 
-UserModelSchema.index({username: "text" });
+UserModelSchema.index({email: "text" });
 export default mongoose.model('UserModel', UserModelSchema)
