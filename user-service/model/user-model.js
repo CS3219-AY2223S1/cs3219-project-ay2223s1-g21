@@ -12,4 +12,5 @@ let UserModelSchema = new Schema({
     }
 })
 
+UserModelSchema.index({username: "text" });
 export default mongoose.model('UserModel', UserModelSchema)

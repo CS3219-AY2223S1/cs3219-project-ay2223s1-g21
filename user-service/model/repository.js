@@ -15,3 +15,7 @@ export async function createUser(params) {
   return new UserModel(params)
 }
 
+export async function userExists(username) {
+    let user = await UserModel.findOne({username: username});
+    return user != null;
+}
