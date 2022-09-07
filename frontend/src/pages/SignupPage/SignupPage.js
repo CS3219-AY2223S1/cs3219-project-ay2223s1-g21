@@ -33,9 +33,10 @@ export default function SignupPage() {
             Sign Up
           </button>
         </div>
+        
         <form ref={loginRef} className={styles.loginGrp}>
           <input type="email" className={styles.txtField} placeholder="Email required" required />
-          <input type="text" className={styles.txtField} placeholder="Enter Password" required /> 
+          <input type="password" className={styles.txtField} placeholder="Enter Password" required /> 
           <div className={styles.chkbox}>
             <input type="checkbox"/>
             <span className={styles.spn}> Remember Password </span>
@@ -45,7 +46,7 @@ export default function SignupPage() {
         </form>
         <form ref={regRef} className={styles.regGrp}>
           <input type="email" className={styles.txtField} placeholder="Email required" required />
-          <input type="text" className={styles.txtField} placeholder="Enter Password" required /> 
+          <input type="password" className={styles.txtField} placeholder="Enter Password" required /> 
           <div className={styles.space}/>
           <button type="submit" className={styles.submit}> Register </button>
         </form>
