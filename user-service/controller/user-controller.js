@@ -1,6 +1,9 @@
-import jwt from "jsonwebtoken";
-
-import { ormCreateUser as _createUser } from '../model/user-orm.js'
+import { 
+    ormCreateUser as _createUser, 
+    ormLogin as _login, 
+    ormLogout as _logout, 
+    ormDeleteUser as _deleteUser } 
+    from '../model/user-orm.js'
 import { getUser, userExists } from '../model/repository.js';
 
 export async function createUser(req, res) {
@@ -43,12 +46,8 @@ export async function login(req, res) {
             return res.status(401).json({ message: "Invalid password!" });
         }
 
-        //Generate JWT Token
-        var token = jwt.sign({ id: user.id }, process.env.SECRET_AUTH_KEY, {
-          expiresIn: 86400, //24 hours
-        });
-
-        req.session.token = token;
+        await _login(req, user.id);
+        console.log("Login successful!");
         return res.status(200).json({ id: user._id, email: email });
     } catch (err) {
         return res.status(500).json({ message: `Login failure. Error: ${err}` });
@@ -57,9 +56,27 @@ export async function login(req, res) {
   
 export async function logout(req, res) {
     try {
-        req.session = null;
+        await _logout(req);
+        console.log("Logout successful!");
         return res.status(200).json({ message: "Signed out succesfull!" });
     } catch (err) {
         return res.status(500).json({ message: `Logout failure. Error: ${err}` });
+    }
+}
+
+export async function deleteUser(req, res) {
+    try {
+        const id = req.session.token.id;
+        console.log(id);
+
+        if (id == null) {
+            return res.status(400).json({ message: "User does not exist!" });    
+        }
+
+        await _deleteUser(id);
+        console.log("Delete user successful!");
+        return res.status(200).json({ message: "Deleted user successfully!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Delete user failure. Error: ${err}` });
     }
 }
