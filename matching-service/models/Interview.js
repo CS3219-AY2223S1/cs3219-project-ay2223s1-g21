@@ -10,14 +10,10 @@ const interviewSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    question: {
-        type: String,
-        required: true
-    },
-    username1: {
+    email1: {
         type: String
     },
-    username2: {
+    email2: {
         type: String
     },
     timeCreated: {

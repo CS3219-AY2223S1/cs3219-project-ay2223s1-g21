@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 
 const MatchSchema = new mongoose.Schema({
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true
