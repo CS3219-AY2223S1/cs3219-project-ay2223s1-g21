@@ -12,8 +12,7 @@ app.options('*', cors())
 app.use(
     cookieSession({
       name: "peer-prep-session",
-      secret: process.env.COOKIE_SECRET,
-      httpOnly: true
+      secret: process.env.COOKIE_SECRET
     })
   );
 
