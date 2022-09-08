@@ -1,0 +1,2 @@
+//auth
+export const UPDATE_LOGGED_IN_STATUS = "UPDATE_LOGGED_IN_STATUS";

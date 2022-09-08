@@ -1,5 +1,6 @@
 import styles from "./signup.module.css";
 import { useState, useRef } from "react";
+import {handleSignupAccount} from "../../services/user_service";
 
 export default function LoginPage() {
   const loginRef = useRef();
@@ -7,7 +8,8 @@ export default function LoginPage() {
   const btnRef = useRef();
 
   const [isRegister, setIsRegister] = useState(true);
-  
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleToggle = () => {
     if (isRegister) {
       loginRef.current.style.left = "-400px";
@@ -19,6 +21,18 @@ export default function LoginPage() {
       btnRef.current.style.left = "0px";
     }  
     setIsRegister(!isRegister);
+  }
+
+  const handleSignupAccount = (e) => {
+    e.preventDefault();
+    const email = e.target[0].value;
+    const password = e.target[1].value;
+    setIsLoading(true);
+    
+  }
+
+  const handleLogin = (e) => {
+
   }
 
   return (
@@ -33,22 +47,22 @@ export default function LoginPage() {
             Sign Up
           </button>
         </div>
-        
-        <form ref={loginRef} className={styles.loginGrp}>
-          <input type="email" className={styles.txtField} placeholder="Email required" required />
-          <input type="password" className={styles.txtField} placeholder="Enter Password" required /> 
+        <h2 className={styles.h2}> Welcome to PeerPrep!</h2>
+        <form ref={loginRef} className={styles.loginGrp} onSubmit={handleLogin}>
+          <input type="email" name="email" className={styles.txtField} placeholder="Email required" required />
+          <input type="password" name="password" className={styles.txtField} placeholder="Enter Password" required /> 
           <div className={styles.chkbox}>
-            <input type="checkbox"/>
-            <span className={styles.spn}> Remember Password </span>
+            {/* <input type="checkbox"/> */}
+            <a href="/home" className={styles.spn}> Forget Password </a>
           </div>
           
-          <button type="submit" className={styles.submit}> Log in</button>
+          <button type="submit" className={styles.submit} disabled={isLoading}> {isLoading ? "Loading..." : "Log in"}</button>
         </form>
-        <form ref={regRef} className={styles.regGrp}>
-          <input type="email" className={styles.txtField} placeholder="Email required" required />
-          <input type="password" className={styles.txtField} placeholder="Enter Password" required /> 
+        <form ref={regRef} className={styles.regGrp} onSubmit={handleSignupAccount}>
+          <input type="email" name="email" className={styles.txtField} placeholder="Email required" required />
+          <input type="password" name="password" className={styles.txtField} placeholder="Enter Password" required /> 
           <div className={styles.space}/>
-          <button type="submit" className={styles.submit}> Register </button>
+          <button type="submit" className={styles.submit} disabled={isLoading}> {isLoading ? "Loading..." : "Register"} </button>
         </form>
       </div>
     </div>

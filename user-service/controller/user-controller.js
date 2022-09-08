@@ -48,6 +48,7 @@ export async function login(req, res) {
           expiresIn: 86400, //24 hours
         });
 
+        // console.log(req);
         req.session.token = token;
         return res.status(200).json({ id: user._id, email: email });
     } catch (err) {
