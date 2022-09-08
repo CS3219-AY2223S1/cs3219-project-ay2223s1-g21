@@ -48,7 +48,7 @@ export async function login(req, res) {
 
         await _login(req, user.id);
         console.log("Login successful!");
-        return res.status(200).json({ id: user._id, email: email });
+        return res.status(200).json({ id: user._id, email: email, message: "Login successful!" });
     } catch (err) {
         return res.status(500).json({ message: `Login failure. Error: ${err}` });
     }
