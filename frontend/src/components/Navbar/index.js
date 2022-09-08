@@ -6,7 +6,7 @@ import {
   NavMenu,
   NavItem,
   NavLinks,
-  NavProfile,
+  NavLinkR,
 } from "./NavbarElements";
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
@@ -48,7 +48,7 @@ const Navbar = (props) => {
             </h3>
           </MobileIcon>
           <NavMenu>
-            <NavProfile to={user ? "/profile" : "/signin"}>Profile</NavProfile>
+            <NavLinkR to={user ? "/profile" : "/signin"}>Profile</NavLinkR>
             <NavItem>
               <NavLinks
                 to="about"
@@ -74,8 +74,8 @@ const Navbar = (props) => {
               </NavLinks>
             </NavItem>
             <NavItem>
-              <NavLinks
-                to="/signin"
+              <NavLinkR
+                to="/login"
                 smooth={true}
                 duration={500}
                 spy={true}
@@ -83,7 +83,7 @@ const Navbar = (props) => {
                 offset={-80}
               >
                 Logout
-              </NavLinks>
+              </NavLinkR>
             </NavItem>
           </NavMenu>
         </NavbarContainer>

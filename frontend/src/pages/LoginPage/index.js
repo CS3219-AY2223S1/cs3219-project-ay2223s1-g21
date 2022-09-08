@@ -1,7 +1,7 @@
 import styles from "./signup.module.css";
 import { useState, useRef } from "react";
 
-export default function SignupPage() {
+export default function LoginPage() {
   const loginRef = useRef();
   const regRef = useRef();
   const btnRef = useRef();

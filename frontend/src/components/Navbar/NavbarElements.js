@@ -12,7 +12,7 @@ export const Nav = styled.nav`
   font-size: 1rem;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 5;
   @media screen and (max-width: 960px) {
     transition: 0.8s all ease;
   }
@@ -92,7 +92,7 @@ export const NavBtn = styled.nav`
   }
 `;
 
-export const NavProfile = styled(LinkR)`
+export const NavLinkR = styled(LinkR)`
   color: #fff;
   display: flex;
   align-items: center;
