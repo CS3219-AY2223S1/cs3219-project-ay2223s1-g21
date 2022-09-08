@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
 
-import { createUser, login, logout } from './controller/user-controller.js';
+import { createUser, login, logout, deleteUser } from './controller/user-controller.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -24,6 +24,7 @@ router.get('/', (_, res) => res.send('Hello World from user-service'))
 router.post('/signup', createUser)
 router.post('/login', login)
 router.post('/logout', logout)
+router.post('/delete', deleteUser)
 
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')

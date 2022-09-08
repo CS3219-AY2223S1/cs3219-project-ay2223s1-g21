@@ -23,3 +23,7 @@ export async function userExists(email) {
     let user = await UserModel.findOne({email: email});
     return user != null;
 }
+
+export async function deleteUser(id) {
+    await UserModel.deleteOne({ _id: id });
+}
