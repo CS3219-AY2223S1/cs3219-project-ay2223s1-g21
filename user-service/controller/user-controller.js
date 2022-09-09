@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import { 
     ormCreateUser as _createUser, 
     ormLogin as _login, 
@@ -11,7 +13,8 @@ export async function createUser(req, res) {
     try {
         const { email, password } = req.body;
         if (email && password) {
-            const resp = await _createUser(email, password);
+            const hash = bcrypt.hashSync(password, parseInt(process.env.SALT_ROUNDS));
+            const resp = await _createUser(email, hash);
             
             if (resp.err) {
                 return res.status(400).json({message: 'Could not create a new user!'});
@@ -28,7 +31,7 @@ export async function createUser(req, res) {
             return res.status(400).json({message: 'Email and/or Password are missing!'});
         }
     } catch (err) {
-        return res.status(500).json({message: 'Database failure when creating new user!'})
+        return res.status(500).json({message: `Database failure when creating new user! Error: ${err}`})
     }
 }
 
@@ -41,9 +44,9 @@ export async function login(req, res) {
         if (!await userExistsByEmail(email)) {
             return res.status(404).json({ message: "User Not found!" });
         }
-``
+
         //Invalid password
-        if (password != user.password) {
+        if (!bcrypt.compareSync(password, user.password)) {
             return res.status(401).json({ message: "Invalid password!" });
         }
 
@@ -99,7 +102,7 @@ export async function changePassword(req, res) {
         }
 
         //Invalid password
-        if (currentPassword != user.password) {
+        if (!bcrypt.compareSync(currentPassword, user.password)) {
             return res.status(401).json({ message: "Invalid password!" });
         }
 
@@ -108,7 +111,9 @@ export async function changePassword(req, res) {
             return res.status(401).json({ message: "Current and new password are identical!" });
         }
 
-        await _changePassword(id, newPassword);
+        const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
+
+        await _changePassword(id, hash);
         console.log("Password changed successfully!");
         return res.status(200).json({ message: "Password changed successfully!" });
     } catch (err) {
