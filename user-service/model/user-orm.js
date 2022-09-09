@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
 
-import { createUser, userExists, deleteUser } from './repository.js';
+import { createUser, userExistsByEmail, deleteUser, getUserById, updatePassword } from './repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreateUser(email, password) {
     try {
         //check unique user
-        if (await userExists(email)) {
+        if (await userExistsByEmail(email)) {
             return false;
         }
 
@@ -47,6 +47,15 @@ export async function ormDeleteUser(id) {
         deleteUser(id);
     } catch (err) {
         console.log('ERROR: Could not delete user');
+        throw err;
+    }
+}
+
+export async function ormChangePassword(id, newPassword) {
+    try {
+        updatePassword(id, newPassword);       
+    } catch (err) {
+        console.log('ERROR: Could not change password');
         throw err;
     }
 }

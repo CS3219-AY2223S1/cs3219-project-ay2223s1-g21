@@ -2,9 +2,10 @@ import {
     ormCreateUser as _createUser, 
     ormLogin as _login, 
     ormLogout as _logout, 
-    ormDeleteUser as _deleteUser } 
+    ormDeleteUser as _deleteUser,
+    ormChangePassword as _changePassword } 
     from '../model/user-orm.js'
-import { getUser, userExists } from '../model/repository.js';
+import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '../model/repository.js';
 
 export async function createUser(req, res) {
     try {
@@ -34,13 +35,13 @@ export async function createUser(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await getUser(email);
+        const user = await getUserByEmail(email);
 
         //User does not exist
-        if (!await userExists(email)) {
+        if (!await userExistsByEmail(email)) {
             return res.status(404).json({ message: "User Not found!" });
         }
-
+``
         //Invalid password
         if (password != user.password) {
             return res.status(401).json({ message: "Invalid password!" });
@@ -78,5 +79,39 @@ export async function deleteUser(req, res) {
         return res.status(200).json({ message: "Deleted user successfully!" });
     } catch (err) {
         return res.status(500).json({ message: `Delete user failure. Error: ${err}` });
+    }
+}
+
+export async function changePassword(req, res) {
+    try {
+        const { currentPassword, reCurrentPassword, newPassword, id } = req.body;
+
+        const user = await getUserById(id);
+
+        //User does not exist
+        if (!await userExistsById(id)) {
+            return res.status(404).json({ message: "User Not found!" });
+        }
+
+        //Different password 
+        if (currentPassword != reCurrentPassword) {
+            return res.status(401).json({ message: "Password do not match!" });
+        }
+
+        //Invalid password
+        if (currentPassword != user.password) {
+            return res.status(401).json({ message: "Invalid password!" });
+        }
+
+        //New password identical to current
+        if (currentPassword == newPassword) {
+            return res.status(401).json({ message: "Current and new password are identical!" });
+        }
+
+        await _changePassword(id, newPassword);
+        console.log("Password changed successfully!");
+        return res.status(200).json({ message: "Password changed successfully!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Password change failure. Error: ${err}` });
     }
 }
