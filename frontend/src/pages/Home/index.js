@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 
 export default function Home() {
   const { isLoggedIn } = useSelector(state => state.authReducer);
-  console.log(isLoggedIn);
 
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => {

@@ -11,11 +11,14 @@ import {
 import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { animateScroll as scroll } from "react-scroll";
+import { useDispatch } from "react-redux";
+import { setIsLoggedIn } from "../../redux/actions/auth";
 
 const Navbar = (props) => {
   const { toggle } = props;
   const [scrollNav, setScrollNav] = useState(() => false);
   const user = window.localStorage.getItem("user");
+  const dispatch = useDispatch();
 
   const changeNav = () => {
     if (window.scrollY >= 80) {
@@ -34,6 +37,9 @@ const Navbar = (props) => {
     scroll.scrollToTop();
   };
   
+  const handleLogout = () => {
+    dispatch(setIsLoggedIn(false));
+  }
 
   return (
     <>
@@ -52,11 +58,6 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="about"
-                smooth={true}
-                duration={500}
-                spy={true}
-                exact="true"
-                offset={-80}
               >
                 About
               </NavLinks>
@@ -64,11 +65,6 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="faq"
-                smooth={true}
-                duration={500}
-                spy={true}
-                exact="true"
-                offset={-80}
               >
                 FAQs
               </NavLinks>
@@ -76,11 +72,7 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinkR
                 to="/login"
-                smooth={true}
-                duration={500}
-                spy={true}
-                exact="true"
-                offset={-80}
+                onClick={handleLogout}
               >
                 Logout
               </NavLinkR>
