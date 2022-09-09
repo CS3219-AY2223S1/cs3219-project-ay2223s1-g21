@@ -26,10 +26,7 @@ export async function ormLogin(req, id) {
             expiresIn: 86400, //24 hours
             });
 
-        req.session.token = {
-            id: id,
-            token: token
-        }
+        req.session.token = token;
     } catch (err) {
         console.log('ERROR: Could not login');
         throw err;
