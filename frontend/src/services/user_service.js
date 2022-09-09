@@ -28,6 +28,7 @@ export const handleLogin = async (email, password) => {
   let statusCode = ""
   let id = ""
   let emailResponse = ""
+  let message =""
   console.log("request sent");
   
   await axios.post(
@@ -36,12 +37,14 @@ export const handleLogin = async (email, password) => {
   ).then(res => {
     statusCode = res.status
     emailResponse = res.data.email
+    message = res.data.message
     id = res.data.id
     console.log("login response OK")
   }).catch(err => {
     statusCode = err.response.status
+    message = err.response.data.message
     console.log("Login error, " + err)
   })
 
-  return {statusCode, emailResponse, id}
+  return {statusCode, emailResponse, id, message}
 }

@@ -1,23 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import MainSection from "../../components/MainSection";
 import AboutSection from "../../components/AboutSection";
 import FAQ from "../../components/FAQ";
 import Sidebar from "../../components/Sidebar";
-import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
-  const { isLoggedIn } = useSelector(state => state.authReducer);
-
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => {
     setIsOpen(!isOpen);
   };
 
-  if (!isLoggedIn) {
-    return (<Navigate to="/login"/>)
-  }
+  const { isLoggedIn } = useSelector((state) => state.authReducer);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login");
+    } else {
+      navigate("/home");
+    }
+    
+  }, [isLoggedIn]);
 
   return (
     <>

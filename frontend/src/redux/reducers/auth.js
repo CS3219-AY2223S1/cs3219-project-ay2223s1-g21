@@ -1,10 +1,11 @@
-import { UPDATE_DIALOG_MSG, UPDATE_DIALOG_TITLE, UPDATE_IS_DIALOG_OPEN, UPDATE_LOGGED_IN_STATUS } from "../actionTypes"
+import { SET_LOADING_SCREEN, UPDATE_JWT_TOKEN, UPDATE_LOGGED_IN_STATUS, UPDATE_USER_EMAIL, UPDATE_USER_ID } from "../actionTypes"
 
 const initialState = {
   isLoggedIn : false,
-  isDialogOpen: false,
-  dialogTitle: "",
-  dialogMsg: ""
+  isLoading: false,
+  jwtToken: "",
+  userId: "",
+  userEmail: ""
 }
 
 export default function authReducer(state = initialState, action) {
@@ -14,25 +15,31 @@ export default function authReducer(state = initialState, action) {
         ...state,
         isLoggedIn: action.payload
       }
-
-    case UPDATE_IS_DIALOG_OPEN:
+    
+    case SET_LOADING_SCREEN:
       return {
         ...state,
-        isDialogOpen: action.payload
+        isLoading: action.payload
       }
 
-    case UPDATE_DIALOG_TITLE:
+    case UPDATE_JWT_TOKEN:
       return {
         ...state,
-        dialogTitle: action.payload
+        jwtToken: action.payload
       }
-
-    case UPDATE_DIALOG_MSG:
+    
+    case UPDATE_USER_ID:
       return {
         ...state,
-        dialogMsg: action.payload
+        userId: action.payload
       }
 
+    case UPDATE_USER_EMAIL:
+      return {
+        ...state,
+        userEmail: action.payload
+      }
+      
     default:
       return state;
   }

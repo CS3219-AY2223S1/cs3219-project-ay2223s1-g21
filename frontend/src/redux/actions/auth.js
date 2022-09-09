@@ -1,8 +1,9 @@
 import {
-  UPDATE_DIALOG_MSG,
-  UPDATE_DIALOG_TITLE,
-  UPDATE_IS_DIALOG_OPEN,
+  SET_LOADING_SCREEN,
+  UPDATE_JWT_TOKEN,
   UPDATE_LOGGED_IN_STATUS,
+  UPDATE_USER_EMAIL,
+  UPDATE_USER_ID,
 } from "../actionTypes";
 
 export const setIsLoggedIn = (isLoggedIn) => {
@@ -12,23 +13,31 @@ export const setIsLoggedIn = (isLoggedIn) => {
   };
 };
 
-export const setIsDialogOpen = (isDialogOpen) => {
-  return {
-    type: UPDATE_IS_DIALOG_OPEN,
-    payload: isDialogOpen,
-  };
-};
 
-export const setDialogTitle = (dialogTitle) => {
+export const setIsLoading = (isLoading) => {
   return {
-    type: UPDATE_DIALOG_TITLE,
-    payload: dialogTitle,
-  };
-};
+    type: SET_LOADING_SCREEN,
+    payload: isLoading
+  }
+}
 
-export const setDialogMsg = (dialogMsg) => {
+export const setJwtToken = (token) => {
   return {
-    type: UPDATE_DIALOG_MSG,
-    payload: dialogMsg,
-  };
-};
+    type: UPDATE_JWT_TOKEN,
+    payload: token
+  }
+}
+
+export const setUserId = (userId) => {
+  return {
+    type: UPDATE_USER_ID,
+    payload: userId
+  }
+}
+
+export const setUserEmail = (userEmail) => {
+  return {
+    type: UPDATE_USER_EMAIL,
+    payload: userEmail
+  }
+}

@@ -11,7 +11,6 @@ import {
   Button
 } from "./MainElements";
 import { useState } from "react";
-import { handleCreateNewAccount, handleLogin } from "../../services/user_service";
 
 const MainSection = () => {
   const [curDifficulty, setCurDifficulty] = useState("");
@@ -22,11 +21,6 @@ const MainSection = () => {
     } else {
       setCurDifficulty(difficulty);
     }
-  }
-
-  const handleSubmitMatchRequest = () => {
-    handleLogin("test", "test");
-    handleCreateNewAccount("test233334", "test");
   }
 
   return (
@@ -43,7 +37,7 @@ const MainSection = () => {
           <Difficulty state="medium" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("medium")}>Medium</Difficulty>
           <Difficulty state="hard" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("hard")}>Hard</Difficulty>
         </DifficultContainer>
-        <Button onClick={handleSubmitMatchRequest}>
+        <Button>
           Match 
         </Button>
       </MainContent>

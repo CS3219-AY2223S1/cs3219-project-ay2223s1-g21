@@ -9,19 +9,21 @@ import {
   DialogTitle,
   Button
 } from "@mui/material"
-import { useSelector, useDispatch } from "react-redux";
-import { setDialogMsg, setDialogTitle, setIsDialogOpen, setIsLoggedIn } from "../../redux/actions/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsLoggedIn, setIsLoading, setJwtToken, setUserId, setUserEmail } from "../../redux/actions/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const loginRef = useRef();
   const regRef = useRef();
   const btnRef = useRef();
   const dispatch = useDispatch();
-
-  const { isDialogOpen, dialogTitle, dialogMsg } = useSelector(state => state.authReducer);
-
+  const navigate = useNavigate();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogMsg, setDialogMsg] = useState("");
+  const isLoading = useSelector(state => state.authReducer.isLoading);
   const [isRegister, setIsRegister] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleToggle = () => {
     if (isRegister) {
@@ -37,51 +39,51 @@ export default function LoginPage() {
   };
 
   const closeDialog = () => {
-    dispatch(setIsDialogOpen(false));
-    dispatch(setDialogMsg(""));
-    dispatch(setDialogTitle(""));
+    setIsDialogOpen(false);
+    setDialogMsg("");
+    setDialogTitle("");
   }
 
   const handleSignupAccount = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
-    setIsLoading(true);
+    dispatch(setIsLoading(true));
     const {statusCode, message} = await handleCreateNewAccount(email, password);
-    dispatch(setDialogMsg(message));
-    dispatch(setIsDialogOpen(true));
+    setDialogMsg(message);
+    setIsDialogOpen(true);
     if (statusCode === 201) {
-      dispatch(setDialogTitle("Registration Success!"));
+      setDialogTitle("Registration Success!");
       handleToggle(); //move to login
       regRef.current.reset(); //reset form values
       loginRef.current.email.value = email;
-      loginRef.current.password.value = password;
+      loginRef.current.password.value = password;      
     } else {
-      dispatch(setDialogTitle("Registration Failed!"));
+      setDialogTitle("Registration Failed!");
     }
     
-    setIsLoading(false);
+    dispatch(setIsLoading(false));
   };
 
   const handleLoginAccount = async (e) => {
-    try {
-      e.preventDefault();
-      const userEmail = e.target[0].value;
-      const userPassword = e.target[1].value;
-      setIsLoading(true);
-      const {statusCode, email, id} = await handleLogin(userEmail, userPassword);
-      if (statusCode === 200) {
-        dispatch(setIsLoggedIn(true));
-        window.location.pathname = "/home";
-      } else {
-        dispatch(setDialogTitle("Login Failed!"));
-        dispatch(setDialogMsg("Your email or password is invalid. Please try again!"));
-        dispatch(setIsDialogOpen(true));
-      }
-      setIsLoading(false);
-    } catch (err) {
-      console.log(err);
+    e.preventDefault();
+    const userEmail = e.target[0].value;
+    const userPassword = e.target[1].value;
+    dispatch(setIsLoading(true));
+    const {statusCode, email, id, message} = await handleLogin(userEmail, userPassword);
+    if (statusCode === 200) {
+      dispatch(setIsLoggedIn(true));
+      dispatch(setIsLoading(false));
+      dispatch(setUserId(id));
+      dispatch(setUserEmail(email));
+      navigate('/home');
+    } else {
+      setDialogTitle("Login Failed!");
+      setDialogMsg(message + "Please try again!");
+      setIsDialogOpen(true);
+      dispatch(setIsLoading(false));
     }
+    
   }
 
   return (
