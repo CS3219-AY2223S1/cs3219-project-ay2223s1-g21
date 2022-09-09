@@ -15,11 +15,28 @@ export async function createUser(params) {
     return new UserModel(params)
 }
 
-export async function getUser(email) {
-    return await UserModel.findOne({email: email});
+export async function getUserByEmail(email) {
+    return await UserModel.findOne({ email: email });
 }
 
-export async function userExists(email) {
-    let user = await UserModel.findOne({email: email});
+export async function getUserById(id) {
+    return await UserModel.findOne({ _id: id });
+}
+
+export async function userExistsByEmail(email) {
+    let user = await UserModel.findOne({ email: email });
     return user != null;
+}
+
+export async function userExistsById(id) {
+    let user = await UserModel.findOne({ _id: id });
+    return user != null;
+}
+
+export async function deleteUser(id) {
+    await UserModel.deleteOne({ _id: id });
+}
+
+export async function updatePassword(id, newPassword) {
+    await UserModel.updateOne({ _id: id }, {password: newPassword});
 }
