@@ -1,13 +1,16 @@
+import jwt from "jsonwebtoken";
 import bcrypt from 'bcrypt';
 
 import { 
-    ormCreateUser as _createUser, 
-    ormLogin as _login, 
-    ormLogout as _logout, 
+    ormCreateUser as _createUser,
     ormDeleteUser as _deleteUser,
     ormChangePassword as _changePassword } 
     from '../model/user-orm.js'
-import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '../model/repository.js';
+import { ormDeleteToken as _deleteToken } from '../model/refreshToken-orm.js'
+import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '../model/user-repository.js';
+import { getToken } from '../model/refreshToken-repository.js';
+import authConfig from '../config/auth-config.js';
+import RefreshTokenModel from '../model/refreshToken-model.js';
 
 export async function createUser(req, res) {
     try {
@@ -50,17 +53,55 @@ export async function login(req, res) {
             return res.status(401).json({ message: "Invalid password!" });
         }
 
-        await _login(req, user.id);
+        //Generate JWT Token
+        var token = jwt.sign({ id: user.id }, authConfig.secret, {
+            expiresIn: authConfig.jwtExpiration
+        });
+
+        let refreshToken = await RefreshTokenModel.createToken(user);
+
+        req.session.refreshToken = refreshToken;
         console.log("Login successful!");
-        return res.status(200).json({ id: user._id, email: email, message: "Login successful!" });
+        return res.status(200).json({ id: user._id, email: email, token: token, message: "Login successful!" });
     } catch (err) {
         return res.status(500).json({ message: `Login failure. Error: ${err}` });
     }
 }
+
+export async function refreshToken(req, res) {
+    const requestToken = req.session.refreshToken;
+  
+    if (requestToken == null) {
+        return res.status(403).json({ message: "Refresh Token is required!" });
+    }
+
+    try {
+        let refreshToken = await getToken(requestToken);
+  
+        if (!refreshToken) {
+            return res.status(403).json({ message: "Refresh token does not exist in database!" });
+        }
+  
+        if (RefreshTokenModel.verifyExpiration(refreshToken)) {
+            _deleteToken(refreshToken);
+
+            return res.status(403).json({ message: "Refresh token expired. Please login again" });
+        }
+  
+        const newAccessToken = jwt.sign({ id: refreshToken.user._id }, authConfig.secret, {
+            expiresIn: authConfig.jwtExpiration,
+        });
+  
+        console.log("Access token generated successfully!");
+        return res.status(200).json({ token: newAccessToken, message: "Access token generated successfully!" });
+    } catch (err) {
+        return res.status(500).send({ message: err });
+    }
+};
   
 export async function logout(req, res) {
     try {
-        await _logout(req);
+        req.session = null;
         console.log("Logout successful!");
         return res.status(200).json({ message: "Signed out succesfull!" });
     } catch (err) {
@@ -70,8 +111,7 @@ export async function logout(req, res) {
 
 export async function deleteUser(req, res) {
     try {
-        const id = req.session.token.id;
-        console.log(id);
+        const { id } = req.body;
 
         if (id == null) {
             return res.status(400).json({ message: "User does not exist!" });    
@@ -87,7 +127,7 @@ export async function deleteUser(req, res) {
 
 export async function changePassword(req, res) {
     try {
-        const { currentPassword, reCurrentPassword, newPassword, id } = req.body;
+        const { currentPassword, newPassword, reNewPassword, id } = req.body;
 
         const user = await getUserById(id);
 
@@ -97,7 +137,7 @@ export async function changePassword(req, res) {
         }
 
         //Different password 
-        if (currentPassword != reCurrentPassword) {
+        if (newPassword != reNewPassword) {
             return res.status(401).json({ message: "Password do not match!" });
         }
 
