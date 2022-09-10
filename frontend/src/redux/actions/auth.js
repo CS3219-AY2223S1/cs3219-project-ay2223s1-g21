@@ -1,18 +1,16 @@
 import {
   SET_LOADING_SCREEN,
   UPDATE_JWT_TOKEN,
-  UPDATE_LOGGED_IN_STATUS,
   UPDATE_USER_EMAIL,
   UPDATE_USER_ID,
+  LOG_OUT_ACCOUNT
 } from "../actionTypes";
 
-export const setIsLoggedIn = (isLoggedIn) => {
+export const setLogout = () => {
   return {
-    type: UPDATE_LOGGED_IN_STATUS,
-    payload: isLoggedIn,
-  };
-};
-
+    type: LOG_OUT_ACCOUNT
+  }
+}
 
 export const setIsLoading = (isLoading) => {
   return {

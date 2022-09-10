@@ -1,17 +1,26 @@
 import styles from "./signup.module.css";
-import { useState, useRef } from "react";
-import { handleCreateNewAccount, handleLogin } from "../../services/user_service";
+import { useEffect, useState, useRef } from "react";
+import {
+  handleCreateNewAccount,
+  handleLogin,
+} from "../../services/user_service";
 import {
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
-  Button
-} from "@mui/material"
+  Button,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { setIsLoggedIn, setIsLoading, setJwtToken, setUserId, setUserEmail } from "../../redux/actions/auth";
+import {
+  setIsLoading,
+  setJwtToken,
+  setUserId,
+  setUserEmail,
+} from "../../redux/actions/auth";
 import { useNavigate } from "react-router-dom";
+import silentLogin from "./silentLogin";
 
 export default function LoginPage() {
   const loginRef = useRef();
@@ -22,9 +31,15 @@ export default function LoginPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogMsg, setDialogMsg] = useState("");
-  const isLoading = useSelector(state => state.authReducer.isLoading);
+  const { isLoading, jwtToken } = useSelector((state) => state.authReducer);
   const [isRegister, setIsRegister] = useState(true);
 
+  const refreshToken = getCookie("peer-prep-session");
+
+  useEffect(() => {
+    silentLogin(jwtToken, refreshToken, dispatch, navigate)
+  }, [jwtToken]);
+  
   const handleToggle = () => {
     if (isRegister) {
       loginRef.current.style.left = "-400px";
@@ -40,16 +55,17 @@ export default function LoginPage() {
 
   const closeDialog = () => {
     setIsDialogOpen(false);
-    setDialogMsg("");
-    setDialogTitle("");
-  }
+  };
 
   const handleSignupAccount = async (e) => {
     e.preventDefault();
     const email = e.target[0].value;
     const password = e.target[1].value;
     dispatch(setIsLoading(true));
-    const {statusCode, message} = await handleCreateNewAccount(email, password);
+    const { statusCode, message } = await handleCreateNewAccount(
+      email,
+      password
+    );
     setDialogMsg(message);
     setIsDialogOpen(true);
     if (statusCode === 201) {
@@ -57,11 +73,11 @@ export default function LoginPage() {
       handleToggle(); //move to login
       regRef.current.reset(); //reset form values
       loginRef.current.email.value = email;
-      loginRef.current.password.value = password;      
+      loginRef.current.password.value = password;
     } else {
       setDialogTitle("Registration Failed!");
     }
-    
+
     dispatch(setIsLoading(false));
   };
 
@@ -70,21 +86,23 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-    const {statusCode, email, id, message} = await handleLogin(userEmail, userPassword);
+    const { statusCode, email, id, message, jwtToken } = await handleLogin(
+      userEmail,
+      userPassword
+    );
     if (statusCode === 200) {
-      dispatch(setIsLoggedIn(true));
       dispatch(setIsLoading(false));
       dispatch(setUserId(id));
       dispatch(setUserEmail(email));
-      navigate('/home');
+      dispatch(setJwtToken(jwtToken));
+      navigate("/home");
     } else {
       setDialogTitle("Login Failed!");
-      setDialogMsg(message + "Please try again!");
+      setDialogMsg(message);
       setIsDialogOpen(true);
       dispatch(setIsLoading(false));
     }
-    
-  }
+  };
 
   return (
     <div className={styles.pageContainer}>
@@ -99,7 +117,11 @@ export default function LoginPage() {
           </button>
         </div>
         <h2 className={styles.h2}> Welcome to PeerPrep!</h2>
-        <form ref={loginRef} className={styles.loginGrp} onSubmit={handleLoginAccount}>
+        <form
+          ref={loginRef}
+          className={styles.loginGrp}
+          onSubmit={handleLoginAccount}
+        >
           <input
             type="email"
             name="email"
@@ -161,4 +183,9 @@ export default function LoginPage() {
       </Dialog>
     </div>
   );
+}
+
+function getCookie(key) {
+  var b = document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)");
+  return b ? b.pop() : "";
 }

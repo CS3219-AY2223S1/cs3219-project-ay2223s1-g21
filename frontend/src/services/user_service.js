@@ -1,4 +1,5 @@
 import axios from "axios";
+import { setJwtToken } from "../redux/actions/auth";
 
 export const handleCreateNewAccount = async (email, password) => {
   const body = {email, password}
@@ -8,7 +9,8 @@ export const handleCreateNewAccount = async (email, password) => {
   console.log("request sent for create new acc");
   await axios.post(
     CREATE_ACCOUNT_ENDPOINT,   
-    body
+    body,
+    {withCredentials : true}
   ).then(res => {
     statusCode = res.status
     message = res.data.message
@@ -25,20 +27,23 @@ export const handleCreateNewAccount = async (email, password) => {
 export const handleLogin = async (email, password) => {
   const LOG_IN_ENDPOINT = process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/login";
   const body = {email, password};
-  let statusCode = ""
-  let id = ""
-  let emailResponse = ""
-  let message =""
+  let statusCode = "";
+  let id = "";
+  let emailResponse = "";
+  let message = "";
+  let token = "";
   console.log("request sent");
   
   await axios.post(
     LOG_IN_ENDPOINT,   
-    body
+    body,
+    {withCredentials : true}
   ).then(res => {
-    statusCode = res.status
-    emailResponse = res.data.email
-    message = res.data.message
-    id = res.data.id
+    statusCode = res.status;
+    emailResponse = res.data.email;
+    message = res.data.message;
+    id = res.data.id;
+    token = res.data.token;
     console.log("login response OK")
   }).catch(err => {
     statusCode = err.response.status
@@ -46,5 +51,19 @@ export const handleLogin = async (email, password) => {
     console.log("Login error, " + err)
   })
 
-  return {statusCode, emailResponse, id, message}
+  return {statusCode, emailResponse, id, message, token};
+}
+
+export const handleLogoutAccount = () => {
+  const LOG_OUT_ENDPT = process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/logout";
+  axios.post(LOG_OUT_ENDPT, null, {withCredentials : true}).then(console.log).catch(console.log);
+}
+
+export const refreshJwtToken = (dispatch) => {
+  return axios
+    .post(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken", null, {withCredentials : true})
+    .then((res) => {
+      dispatch(setJwtToken(res.data.token))
+    })
+    .catch((err) => err.response.data.message);
 }
