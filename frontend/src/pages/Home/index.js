@@ -22,8 +22,7 @@ export default function Home() {
     } else {
       navigate("/home");
     }
-    
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigate]);
 
   return (
     <>

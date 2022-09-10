@@ -58,6 +58,10 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="about"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-80}
               >
                 About
               </NavLinks>
@@ -65,6 +69,10 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="faq"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-80}
               >
                 FAQs
               </NavLinks>
