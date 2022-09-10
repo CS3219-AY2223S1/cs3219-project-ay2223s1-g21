@@ -1,27 +1,29 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import SignupPage from "./pages/SignupPage/SignupPage";
-import MatchingPage from "./pages/Matching/Matching";
+import { useSelector } from "react-redux";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import Home from "./pages/Home";
+import LoadingScreen from "./pages/LoadingScreen";
+import LoginPage from "./pages/LoginPage";
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
+  const { isLoading } = useSelector((state) => state.authReducer);
+
   return (
     <div className="App">
       <Router>
         <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/home" element={<PrivateRoute component={Home} />} />
           <Route
-            exact
-            path="/"
-            element={<Navigate replace to="/signup" />}
-          ></Route>
-          <Route path="/signup" element={<SignupPage />} />
+            path="/change_password"
+            element={<PrivateRoute component={ChangePasswordPage} />}
+          />
           <Route path="/matching" element={<MatchingPage />} />
-          <Route element={() => <div>404</div>} />
+          <Route path="*" element={<PrivateRoute component={Home} />} />
         </Routes>
       </Router>
+      {isLoading && <LoadingScreen />}
     </div>
   );
 }
