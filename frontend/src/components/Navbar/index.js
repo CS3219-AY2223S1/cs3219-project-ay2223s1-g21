@@ -12,7 +12,8 @@ import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import { useDispatch } from "react-redux";
-import { setIsLoggedIn } from "../../redux/actions/auth";
+import { setLogout } from "../../redux/actions/auth";
+import { handleLogoutAccount } from "../../services/user_service";
 
 const Navbar = (props) => {
   const { toggle } = props;
@@ -38,7 +39,8 @@ const Navbar = (props) => {
   };
   
   const handleLogout = () => {
-    dispatch(setIsLoggedIn(false));
+    handleLogoutAccount();
+    dispatch(setLogout());
   }
 
   return (
@@ -58,6 +60,10 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="about"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-80}
               >
                 About
               </NavLinks>
@@ -65,6 +71,10 @@ const Navbar = (props) => {
             <NavItem>
               <NavLinks
                 to="faq"
+                smooth={true}
+                duration={500}
+                spy={true}
+                offset={-80}
               >
                 FAQs
               </NavLinks>

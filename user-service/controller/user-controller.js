@@ -49,12 +49,12 @@ export async function login(req, res) {
 
         //User does not exist
         if (!await userExistsByEmail(email)) {
-            return res.status(404).json({ message: "User Not found!" });
+            return res.status(404).json({ message: "User Not found! Please try again." });
         }
 
         //Invalid password
         if (!bcrypt.compareSync(password, user.password)) {
-            return res.status(401).json({ message: "Invalid password!" });
+            return res.status(401).json({ message: "Invalid password! Please try again." });
         }
 
         //Generate JWT Token
