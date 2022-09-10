@@ -1,5 +1,5 @@
 import axios from "axios";
-import { setJwtToken } from "../redux/actions/auth";
+import { setJwtToken, setUserEmail, setUserId } from "../redux/actions/auth";
 
 export const handleCreateNewAccount = async (email, password) => {
   const body = {email, password}
@@ -61,9 +61,11 @@ export const handleLogoutAccount = () => {
 
 export const refreshJwtToken = (dispatch) => {
   return axios
-    .post(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken", null, {withCredentials : true})
+    .get(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken", {withCredentials : true})
     .then((res) => {
-      dispatch(setJwtToken(res.data.token))
+      dispatch(setUserEmail(res.data.email));
+      dispatch(setUserId(res.data.id));
+      dispatch(setJwtToken(res.data.token));
     })
     .catch((err) => err.response.data.message);
 }

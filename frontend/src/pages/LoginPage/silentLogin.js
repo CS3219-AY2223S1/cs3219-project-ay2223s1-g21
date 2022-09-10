@@ -1,9 +1,9 @@
 import { refreshJwtToken } from "../../services/user_service";
 
-export default async function silentLogin(jwtToken, refreshToken, dispatch, navigate) {
-  if (!jwtToken && refreshToken) {
+export default async function silentLogin(jwtToken, dispatch, navigate) {
+  if (!jwtToken) {
     refreshJwtToken(dispatch);
-  } else if (jwtToken && refreshToken) {
+  } else {
     navigate('/home');
   }
 }

@@ -34,10 +34,9 @@ export default function LoginPage() {
   const { isLoading, jwtToken } = useSelector((state) => state.authReducer);
   const [isRegister, setIsRegister] = useState(true);
 
-  const refreshToken = getCookie("peer-prep-session");
 
   useEffect(() => {
-    silentLogin(jwtToken, refreshToken, dispatch, navigate)
+    silentLogin(jwtToken, dispatch, navigate)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwtToken]);
   
@@ -184,9 +183,4 @@ export default function LoginPage() {
       </Dialog>
     </div>
   );
-}
-
-function getCookie(key) {
-  var b = document.cookie.match("(^|;)\\s*" + key + "\\s*=\\s*([^;]+)");
-  return b ? b.pop() : "";
 }
