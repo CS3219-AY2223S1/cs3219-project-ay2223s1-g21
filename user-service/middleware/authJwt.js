@@ -8,11 +8,16 @@ const catchError = (err, res) => {
         return res.status(401).send({ message: "Unauthorized! Access Token was expired!" });
     }
 
-    return res.sendStatus(401).send({ message: "Unauthorized!" });
+    return res.status(401).send({ message: "Unauthorized!" });
 }
 
 export async function verifyToken(req, res, next) {
-    let token = req.headers["x-access-token"];
+    const token = req.headers["access-token"];
+    const { id } = req.body;
+
+    if (id == null) {
+        return res.status(403).send({ message: "No user id provided!" });
+    }
 
     if (!token) {
         return res.status(403).send({ message: "No token provided!" });
@@ -22,7 +27,9 @@ export async function verifyToken(req, res, next) {
         if (err) {
             return catchError(err, res);
         }
-    req.userId = decoded.id;
-    next();
+        if (id != decoded.id) {
+            return res.status(401).send({ message: "Unauthorized!" });
+        }
+        next();
   });
 };
