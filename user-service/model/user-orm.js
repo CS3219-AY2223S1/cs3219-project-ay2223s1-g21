@@ -10,8 +10,6 @@ export async function ormCreateUser(email, password) {
             return false;
         }
 
-        password = bcrypt.hashSync(password, parseInt(process.env.SALT_ROUNDS));
-
         const newUser = await createUser({email, password});
         newUser.save();
         return true;
@@ -32,7 +30,8 @@ export async function ormDeleteUser(id) {
 
 export async function ormChangePassword(id, newPassword) {
     try {
-        updatePassword(id, newPassword);       
+        const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
+        updatePassword(id, hash);       
     } catch (err) {
         console.log('ERROR: Could not change password');
         throw err;
