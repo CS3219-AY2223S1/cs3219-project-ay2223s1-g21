@@ -1,0 +1,282 @@
+const mongoose = require('mongoose');
+const Match = require('../models/Match');
+const Interview = require('../models/Interview');
+const responseStatus = require('../utilities/constants/ResponseStatus');
+const logMsgs = require('../utilities/constants/LogMessages');
+const requestHelpers = require('../utilities/helpers/HelperFunctions');
+const clientErrMsgs = require('../utilities/errors/ClientError');
+const mongoErrMsgs = require('../utilities/errors/MongoError');
+
+function serviceHealthCheck() {
+    var res = { 
+        status: responseStatus.SUCCESS, 
+        data: {
+            message: logMsgs.SERVICE_HEALTHY
+        }
+    };
+
+    return res;
+};
+
+async function searchMatch(socket, email, difficulty, callback) {
+    console.log("hi i reached")
+
+    if (!requestHelpers.isValidDifficulty(difficulty)) {
+        var res = { 
+            status: responseStatus.BAD_REQUEST, 
+            message: clientErrMsgs.INVALID_DIFFICULTY_ERR
+        };
+        return res;
+    }
+
+    try {
+        const matchExists = await Match.findOne({ email: email }).exec();
+        if (matchExists) {  
+            await Match.findOneAndDelete({ email: email }).exec();
+        }
+
+        const match = new Match({
+            email: email,
+            difficulty: difficulty,
+        });
+
+        await match.save();
+    } catch (err) {
+        var res = { 
+            status: responseStatus.BAD_REQUEST, 
+            message: mongoErrMsgs.readError(err)
+        };
+        return res;
+    }
+
+    var count = 0;
+    const intervalId = setInterval(async () => { //each interval is 5000 ms
+        count = count + 1;
+        if (count > 5) {
+            clearInterval(intervalId);
+            await Match.findOneAndDelete({ email: email }).exec();
+            
+            var res = { 
+                status: responseStatus.NOT_FOUND, 
+                message: clientErrMsgs.TIMEOUT_30_ERR
+            };
+            return res;
+        }
+        console.log("Retry find match")
+
+        try {
+            const interviewExists = await Interview.findOne({
+                $or: [
+                    { email1: email },
+                    { email2: email }
+                ]
+            });
+
+            if (interviewExists) {
+                // user is already matched with a partner
+                clearInterval(intervalId);
+                var partnerEmail = interviewExists.firstEmail;
+                if (partnerEmail == email) {
+                    partnerEmail = interviewExists.secondEmail;
+                }
+
+                var res = {
+                    status: responseStatus.SUCCESS,
+                    data: {
+                        partnerEmail: partnerEmail,
+                        interviewId: interviewExists.interviewId,
+                        secondsLeft: 3600
+                    }
+                };
+                return res;
+            }
+
+            const matchRecord = await Match.findOne({ email: email }).exec();
+            if (!matchRecord) {
+                clearInterval(intervalId);
+                var res = { 
+                    status: responseStatus.NOT_FOUND, 
+                    message: clientErrMsgs.FIND_MATCH_ALR_CANCELLED_ERR
+                };
+                return res;
+            }
+
+            // if user is not matched with a partner yet, try to find a partner
+            const partnerResult = await Match.findOne({
+                email: { $ne: email },
+                difficulty: difficulty
+            }, {}, {
+                sort: { "createdAt": 1 }
+            }).exec();
+
+            if (!partnerResult) {
+                console.log("no partner found")
+                return;
+            }
+
+            // match is found
+            clearInterval(intervalId);
+            console.log("[MS] Match found");
+
+            // Delete both match records
+            await Match.findOneAndDelete({ email: email }).exec();
+            await Match.findOneAndDelete({ email: partnerResult.email }).exec();
+
+            const interview = new Interview({
+                interviewId: mongoose.Types.ObjectId(),
+                difficulty: difficulty,
+                email1: email,
+                email2: partnerResult.email
+            });
+            await interview.save();
+
+            var res = { 
+                status: responseStatus.SUCCESS,
+                data: {
+                    interviewId: interview.interviewId,
+                    partnerEmail: partnerResult.email,
+                    difficulty: difficulty,
+                    secondsLeft: 3600
+                }
+            };
+            
+            socket.emit("matchSuccess", res);
+            return res;
+        } catch (err) {
+            clearInterval(intervalId);
+            var res = { 
+                status: responseStatus.ERROR, 
+                message: mongoErrMsgs.writeError(err)
+            };
+            return res;
+        }
+    }, 5000); 
+
+}
+
+// Get number of current ongoing interviews
+async function interviewsCount() {
+    try {
+        const numInterviews = await Interview.countDocuments({});
+        var res = {
+            status: responseStatus.SUCCESS,
+            data: {
+                count: numInterviews
+            }
+        };
+        return res;
+    } catch (err) {
+        var res = {
+            status: responseStatus.ERROR,
+            message: mongoErrMsgs.readError(err)
+        };
+        return res;
+    }
+}
+
+// Get interview of user (if it exist)
+async function getInterview(email) {
+    try {
+        const interview = await Interview.findOne({
+            $or: [
+                { email1: email },
+                { email2: email }
+            ]
+        });
+
+        if (!interview) {
+            var res = {
+                status: responseStatus.NOT_FOUND,
+                message: clientErrMsgs.NO_INTERVIEW_FOUND_ERR
+            }
+            return res;
+        }
+
+        var partnerEmail = interview.email1;
+        if (partnerEmail == email) {
+            partnerEmail = interview.email2;
+        }
+
+        var secondsPassed = Math.floor((new Date().getTime() - interview.timeCreated.getTime()) / 1000);
+        const secondsLeft = 3600 - secondsPassed;
+
+        var res = {
+            status: responseStatus.SUCCESS,
+            data: {
+                partnerEmail: partnerEmail,
+                interviewId: interview.interviewId,
+                secondsLeft: secondsLeft
+            }
+        };
+
+        return res;
+    } catch (err) {
+        var res = {
+            status: responseStatus.ERROR,
+            message: mongoErrMsgs.readError(err)
+        };
+        return res;
+    }
+}
+
+async function endInterview(email) {
+    try {
+        const interview = await Interview.findOne({
+            $or: [
+                { email1: email },
+                { email2: email }
+            ]
+        });
+
+        if (!interview) {
+            var res = {
+                status: responseStatus.NOT_FOUND,
+                message: clientErrMsgs.UNABLE_TO_DELETE_INTERVIEW_ERR
+            }
+            return res;
+        }
+
+        const firstEmail = interview.email1;
+        const secondEmail = interview.email2;
+
+        if (firstEmail == undefined || secondEmail == undefined) {
+            await Interview.findOneAndDelete({ interviewId: interview.interviewId }).exec();
+            var res = {
+                status: responseStatus.SUCCESS,
+                data: {
+                    message: logMsgs.INTERVIEW_ENDED
+                }
+            }
+            return res;
+        }
+
+        if (email == firstEmail) {
+            interview.email1 = undefined;
+        } else {
+            interview.email2 = undefined;
+        }
+        await interview.save();
+
+        var res = {
+            status: responseStatus.SUCCESS,
+            data: {
+                message: logMsgs.INTERVIEW_ENDED
+            }
+        }
+        return res;
+    } catch (err) {
+        var res = {
+            status: responseStatus.ERROR,
+            message: mongoErrMsgs.deleteError(err)
+        }
+        return res;
+    }
+}
+
+module.exports = {
+    serviceHealthCheck,
+    searchMatch,
+    interviewsCount,
+    getInterview,
+    endInterview,
+};
