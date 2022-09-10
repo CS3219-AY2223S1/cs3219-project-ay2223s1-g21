@@ -11,8 +11,18 @@ mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
-export async function getToken(requestToken) {
-    return await RefreshTokenModel.findOne({ token: requestToken });
+export async function createToken(params) { 
+    return new RefreshTokenModel(params)
+}
+
+export async function getAllToken() {
+    try {
+        const doc = await RefreshTokenModel.find({});
+        return doc;
+    } catch (err) {
+        console.log(`ERROR: RefreshTokenModel database ${err}`);
+        throw err;
+    }
 }
 
 export async function deleteToken(refreshToken) {
