@@ -8,11 +8,18 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 const responseStatus = require('./utilities/constants/ResponseStatus');
 const clientErrors = require('./utilities/errors/ClientError');
-const { serviceHealthCheck } = require('./controllers/MatchingController');
-const { searchMatch } = require('./controllers/MatchingController');
-const { response } = require('express');
+const fns = require('./controllers/MatchingController');
 
-const PORT = 3000 || process.env.PORT; 
+function wait_for(promise) {
+    let ret, done;
+    if (typeof promise === 'object' && promise !== null && 'then' in promise) {
+        promise.then(r => {ret = r, done = true});
+    }
+    while (!done) {}
+    return ret;
+};
+
+const PORT = 3000; 
 app.use(cors()) 
 app.options('*', cors())
 
@@ -29,49 +36,49 @@ const server = app.listen(PORT, function () {
 
 const io = socket(server); // Socket.io server instance
 
-
-
 io.on('connection', function (socket) {
     console.log("User connected: " + socket.id);
-    io.emit('message', "welcome to the backend")
+    io.emit('message', "welcome to the backend");
 
     socket.on('checkHealth', () => {
-        socket.emit('healthStatus', serviceHealthCheck())
-    })
-
-    //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
-    socket.on('findMatch', async (data, callback) => { 
-        var data = JSON.parse(data);
-        console.log(data.email)
-        console.log(data.difficulty)
-        console.log('Finding match now..')
-        
-        var res = await searchMatch(data.email, data.difficulty);
-
-        
-        //if found match
-        socket.emit('matchSuccess', res);
-
-        //else time out
-        socket.emit('matchFailed', "Failed to match");
-    }); 
-
-    // When a client disconnects (leaves room)
-    socket.on('disconnect', () => {
-        
-    })
-});
-
-app.use('/api/matching', routes);
-
-app.use((req, res) => {
-    res.status(404).json({
-        status: responseStatus.FAILED,
-        data: {
-            message: clientErrors.INVALID_API_ENDPOINT
-        }
+        console.log('Health is ok')
+        socket.emit('healthStatus', fns.serviceHealthCheck())
     });
 
-});
+    //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
+    socket.on('findMatch', wait_for(
+            (async (data) => { 
+                var data = JSON.parse(data);
+                console.log(data.email)
+                console.log(data.difficulty)
+                console.log('Finding match now..')
+                
+                //var res = await searchMatch(data.email, data.difficulty);
+                try {
+                    var res = await fns.searchMatch(socket, data.email, data.difficulty);
 
-module.exports = app;
+                    socket.emit('matchFailed', res);
+                    socket.emit('matchFailed', 'wtf');
+                } catch(error) {
+                    console.error('server err', error);
+                }
+
+
+                // exists = await new Promise(resolve => socket.emit('check', name, data => resolve(data.result)))
+                //if found match
+                //socket.emit('matchSuccess', res);
+
+                //else time out
+                //socket.emit('matchFailed', "Failed to match");
+            })()
+        )
+    ); 
+
+    // When a client disconnects (leaves room)
+    socket.on('disconnect', (data) => {
+        console.log("Disconnected");
+        var data = JSON.parse(data);
+        console.log(data.email)
+        fns.endInterview(data.email);
+    })
+});
