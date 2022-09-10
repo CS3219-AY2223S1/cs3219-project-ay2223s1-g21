@@ -1,3 +1,5 @@
+import bcrypt from 'bcrypt';
+
 import { createUser, userExistsByEmail, deleteUser, updatePassword } from './user-repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
@@ -7,6 +9,8 @@ export async function ormCreateUser(email, password) {
         if (await userExistsByEmail(email)) {
             return false;
         }
+
+        password = bcrypt.hashSync(password, parseInt(process.env.SALT_ROUNDS));
 
         const newUser = await createUser({email, password});
         newUser.save();

@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieSession from 'cookie-session';
 
 import { createUser, login, logout, deleteUser, changePassword, refreshToken } from './controller/user-controller.js';
+import { verifyToken } from './middleware/authJwt.js';
 
 const app = express();
 app.use(express.urlencoded({ extended: true }))
@@ -18,7 +19,7 @@ app.use(
     cookieSession({
       name: "peer-prep-session",
       secret: process.env.COOKIE_SECRET,
-      httpOnly: false
+      httpOnly: true
     })
   );
 
@@ -29,9 +30,11 @@ router.get('/', (_, res) => res.send('Hello World from user-service'))
 router.post('/signup', createUser)
 router.post('/login', login)
 router.post('/logout', logout)
-router.post('/delete', deleteUser)
-router.post('/changepassword', changePassword)
-router.post('/refreshtoken', refreshToken)
+router.post('/delete', [verifyToken], deleteUser)
+router.post('/changepassword', [verifyToken], changePassword)
+router.get('/refreshtoken', refreshToken)
+
+
 
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json');
