@@ -4,8 +4,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useEffect } from "react";
 import Page from "../layout/Page";
 import { contentBox, progressBox, progressTextBox } from "./styles";
-import { URL_CANCEL_MATCH } from "../../configs";
-import axios from "axios";
 import { Button } from "@mui/material";
 import io from 'socket.io-client';
 
@@ -14,16 +12,6 @@ export default function MatchingPage() {
   const [isTimeout, setTimeOut] = useState(false);
   const [socket , setSocket] = useState(null);
   const [isConnected , setIsConnect] = useState(false);
-
-  const cancelMatchRequest = async () => {
-    await axios.post(URL_CANCEL_MATCH, {}).finally(() => {
-      setTimeOut(true);
-    });
-  };
-
-  useEffect(() => {
-    if (!progress) cancelMatchRequest();
-  }, [progress]);
 
   useEffect(() => {
     const socket = io(`http://localhost:${process.env.REACT_APP_MATCHING_PORT}`)
@@ -42,7 +30,18 @@ export default function MatchingPage() {
 
   useEffect(() => {
     if(isConnected) {
-      socket.emit("findMatch", { email: "John" })
+      const emailAddrs = ["John", "Emily", "Alex"]
+      const e = emailAddrs[Math.floor(Math.random() * 3)];
+
+      socket.emit("findMatch", {email: e, difficulty: "hard"})
+      socket.on("matchSuccess", (res) => {
+        const {interviewId} = res.data
+        window.location.href = `/room/${interviewId}`;
+      })
+      socket.on("matchFailed", (res) => {
+        console.log("Failure to find a match");
+        setTimeOut(true)
+      });
       const timer = setInterval(() => {
         setProgress((prevProgress) => (prevProgress > 0 ? prevProgress - 1 : 0));
       }, 1000);
