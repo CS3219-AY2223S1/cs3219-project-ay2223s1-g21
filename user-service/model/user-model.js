@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
+
 var Schema = mongoose.Schema
 let UserModelSchema = new Schema({
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true,

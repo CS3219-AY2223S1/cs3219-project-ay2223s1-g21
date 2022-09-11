@@ -1,5 +1,4 @@
-const express = require('express');
-const socket = require('socket.io')
+const express = require('express')
 const cors = require('cors');
 const mongoose = require('mongoose')
 const app = express();
@@ -20,7 +19,7 @@ function wait_for(promise) {
 };
 
 const PORT = 3000; 
-app.use(cors()) 
+app.use(cors())
 app.options('*', cors())
 
 const server = app.listen(PORT, function () {
@@ -34,11 +33,11 @@ const server = app.listen(PORT, function () {
     }
 });
 
-const io = socket(server); // Socket.io server instance
+const io = require('socket.io')(server, {cors: {origin: "*"}})
 
 io.on('connection', function (socket) {
     console.log("User connected: " + socket.id);
-    io.emit('message', "welcome to the backend");
+    io.emit('connectionSuccess', "welcome to the backend");
 
     socket.on('checkHealth', () => {
         console.log('Health is ok')
@@ -47,7 +46,6 @@ io.on('connection', function (socket) {
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
     socket.on('findMatch', async (data) => { 
-                var data = JSON.parse(data);
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log('Finding match now..')
