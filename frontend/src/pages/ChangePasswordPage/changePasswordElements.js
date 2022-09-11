@@ -12,6 +12,24 @@ export const PageContainer = styled.div`
   position: absolute;
 `
 
+export const BackButton = styled.button`
+  width: 85%;
+  padding: 10px 30px;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  background: rgba(255,255,255,0.15);
+  border: 0;
+  outline: none;
+  border-radius: 30px;
+  color: #fff;
+  transform: translateY(200%);
+
+  &:hover {
+    box-shadow: '0 0 0 0.2rem #b9abe0';
+  }
+`
+
 export const Form = styled.div`
   width: 380px;
   height: 450px;
@@ -28,7 +46,7 @@ export const ChangePasswordForm = styled.div`
   width: 380px;
   height: 480px;
   position: relative;
-  margin: 6% auto;
+  margin: 10% auto;
   backdrop-filter: blur(8.5px);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   background: rgba(255, 255, 255, 0.15);
@@ -72,7 +90,7 @@ export const FormTitle = styled.h2`
   text-align: center;
 `
 
-export const FormGrp = styled.div`
+export const FormGrp = styled.form`
   transform: translateY(15%);
   position: absolute;
   width: 280px;
