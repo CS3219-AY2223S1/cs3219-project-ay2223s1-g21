@@ -32,18 +32,6 @@ export const BackButton = styled.button`
 
 export const Form = styled.div`
   width: 380px;
-  height: 450px;
-  position: relative;
-  margin: 6% auto;
-  backdrop-filter: blur(8.5px);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  background: rgba(255, 255, 255, 0.15);
-  padding: 5px;
-  overflow: hidden;
-`
-
-export const ChangePasswordForm = styled.div`
-  width: 380px;
   height: 480px;
   position: relative;
   margin: 10% auto;

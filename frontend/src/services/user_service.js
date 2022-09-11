@@ -96,3 +96,23 @@ export const changePassword = (id, currentPassword, newPassword, reNewPassword, 
     }
   )
 }
+
+export const forgetPasswordRequest = (email) => {
+  return axios.post(
+    process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/requestPasswordReset",
+    {email},
+    {
+      withCredentials: true
+    }
+  );
+}
+
+export const ResetPasswordRequest = (userId, token, password) => {
+  return axios.post(
+    process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/resetPassword",
+    {userId, token, password},
+    {
+      withCredentials: true
+    }
+  )
+}
