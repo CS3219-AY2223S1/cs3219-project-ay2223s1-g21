@@ -1,12 +1,13 @@
+import { useSearchParams } from "react-router-dom";
 import {
   PageContainer,
   Form,
-  TextField,
-  SubmitButton,
-  FormTitle,
   FormGrp,
+  FormTitle,
+  SubmitButton,
+  TextField,
   BackButton
-} from "./changePasswordElements";
+} from "../ChangePasswordPage/changePasswordElements";
 import {
   Dialog,
   DialogActions,
@@ -16,48 +17,34 @@ import {
   Button,
 } from "@mui/material";
 import { useState } from "react";
-import { changePassword } from "../../services/user_service";
-import { useDispatch, useSelector } from "react-redux";
-import { setIsLoading } from "../../redux/actions/auth";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import { useDispatch } from "react-redux";
+import { setIsLoading } from "../../redux/actions/auth";
+import { ResetPasswordRequest } from "../../services/user_service";
 
-
-export default function ChangePasswordPage() {
+export default function ResetPassword() {
+  // setSearchParams not suppose to be used.
+  // eslint-disable-next-line no-unused-vars
+  const [searchParams, setSearchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const id = searchParams.get("id");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const [dialogMsg, setDialogMsg] = useState("");
   const [success, setSucces] = useState(false);
   const navigate = useNavigate();
-
-  const closeDialog = () => {
-    setIsDialogOpen(false);
-    if (success) {
-      navigate('/profile');
-    }
-  };
-
   const dispatch = useDispatch();
 
-  const handleChangePassword = (e) => {
+  const handleResetPassword = (e) => {
     dispatch(setIsLoading(true));
     e.preventDefault();
-    const curPw = e.target[0].value;
-    const newPw = e.target[1].value;
-    const newRetypedPw = e.target[2].value;
-    const axiosPromise = changePassword(
-      userId,
-      curPw,
-      newPw,
-      newRetypedPw,
-      jwtToken
-    );
-    axiosPromise
+    const newPassword = e.target[0].value;
+    ResetPasswordRequest(id, token, newPassword)
       .then((res) => {
         setDialogMsg(res.data.message);
         setIsDialogOpen(true);
         dispatch(setIsLoading(false));
         setSucces(true);
+        e.target[0].value = "";
       })
       .catch((err) => {
         setDialogMsg(err?.response?.data?.message || err.message);
@@ -65,24 +52,26 @@ export default function ChangePasswordPage() {
         dispatch(setIsLoading(false));
         setSucces(false);
         e.target[0].value = "";
-        e.target[1].value = "";
-        e.target[2].value = "";
       });
+  }
+
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    if (success) {
+      navigateBack();
+    }
   };
 
   const navigateBack = () => {
-    navigate('/profile');
+    navigate('/login');
   }
 
   return (
     <PageContainer>
-      <Navbar />
       <Form>
-        <FormGrp onSubmit={handleChangePassword}>
-          <FormTitle> Change Password Form </FormTitle>
-          <TextField type="password" placeholder="Type in your current password" />
-          <TextField type="password" placeholder="Type in your new password" />
-          <TextField type="password" placeholder="Re-type your new passowrd" />
+        <FormGrp style={{top: '20%'}}onSubmit={handleResetPassword}>
+          <FormTitle>Reset Password Form</FormTitle>
+          <TextField type="password" placeholder="Enter your new password" />
           <SubmitButton type="submit"> Submit </SubmitButton>
           <BackButton onClick={navigateBack}> Back </BackButton>
         </FormGrp>

@@ -140,7 +140,7 @@ export default function LoginPage() {
           />
           <div className={styles.chkbox}>
             {/* <input type="checkbox"/> */}
-            <a href="/home" className={styles.spn}>
+            <a href="/forget_password" className={styles.spn}>
               Forget Password
             </a>
           </div>
