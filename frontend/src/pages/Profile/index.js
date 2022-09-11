@@ -9,13 +9,12 @@ const Profile = () => {
     setIsOpen(!isOpen);
   };
 
-  const [section, setSection] = useState(() => true);
 
   return (
     <>
       <Sidebar isOpen={isOpen} toggle={toggle} />
       <Navbar />
-      <ProfileSection section={section} />
+      <ProfileSection />
     </>
   );
 };
