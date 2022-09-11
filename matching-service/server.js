@@ -51,14 +51,14 @@ io.on('connection', function (socket) {
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log('Finding match now..')
+                var res;
                 
                 //var res = await searchMatch(data.email, data.difficulty);
                 try {
-                    await fns.searchMatch(socket, io, data.email, data.difficulty);
+                    res = await fns.searchMatch(socket, io, data.email, data.difficulty);
                 } catch(error) {
                     console.error('server err', error);
                 }
-
 
                 // exists = await new Promise(resolve => socket.emit('check', name, data => resolve(data.result)))
                 //if found match

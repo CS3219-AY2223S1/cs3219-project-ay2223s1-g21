@@ -24,6 +24,9 @@ async function searchMatch(socket, io, email, difficulty) {
             status: responseStatus.BAD_REQUEST, 
             message: clientErrMsgs.INVALID_DIFFICULTY_ERR
         };
+
+        console.log("Invalid difficulty");
+        socket.emit("matchFailed", res);
         return res;
     }
 
@@ -44,6 +47,8 @@ async function searchMatch(socket, io, email, difficulty) {
             status: responseStatus.BAD_REQUEST, 
             message: mongoErrMsgs.readError(err)
         };
+    
+        socket.emit("matchFailed", res);
         return res;
     }
 
@@ -71,7 +76,7 @@ async function searchMatch(socket, io, email, difficulty) {
             });
 
             if (interviewExists) {
-                // user is already matched with a partner
+                // user is already matched with a partner, clear the interval and we are done
                 clearInterval(intervalId);
                 var partnerEmail = interviewExists.firstEmail;
                 if (partnerEmail == email) {
@@ -86,6 +91,8 @@ async function searchMatch(socket, io, email, difficulty) {
                         secondsLeft: 3600
                     }
                 };
+
+                socket.emit("matchSuccess", res);
                 return res;
             }
 
@@ -96,6 +103,8 @@ async function searchMatch(socket, io, email, difficulty) {
                     status: responseStatus.NOT_FOUND, 
                     message: clientErrMsgs.FIND_MATCH_ALR_CANCELLED_ERR
                 };
+
+                socket.emit("matchFailed", res);
                 return res;
             }
 
@@ -106,6 +115,8 @@ async function searchMatch(socket, io, email, difficulty) {
             }, {}, {
                 sort: { "createdAt": 1 }
             }).exec();
+
+            console.log(partnerResult);
 
             if (!partnerResult) {
                 console.log("No partner found for this retry")
@@ -147,6 +158,7 @@ async function searchMatch(socket, io, email, difficulty) {
                 status: responseStatus.ERROR, 
                 message: mongoErrMsgs.writeError(err)
             };
+            socket.emit("matchFailed", res);
             return res;
         }
     }, 5000); 
