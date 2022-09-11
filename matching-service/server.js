@@ -46,8 +46,7 @@ io.on('connection', function (socket) {
     });
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
-    socket.on('findMatch', wait_for(
-            (async (data) => { 
+    socket.on('findMatch', async (data) => { 
                 var data = JSON.parse(data);
                 console.log(data.email)
                 console.log(data.difficulty)
@@ -55,10 +54,7 @@ io.on('connection', function (socket) {
                 
                 //var res = await searchMatch(data.email, data.difficulty);
                 try {
-                    var res = await fns.searchMatch(socket, data.email, data.difficulty);
-
-                    socket.emit('matchFailed', res);
-                    socket.emit('matchFailed', 'wtf');
+                    await fns.searchMatch(socket, io, data.email, data.difficulty);
                 } catch(error) {
                     console.error('server err', error);
                 }
@@ -70,8 +66,7 @@ io.on('connection', function (socket) {
 
                 //else time out
                 //socket.emit('matchFailed', "Failed to match");
-            })()
-        )
+            }
     ); 
 
     // When a client disconnects (leaves room)

@@ -18,9 +18,7 @@ function serviceHealthCheck() {
     return res;
 };
 
-async function searchMatch(socket, email, difficulty, callback) {
-    console.log("hi i reached")
-
+async function searchMatch(socket, io, email, difficulty) {
     if (!requestHelpers.isValidDifficulty(difficulty)) {
         var res = { 
             status: responseStatus.BAD_REQUEST, 
@@ -62,7 +60,7 @@ async function searchMatch(socket, email, difficulty, callback) {
             };
             return res;
         }
-        console.log("Retry find match")
+        console.log("Retrying find match for user: " + email);
 
         try {
             const interviewExists = await Interview.findOne({
@@ -110,7 +108,7 @@ async function searchMatch(socket, email, difficulty, callback) {
             }).exec();
 
             if (!partnerResult) {
-                console.log("no partner found")
+                console.log("No partner found for this retry")
                 return;
             }
 
@@ -141,6 +139,7 @@ async function searchMatch(socket, email, difficulty, callback) {
             };
             
             socket.emit("matchSuccess", res);
+            io.emit("matchSuccess", "success match");
             return res;
         } catch (err) {
             clearInterval(intervalId);
