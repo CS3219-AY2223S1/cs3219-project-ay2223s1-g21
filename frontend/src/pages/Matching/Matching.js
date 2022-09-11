@@ -7,10 +7,13 @@ import { contentBox, progressBox, progressTextBox } from "./styles";
 import { URL_CANCEL_MATCH } from "../../configs";
 import axios from "axios";
 import { Button } from "@mui/material";
+import io from 'socket.io-client';
 
 export default function MatchingPage() {
-  const [progress, setProgress] = useState(3);
+  const [progress, setProgress] = useState(30);
   const [isTimeout, setTimeOut] = useState(false);
+  const [socket , setSocket] = useState(null);
+  const [isConnected , setIsConnect] = useState(false);
 
   const cancelMatchRequest = async () => {
     await axios.post(URL_CANCEL_MATCH, {}).finally(() => {
@@ -23,13 +26,31 @@ export default function MatchingPage() {
   }, [progress]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => (prevProgress > 0 ? prevProgress - 1 : 0));
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+    const socket = io(`http://localhost:${process.env.REACT_APP_MATCHING_PORT}`)
+    setSocket(socket);
+    return () => { socket.emit("disconnect"); socket.close()};
+  }, [setSocket]);
+
+  useEffect(() => {
+    if(socket) {
+      socket.emit("connection");
+      socket.on("connectionSuccess", (message) => {
+        setIsConnect(true);
+      })
+    }
+  }, [socket])
+
+  useEffect(() => {
+    if(isConnected) {
+      socket.emit("findMatch", { email: "John" })
+      const timer = setInterval(() => {
+        setProgress((prevProgress) => (prevProgress > 0 ? prevProgress - 1 : 0));
+      }, 1000);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [isConnected])
 
   const loadingScreen = (
     <Box sx={contentBox}>
