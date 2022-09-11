@@ -65,6 +65,7 @@ async function searchMatch(socket, io, email, difficulty) {
             };
 
             socket.emit("matchFailed", res);
+            console.log("30 seconds passed, matching failed for user:" + email)
             return res;
         }
         console.log("Retrying find match for user: " + email);
@@ -98,7 +99,10 @@ async function searchMatch(socket, io, email, difficulty) {
                 return res;
             }
 
-            const matchRecord = await Match.findOne({ email: email }).exec();
+            //interview does not exist
+            const matchRecord = await Match.findOne({ email: email }).exec(); 
+
+            //ensures that Match for this user is registered in Mongo database.
             if (!matchRecord) {
                 clearInterval(intervalId);
                 var res = { 
@@ -232,7 +236,7 @@ async function getInterview(email) {
     }
 }
 
-async function endInterview(email) {
+async function endInterview(socket, io, email) {
     try {
         const interview = await Interview.findOne({
             $or: [
@@ -246,6 +250,7 @@ async function endInterview(email) {
                 status: responseStatus.NOT_FOUND,
                 message: clientErrMsgs.UNABLE_TO_DELETE_INTERVIEW_ERR
             }
+            socket.emit("disconnectFailed", res);
             return res;
         }
 
@@ -259,7 +264,9 @@ async function endInterview(email) {
                 data: {
                     message: logMsgs.INTERVIEW_ENDED
                 }
-            }
+            }           
+            console.log("Interview has ended")
+            socket.emit("disconnectSuccess", res);
             return res;
         }
 
@@ -276,12 +283,15 @@ async function endInterview(email) {
                 message: logMsgs.INTERVIEW_ENDED
             }
         }
+        console.log("Interview has ended")
+        socket.emit("disconnectSuccess", res);
         return res;
     } catch (err) {
         var res = {
             status: responseStatus.ERROR,
             message: mongoErrMsgs.deleteError(err)
         }
+        socket.emit("disconnectFailed", res);
         return res;
     }
 }

@@ -5,8 +5,6 @@ const app = express();
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
-const responseStatus = require('./utilities/constants/ResponseStatus');
-const clientErrors = require('./utilities/errors/ClientError');
 const fns = require('./controllers/MatchingController');
 
 function wait_for(promise) {
@@ -46,6 +44,7 @@ io.on('connection', function (socket) {
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
     socket.on('findMatch', async (data) => { 
+                //data = JSON.parse(data)
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log('Finding match now..')
@@ -57,21 +56,17 @@ io.on('connection', function (socket) {
                 } catch(error) {
                     console.error('server err', error);
                 }
-
-                // exists = await new Promise(resolve => socket.emit('check', name, data => resolve(data.result)))
-                //if found match
-                //socket.emit('matchSuccess', res);
-
-                //else time out
-                //socket.emit('matchFailed', "Failed to match");
             }
     ); 
 
     // When a client disconnects (leaves room)
-    socket.on('disconnect', (data) => {
-        console.log("Disconnected");
-        var data = JSON.parse(data);
+    socket.on('endInterview', async (data) => {
+        //data = JSON.parse(data)
         console.log(data.email)
-        fns.endInterview(data.email);
+        try {
+            await fns.endInterview(socket, io, data.email);
+        } catch(error) {
+            console.error('server err', error)
+        }
     })
 });
