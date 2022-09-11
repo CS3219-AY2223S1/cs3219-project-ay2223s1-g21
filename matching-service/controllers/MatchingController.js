@@ -53,7 +53,7 @@ async function searchMatch(socket, io, email, difficulty) {
     }
 
     var count = 0;
-    const intervalId = setInterval(async () => { //each interval is 5000 ms
+    const intervalId = setInterval(async () => { //each interval happens every 5000 ms
         count = count + 1;
         if (count > 5) {
             clearInterval(intervalId);
@@ -63,6 +63,8 @@ async function searchMatch(socket, io, email, difficulty) {
                 status: responseStatus.NOT_FOUND, 
                 message: clientErrMsgs.TIMEOUT_30_ERR
             };
+
+            socket.emit("matchFailed", res);
             return res;
         }
         console.log("Retrying find match for user: " + email);
