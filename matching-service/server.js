@@ -70,7 +70,6 @@ io.on('connection', function (socket) {
     // When a client disconnects (leaves room)
     socket.on('disconnect', (data) => {
         console.log("Disconnected");
-        var data = JSON.parse(data);
         console.log(data.email)
         fns.endInterview(data.email);
     })
