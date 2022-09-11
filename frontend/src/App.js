@@ -9,6 +9,7 @@ import Home from "./pages/Home";
 import LoadingScreen from "./pages/LoadingScreen";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
+import Profile from "./pages/Profile";
 
 function App() {
   const { isLoading } = useSelector((state) => state.authReducer);
@@ -18,9 +19,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/home" element={<PrivateRoute component={Home} />} />
-          <Route path="/change_password" element={<PrivateRoute component={ChangePasswordPage} />} />
-          <Route path="*" element={<PrivateRoute component={Home} />} /> 
+          <Route path="/home" element={<PrivateRoute component={Home} fromUrl={"/home"}/>} />
+          <Route path="/change_password" element={<PrivateRoute component={ChangePasswordPage} fromUrl={"/change_password"}/>} />
+          <Route path="/profile" element={<PrivateRoute component={Profile} fromUrl={"/profile"}/>} /> 
+          <Route path="*" element={<PrivateRoute component={Home} fromUrl={"*"}/>} /> 
         </Routes>
       </Router>
       {isLoading && <LoadingScreen />}

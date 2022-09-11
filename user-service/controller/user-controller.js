@@ -129,6 +129,7 @@ export async function deleteUser(req, res) {
         }
 
         await _deleteUser(id);
+        req.session = null;
         console.log("Delete user successful!");
         return res.status(200).json({ message: "Deleted user successfully!" });
     } catch (err) {
