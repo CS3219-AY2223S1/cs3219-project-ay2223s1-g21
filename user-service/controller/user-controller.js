@@ -16,7 +16,7 @@ import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '
 import authConfig from '../config/auth-config.js';
 import passwordRegex from "../util/password-regex.js";
 import CONSTANTS from "../util/constants.js";
-import { getPasswordToken } from "../model/passwordToken-repository.js";
+import { getPasswordToken, deletePasswordToken } from "../model/passwordToken-repository.js";
 import { sendEmail } from "../util/email/sendEmail.js";
 
 export async function createUser(req, res) {
