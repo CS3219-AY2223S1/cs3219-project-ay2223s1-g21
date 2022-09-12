@@ -6,6 +6,7 @@ const logMsgs = require('../utilities/constants/LogMessages');
 const requestHelpers = require('../utilities/helpers/HelperFunctions');
 const clientErrMsgs = require('../utilities/errors/ClientError');
 const mongoErrMsgs = require('../utilities/errors/MongoError');
+const authJwt = require('../utilities/auth/authJwt');
 
 function serviceHealthCheck() {
     var res = { 
@@ -18,7 +19,14 @@ function serviceHealthCheck() {
     return res;
 };
 
-async function searchMatch(socket, io, email, difficulty) {
+async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
+    try {
+        await authJwt.verifyToken(jwtToken, id, socket);
+    }
+    catch (err) {
+
+    }
+
     if (!requestHelpers.isValidDifficulty(difficulty)) {
         var res = { 
             status: responseStatus.BAD_REQUEST, 

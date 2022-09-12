@@ -32,6 +32,7 @@ const server = app.listen(PORT, function () {
 });
 
 const io = require('socket.io')(server, {cors: {origin: "*"}})
+const jwt = require('jsonwebtoken')
 
 io.on('connection', function (socket) {
     console.log("User connected: " + socket.id);
@@ -44,29 +45,18 @@ io.on('connection', function (socket) {
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
     socket.on('findMatch', async (data) => { 
-                //data = JSON.parse(data)
+                data = JSON.parse(data)
                 console.log(data.email)
                 console.log(data.difficulty)
+                console.log(data.jwtToken)
+                console.log(data.id)
                 console.log('Finding match now..')
-                var res;
                 
-                //var res = await searchMatch(data.email, data.difficulty);
                 try {
-                    res = await fns.searchMatch(socket, io, data.email, data.difficulty);
+                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.id);
                 } catch(error) {
                     console.error('server err', error);
                 }
             }
     ); 
-
-    // When a client disconnects (leaves room)
-    socket.on('endInterview', async (data) => {
-        //data = JSON.parse(data)
-        console.log(data.email)
-        try {
-            await fns.endInterview(socket, io, data.email);
-        } catch(error) {
-            console.error('server err', error)
-        }
-    })
 });
