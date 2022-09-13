@@ -4,19 +4,21 @@ import bcrypt from 'bcrypt';
 import { 
     ormCreateUser as _createUser,
     ormDeleteUser as _deleteUser,
-    ormChangePassword as _changePassword } 
+    ormChangePassword as _changePassword,
+    ormGetUserByEmail as _getUserByEmail,
+    ormGetUserById as _getUserById,
+    ormUserExistsByEmail as _userExistsByEmail,
+    ormUserExistsById as _userExistsById } 
     from '../model/user-orm.js'
 import { 
     ormCreateToken as _createToken, 
     ormGetToken as _getToken, 
     ormDeleteToken as _deleteToken } 
     from '../model/refreshToken-orm.js'
-import { ormCreatePasswordToken as _createPasswordToken, ormDeletePasswordToken as _deletePasswordToken } from '../model/passwordToken-orm.js';
-import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '../model/user-repository.js';
+import { ormCreatePasswordToken as _createPasswordToken, ormDeletePasswordToken as _deletePasswordToken, ormGetPasswordToken as _getPasswordToken } from '../model/passwordToken-orm.js';
 import authConfig from '../config/auth-config.js';
 import passwordRegex from "../util/password-regex.js";
 import CONSTANTS from "../util/constants.js";
-import { getPasswordToken, deletePasswordToken } from "../model/passwordToken-repository.js";
 import { sendEmail } from "../util/email/sendEmail.js";
 
 export async function createUser(req, res) {
@@ -52,10 +54,10 @@ export async function createUser(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await _getUserByEmail(email);
 
         //User does not exist
-        if (!await userExistsByEmail(email)) {
+        if (!await _userExistsByEmail(email)) {
             return res.status(404).json({ message: "User Not found! Please try again." });
         }
 
@@ -141,10 +143,10 @@ export async function changePassword(req, res) {
     try {
         const { currentPassword, newPassword, reNewPassword, id } = req.body;
 
-        const user = await getUserById(id);
+        const user = await _getUserById(id);
 
         //User does not exist
-        if (!await userExistsById(id)) {
+        if (!await _userExistsById(id)) {
             return res.status(404).json({ message: "User Not found!" });
         }
 
@@ -179,18 +181,18 @@ export async function changePassword(req, res) {
 export async function requestPasswordReset(req, res) {
     try {
         const { email } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await _getUserByEmail(email);
 
         //User does not exist
-        if (!await userExistsByEmail(email)) {
+        if (!await _userExistsByEmail(email)) {
             return res.status(404).json({ message: "User Not found!" });
         }
 
-        let token = await getPasswordToken(user._id);
+        let token = await _getPasswordToken(user._id);
         
         //If token exist, delete it
         if (token) {
-            await deletePasswordToken(token);
+            await _deletePasswordToken(token);
         }
     
         const resetToken = await _createPasswordToken(user._id);
@@ -216,7 +218,7 @@ export async function resetPassword(req, res) {
     try {
         const { userId, token, password } = req.body;
 
-        let resetToken = await getPasswordToken(userId);
+        let resetToken = await _getPasswordToken(userId);
     
         //Reset password token does not exist
         if (!resetToken) {
@@ -235,7 +237,7 @@ export async function resetPassword(req, res) {
 
         await _changePassword(userId, password)
     
-        const user = getUserById(userId);
+        const user = _getUserById(userId);
     
         sendEmail(
             user.email,
