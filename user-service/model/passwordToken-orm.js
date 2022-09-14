@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
-import { createPasswordToken, deletePasswordToken } from './passwordToken-repository.js';
+import { createPasswordToken, deletePasswordToken, getPasswordToken } from './passwordToken-repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreatePasswordToken(id) {
@@ -29,6 +29,15 @@ export async function ormDeletePasswordToken(id) {
         deletePasswordToken(id);
     } catch (err) {
         console.log('ERROR: Could not delete password token');
+        throw err;
+    }
+}
+
+export async function ormGetPasswordToken(id) {
+    try {
+        getPasswordToken(id);
+    } catch (err) {
+        console.log('ERROR: Could not get password token');
         throw err;
     }
 }
