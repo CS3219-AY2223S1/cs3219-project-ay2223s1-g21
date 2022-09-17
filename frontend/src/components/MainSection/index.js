@@ -1,4 +1,3 @@
-import Video from "../../assets/home.gif";
 import bg from "../../assets/background.jpg";
 import {
   MainContainer,

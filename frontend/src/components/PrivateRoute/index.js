@@ -7,10 +7,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
+const PrivateRoute = ({ component: Component, fromUrl }) => {
   const isLoggedIn = useSelector(state => state.authReducer.jwtToken !== "");
 
-  return isLoggedIn ? <Component {...rest} /> : <Navigate to="/login" />
+  return isLoggedIn ? <Component /> : <Navigate to="/login" state={{from: fromUrl}}/>
 };
 
 export default PrivateRoute;

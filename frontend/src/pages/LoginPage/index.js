@@ -19,10 +19,11 @@ import {
   setUserId,
   setUserEmail,
 } from "../../redux/actions/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import silentLogin from "./silentLogin";
 
 export default function LoginPage() {
+  const location = useLocation();
   const loginRef = useRef();
   const regRef = useRef();
   const btnRef = useRef();
@@ -36,7 +37,7 @@ export default function LoginPage() {
 
 
   useEffect(() => {
-    silentLogin(jwtToken, dispatch, navigate)
+    silentLogin(jwtToken, dispatch, navigate, location?.state?.from);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwtToken]);
   
@@ -51,6 +52,7 @@ export default function LoginPage() {
       btnRef.current.style.left = "0px";
     }
     setIsRegister(!isRegister);
+    
   };
 
   const closeDialog = () => {
@@ -70,8 +72,8 @@ export default function LoginPage() {
     setIsDialogOpen(true);
     if (statusCode === 201) {
       setDialogTitle("Registration Success!");
-      handleToggle(); //move to login
-      regRef.current.reset(); //reset form values
+      regRef.current.email.value = "";
+      regRef.current.password.value = "";
       loginRef.current.email.value = email;
       loginRef.current.password.value = password;
     } else {
@@ -138,7 +140,7 @@ export default function LoginPage() {
           />
           <div className={styles.chkbox}>
             {/* <input type="checkbox"/> */}
-            <a href="/home" className={styles.spn}>
+            <a href="/forget_password" className={styles.spn}>
               Forget Password
             </a>
           </div>

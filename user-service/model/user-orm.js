@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { createUser, userExistsByEmail, deleteUser, updatePassword } from './user-repository.js';
+import { createUser, userExistsByEmail, deleteUser, updatePassword, getUserByEmail, getUserById, userExistsById } from './user-repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreateUser(email, password) {
@@ -9,8 +9,6 @@ export async function ormCreateUser(email, password) {
         if (await userExistsByEmail(email)) {
             return false;
         }
-
-        password = bcrypt.hashSync(password, parseInt(process.env.SALT_ROUNDS));
 
         const newUser = await createUser({email, password});
         newUser.save();
@@ -32,9 +30,46 @@ export async function ormDeleteUser(id) {
 
 export async function ormChangePassword(id, newPassword) {
     try {
-        updatePassword(id, newPassword);       
+        const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
+        updatePassword(id, hash);       
     } catch (err) {
         console.log('ERROR: Could not change password');
+        throw err;
+    }
+}
+
+export async function ormGetUserByEmail(email) {
+    try {
+        return await getUserByEmail(email);
+    } catch (err) {
+        console.log('ERROR: Could not get user by email');
+        throw err;
+    }
+}
+
+export async function ormGetUserById(id) {
+    try {
+        return await getUserById(id);
+    } catch (err) {
+        console.log('ERROR: Could not get user by id');
+        throw err;
+    }
+}
+
+export async function ormUserExistsByEmail(email) {
+    try {
+        return await userExistsByEmail(email);
+    } catch (err) {
+        console.log('ERROR: Could not dcheck if user exists by email');
+        throw err;
+    }
+}
+
+export async function ormUserExistsById(id) {
+    try {
+        return await userExistsById(id);
+    } catch (err) {
+        console.log('ERROR: Could not check if user exists by id');
         throw err;
     }
 }
