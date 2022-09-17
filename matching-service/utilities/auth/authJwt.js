@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const authConfig = require('../auth/authConfig');
 const responseStatus = require('../constants/ResponseStatus');
 const { TokenExpiredError } = jwt;
 
@@ -65,7 +64,6 @@ function verifyToken(token, id, socket) {
         }
     });
 
-    console.log("RES", verifyRes)
     return verifyRes
 };
 
