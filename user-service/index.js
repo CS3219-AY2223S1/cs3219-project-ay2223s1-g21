@@ -30,11 +30,11 @@ router.get('/', (_, res) => res.send('Hello World from user-service'))
 router.post('/signup', createUser)
 router.post('/login', login)
 router.post('/logout', logout)
-router.post('/delete', [verifyToken], deleteUser)
-router.post('/changepassword', [verifyToken], changePassword)
+router.delete('/delete', [verifyToken], deleteUser)
+router.put('/changepassword', [verifyToken], changePassword)
 router.get('/refreshtoken', refreshToken)
 router.post('/requestPasswordReset', requestPasswordReset)
-router.post('/resetPassword', resetPassword)
+router.put('/resetPassword', resetPassword)
 
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json');
