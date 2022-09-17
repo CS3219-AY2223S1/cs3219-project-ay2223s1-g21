@@ -20,11 +20,17 @@ function serviceHealthCheck() {
 };
 
 async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
+    var authRes;
     try {
-        await authJwt.verifyToken(jwtToken, id, socket);
+        authRes = authJwt.verifyToken(jwtToken, id, socket);
     }
     catch (err) {
+        console.log(err)
+        return err;
+    }
 
+    if (authRes.message.includes("Unauthorized")) {
+        return;
     }
 
     if (!requestHelpers.isValidDifficulty(difficulty)) {
@@ -37,6 +43,8 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
         socket.emit("matchFailed", res);
         return res;
     }
+
+    console.log('Finding match now..')
 
     try {
         const matchExists = await Match.findOne({ email: email }).exec();
@@ -60,10 +68,10 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
         return res;
     }
 
-    var count = 0;
+    var intervalNum = 0;
     const intervalId = setInterval(async () => { //each interval happens every 5000 ms
-        count = count + 1;
-        if (count > 5) {
+        intervalNum = intervalNum + 1;
+        if (intervalNum > 5) {
             clearInterval(intervalId);
             await Match.findOneAndDelete({ email: email }).exec();
             
@@ -244,7 +252,7 @@ async function getInterview(email) {
     }
 }
 
-async function endInterview(socket, io, email) {
+async function endInterview(socket, email) {
     try {
         const interview = await Interview.findOne({
             $or: [

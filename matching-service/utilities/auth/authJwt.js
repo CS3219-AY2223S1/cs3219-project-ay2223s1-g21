@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const authConfig = require('../config/authConfig.js');
+const authConfig = require('../auth/authConfig');
 const responseStatus = require('../constants/ResponseStatus');
 const { TokenExpiredError } = jwt;
 
@@ -23,11 +23,11 @@ const catchError = (err, socket) => {
     return res;
 }
 
-async function verifyToken(token, id, socket) {
+function verifyToken(token, id, socket) {
     if (!token) {
         var res = { 
             status: responseStatus.BAD_REQUEST, 
-            message: "No user id provided!"
+            message: "No user id provided! Unauthorized!"
         };
         console.log('No user id provided')
         socket.emit('matchFailed', res)
@@ -37,14 +37,14 @@ async function verifyToken(token, id, socket) {
     if (!token) {
         var res = { 
             status: responseStatus.BAD_REQUEST, 
-            message: "No token provided!"
+            message: "No token provided! Unauthorized!"
         };
         console.log('No token provided')
         socket.emit('matchFailed', res)
         return res
     }
 
-    jwt.verify(token, authConfig.secret, (err, decoded) => {
+    var verifyRes = jwt.verify(token, authConfig.secret, (err, decoded) => {
         if (err) {
             return catchError(err, socket);
         }
@@ -57,6 +57,11 @@ async function verifyToken(token, id, socket) {
             socket.emit('matchFailed', res)
             return res;
         }
-        return "ok";
-  });
+    });
+
+    return verifyRes
+};
+
+module.exports = {
+    verifyToken,
 };
