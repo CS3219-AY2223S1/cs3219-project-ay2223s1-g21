@@ -35,7 +35,7 @@ io.on('connection', function (socket) {
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
     socket.on('findMatch', async (data) => { 
-                data = JSON.parse(data)
+                //data = JSON.parse(data)
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log(data.jwtToken)
