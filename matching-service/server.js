@@ -1,13 +1,16 @@
+const { config } = require('dotenv');
 const express = require('express')
 const cors = require('cors');
 const mongoose = require('mongoose')
 const app = express();
 
+config();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 const fns = require('./controllers/MatchingController');
 
-const PORT = 3000; 
+const PORT = process.env.PORT || 3000;
+
 app.use(cors())
 app.options('*', cors())
 
