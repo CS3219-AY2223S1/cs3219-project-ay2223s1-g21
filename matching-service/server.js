@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 const fns = require('./controllers/MatchingController');
 
-const PORT = 3000; 
+const PORT = process.env.PORT || 3000; 
 app.use(cors())
 app.options('*', cors())
 
@@ -48,4 +48,16 @@ io.on('connection', function (socket) {
                 }
             }
     ); 
+
+    socket.on('leaveRoom', async (data) => {
+        console.log(data.email)
+        console.log(data.jwtToken)
+        console.log(data.id)
+
+        try {
+            await fns.endInterview(socket, io, data.email, data.jwtToken, data.id);
+        } catch(error) {
+            console.error('server err', error);
+        }
+    })
 });

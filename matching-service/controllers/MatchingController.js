@@ -19,7 +19,7 @@ function serviceHealthCheck() {
     return res;
 };
 
-async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
+function authUser(jwtToken, id, socket) {
     var authRes;
     try {
         authRes = authJwt.verifyToken(jwtToken, id, socket);
@@ -28,6 +28,11 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
         console.log(err)
         return err;
     }
+    return authRes
+}
+
+async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
+    authRes = authUser(jwtToken, id, socket)
 
     if (authRes.message.includes("Unauthorized")) {
         return;
@@ -252,7 +257,14 @@ async function getInterview(email) {
     }
 }
 
-async function endInterview(socket, email) {
+async function endInterview(socket, io, email, jwtToken, id) { //interview will be deleted from database
+
+    authRes = authUser(jwtToken, id, socket)
+
+    if (authRes.message.includes("Unauthorized")) {
+        return;
+    }    
+
     try {
         const interview = await Interview.findOne({
             $or: [
