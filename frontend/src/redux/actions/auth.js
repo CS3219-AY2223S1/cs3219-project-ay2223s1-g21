@@ -3,7 +3,7 @@ import {
   UPDATE_JWT_TOKEN,
   UPDATE_USER_EMAIL,
   UPDATE_USER_ID,
-  LOG_OUT_ACCOUNT
+  LOG_OUT_ACCOUNT,
 } from "../actionTypes";
 
 export const setLogout = () => {

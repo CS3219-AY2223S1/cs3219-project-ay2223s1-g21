@@ -19,20 +19,8 @@ function serviceHealthCheck() {
     return res;
 };
 
-function authUser(jwtToken, id, socket) {
-    var authRes;
-    try {
-        authRes = authJwt.verifyToken(jwtToken, id, socket);
-    }
-    catch (err) {
-        console.log(err)
-        return err;
-    }
-    return authRes
-}
-
 async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
-    authRes = authUser(jwtToken, id, socket)
+    var authRes = authJwt.verifyToken(jwtToken, id, socket);
 
     if (authRes.message.includes("Unauthorized")) {
         return;
@@ -258,6 +246,7 @@ async function getInterview(email) {
 }
 
 async function endInterview(socket, io, email, jwtToken, id) { //interview will be deleted from database
+    var authRes = authJwt.verifyToken(jwtToken, id, socket);
 
     authRes = authUser(jwtToken, id, socket)
 

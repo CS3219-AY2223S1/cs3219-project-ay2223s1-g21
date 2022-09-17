@@ -18,8 +18,11 @@ import { handleLogoutAccount } from "../../services/user_service";
 const Navbar = (props) => {
   const { toggle } = props;
   const [scrollNav, setScrollNav] = useState(() => false);
-  const user = window.localStorage.getItem("user");
   const dispatch = useDispatch();
+
+  const curUrlIsProfileOrChangePassword =
+    window.location.pathname === "/profile" ||
+    window.location.pathname === "/change_password";
 
   const changeNav = () => {
     if (window.scrollY >= 80) {
@@ -37,11 +40,11 @@ const Navbar = (props) => {
   const toggleHome = () => {
     scroll.scrollToTop();
   };
-  
+
   const handleLogout = () => {
     handleLogoutAccount();
     dispatch(setLogout());
-  }
+  };
 
   return (
     <>
@@ -56,34 +59,37 @@ const Navbar = (props) => {
             </h3>
           </MobileIcon>
           <NavMenu>
-            <NavLinkR to={user ? "/profile" : "/signin"}>Profile</NavLinkR>
+            <NavLinkR to={!curUrlIsProfileOrChangePassword ? "/profile" : "/home"}>
+              {!curUrlIsProfileOrChangePassword ? "Profile" : "Home"}
+            </NavLinkR>
+            {!curUrlIsProfileOrChangePassword && (
+              <>
+                <NavItem>
+                  <NavLinks
+                    to="about"
+                    smooth={true}
+                    duration={500}
+                    spy={true}
+                    offset={-80}
+                  >
+                    About
+                  </NavLinks>
+                </NavItem>
+                <NavItem>
+                  <NavLinks
+                    to="faq"
+                    smooth={true}
+                    duration={500}
+                    spy={true}
+                    offset={-80}
+                  >
+                    FAQs
+                  </NavLinks>
+                </NavItem>
+              </>
+            )}
             <NavItem>
-              <NavLinks
-                to="about"
-                smooth={true}
-                duration={500}
-                spy={true}
-                offset={-80}
-              >
-                About
-              </NavLinks>
-            </NavItem>
-            <NavItem>
-              <NavLinks
-                to="faq"
-                smooth={true}
-                duration={500}
-                spy={true}
-                offset={-80}
-              >
-                FAQs
-              </NavLinks>
-            </NavItem>
-            <NavItem>
-              <NavLinkR
-                to="/login"
-                onClick={handleLogout}
-              >
+              <NavLinkR to="/login" onClick={handleLogout}>
                 Logout
               </NavLinkR>
             </NavItem>

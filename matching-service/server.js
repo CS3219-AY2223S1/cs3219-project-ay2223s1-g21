@@ -1,13 +1,16 @@
+const { config } = require('dotenv');
 const express = require('express')
 const cors = require('cors');
 const mongoose = require('mongoose')
 const app = express();
 
+config();
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 const fns = require('./controllers/MatchingController');
 
 const PORT = process.env.PORT || 3000; 
+
 app.use(cors())
 app.options('*', cors())
 
@@ -39,10 +42,10 @@ io.on('connection', function (socket) {
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log(data.jwtToken)
-                console.log(data.id)
+                console.log(data.userId)
                 
                 try {
-                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.id);
+                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.userId);
                 } catch(error) {
                     console.error('server err', error);
                 }

@@ -4,13 +4,22 @@ import bcrypt from 'bcrypt';
 import { 
     ormCreateUser as _createUser,
     ormDeleteUser as _deleteUser,
-    ormChangePassword as _changePassword } 
+    ormChangePassword as _changePassword,
+    ormGetUserByEmail as _getUserByEmail,
+    ormGetUserById as _getUserById,
+    ormUserExistsByEmail as _userExistsByEmail,
+    ormUserExistsById as _userExistsById } 
     from '../model/user-orm.js'
-import { ormCreateToken as _createToken, ormGetToken as _getToken, ormDeleteToken as _deleteToken } from '../model/refreshToken-orm.js'
-import { getUserByEmail, getUserById, userExistsByEmail, userExistsById } from '../model/user-repository.js';
+import { 
+    ormCreateToken as _createToken, 
+    ormGetToken as _getToken, 
+    ormDeleteToken as _deleteToken } 
+    from '../model/refreshToken-orm.js'
+import { ormCreatePasswordToken as _createPasswordToken, ormDeletePasswordToken as _deletePasswordToken, ormGetPasswordToken as _getPasswordToken } from '../model/passwordToken-orm.js';
 import authConfig from '../config/auth-config.js';
 import passwordRegex from "../util/password-regex.js";
 import CONSTANTS from "../util/constants.js";
+import { sendEmail } from "../util/email/sendEmail.js";
 
 export async function createUser(req, res) {
     try {
@@ -45,10 +54,10 @@ export async function createUser(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
-        const user = await getUserByEmail(email);
+        const user = await _getUserByEmail(email);
 
         //User does not exist
-        if (!await userExistsByEmail(email)) {
+        if (!await _userExistsByEmail(email)) {
             return res.status(404).json({ message: "User Not found! Please try again." });
         }
 
@@ -68,7 +77,7 @@ export async function login(req, res) {
         console.log("Login successful!");
         return res.status(200).json({ id: user._id, email: email, token: token, message: "Login successful!" });
     } catch (err) {
-        return res.status(500).json({ message: `Login failure. Error: ${err}` });
+        return res.status(500).json({ message: `Login failed. Error: ${err}` });
     }
 }
 
@@ -99,7 +108,7 @@ export async function refreshToken(req, res) {
         console.log("Access token generated successfully!");
         return res.status(200).json({ id: refreshToken.user, email: refreshToken.email, token: newAccessToken, message: "Access token generated successfully!" });
     } catch (err) {
-        return res.status(500).send({ message: err });
+        return res.status(500).send({ message: `Refresh token failed. Error: ${err}` });
     }
 };
   
@@ -122,10 +131,11 @@ export async function deleteUser(req, res) {
         }
 
         await _deleteUser(id);
+        req.session = null;
         console.log("Delete user successful!");
         return res.status(200).json({ message: "Deleted user successfully!" });
     } catch (err) {
-        return res.status(500).json({ message: `Delete user failure. Error: ${err}` });
+        return res.status(500).json({ message: `Delete user failed. Error: ${err}` });
     }
 }
 
@@ -133,10 +143,10 @@ export async function changePassword(req, res) {
     try {
         const { currentPassword, newPassword, reNewPassword, id } = req.body;
 
-        const user = await getUserById(id);
+        const user = await _getUserById(id);
 
         //User does not exist
-        if (!await userExistsById(id)) {
+        if (!await _userExistsById(id)) {
             return res.status(404).json({ message: "User Not found!" });
         }
 
@@ -160,12 +170,88 @@ export async function changePassword(req, res) {
             return res.status(400).json({message: CONSTANTS.INVALID_PASSWORD_MESSAGE});
         }
 
-        const hash = bcrypt.hashSync(newPassword, parseInt(process.env.SALT_ROUNDS));
-
-        await _changePassword(id, hash);
+        await _changePassword(id, newPassword);
         console.log("Password changed successfully!");
         return res.status(200).json({ message: "Password changed successfully!" });
     } catch (err) {
-        return res.status(500).json({ message: `Password change failure. Error: ${err}` });
+        return res.status(500).json({ message: `Password change failed. Error: ${err}` });
     }
 }
+
+export async function requestPasswordReset(req, res) {
+    try {
+        const { email } = req.body;
+        const user = await _getUserByEmail(email);
+
+        //User does not exist
+        if (!await _userExistsByEmail(email)) {
+            return res.status(404).json({ message: "User Not found!" });
+        }
+
+        let token = await _getPasswordToken(user._id);
+        
+        //If token exist, delete it
+        if (token) {
+            await _deletePasswordToken(token);
+        }
+    
+        const resetToken = await _createPasswordToken(user._id);
+    
+        const link = `${process.env.CLIENT_DOMAIN}/passwordReset?token=${resetToken}&id=${user._id}`;
+    
+        sendEmail(
+            user.email,
+            "Reset Password Request",
+            {
+                email: user.email,
+                link: link,
+            },
+            "./requestResetPassword.handlebars"
+        );
+        return res.status(200).json({ message: "Check your email for instructions to reset your password!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Request Password Reset failed. Error: ${err}` });
+    }
+};
+  
+export async function resetPassword(req, res) {
+    try {
+        const { userId, token, password } = req.body;
+
+        let resetToken = await _getPasswordToken(userId);
+    
+        //Reset password token does not exist
+        if (!resetToken) {
+            return res.status(404).json({ message: "Password reset token not found!" });
+        }
+
+        //Invalid reset password token
+        if (!bcrypt.compareSync(token, resetToken.token)) {
+            return res.status(401).json({ message: "Invalid or expired reset password token!" })
+        }
+    
+        //Does not match password criteria
+        if (!password.match(passwordRegex)) {
+            return res.status(400).json({message: CONSTANTS.INVALID_PASSWORD_MESSAGE});
+        }
+
+        await _changePassword(userId, password)
+    
+        const user = _getUserById(userId);
+    
+        sendEmail(
+            user.email,
+            "Password Reset Successfully",
+            {
+            email: user.email,
+            },
+            "./resetPassword.handlebars"
+        );
+    
+        await _deletePasswordToken(token._id);
+
+        return res.status(200).json({ message: "Password reset successfully! Please login with your new password." });
+    } catch (err) {
+        return res.status(500).json({ message: `Reset Password failed. Error: ${err}` });
+    }
+};

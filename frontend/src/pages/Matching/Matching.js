@@ -6,17 +6,22 @@ import Page from "../layout/Page";
 import { contentBox, progressBox, progressTextBox } from "./styles";
 import { Button } from "@mui/material";
 import io from 'socket.io-client';
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 export default function MatchingPage() {
+  const navigate = useNavigate();
   const [progress, setProgress] = useState(30);
   const [isTimeout, setTimeOut] = useState(false);
   const [socket , setSocket] = useState(null);
   const [isConnected , setIsConnect] = useState(false);
+  const { userId, userEmail , jwtToken} = useSelector((state) => state.authReducer);
+  const { difficulty} = useSelector((state) => state.matchingReducer);
 
   useEffect(() => {
     const socket = io(`http://localhost:${process.env.REACT_APP_MATCHING_PORT}`)
     setSocket(socket);
-    return () => { socket.emit("disconnect"); socket.close()};
+    return () => { socket.close()};
   }, [setSocket]);
 
   useEffect(() => {
@@ -30,10 +35,8 @@ export default function MatchingPage() {
 
   useEffect(() => {
     if(isConnected) {
-      const emailAddrs = ["John", "Emily", "Alex"]
-      const e = emailAddrs[Math.floor(Math.random() * 3)];
+      socket.emit("findMatch", {email: userEmail, difficulty: difficulty, jwtToken: jwtToken, userId: userId})
 
-      socket.emit("findMatch", {email: e, difficulty: "hard"})
       socket.on("matchSuccess", (res) => {
         const {interviewId} = res.data
         window.location.href = `/room/${interviewId}`;
@@ -66,8 +69,8 @@ export default function MatchingPage() {
           thickness={2}
         />
         <Box sx={progressTextBox}>
-          <Typography variant="h2" component="div" color="text.secondary">
-            {`${progress}`}
+          <Typography variant={isConnected ? "h2" : "h4"} component="div" color="text.secondary">
+            {isConnected ? `${progress}` : "Connecting to the server" }
           </Typography>
         </Box>
       </Box>
@@ -78,7 +81,7 @@ export default function MatchingPage() {
         }}
       >
         <Typography variant="h6" color="text.secondary">
-          {"Finding a match , please wait"}
+          {isConnected ? "Finding a match , please wait" : ""}
         </Typography>
       </Box>
     </Box>
@@ -94,10 +97,10 @@ export default function MatchingPage() {
         sx={{ margin: "auto" }}
         disableElevation
         onClick={() => {
-          window.location.href = "/signup";
+          navigate("/home");
         }}
       >
-        Disable elevation
+        return to home screen
       </Button>
     </Box>
   );
