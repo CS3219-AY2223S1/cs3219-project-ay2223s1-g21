@@ -3,6 +3,7 @@ export const progressTextBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  width: "250px"
 };
 
 export const contentBox = {
