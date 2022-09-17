@@ -165,7 +165,6 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
             };
             
             socket.emit("matchSuccess", res);
-            io.emit("matchSuccess", "success match");
             return res;
         } catch (err) {
             clearInterval(intervalId);
