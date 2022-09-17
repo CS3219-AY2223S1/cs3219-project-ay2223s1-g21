@@ -15,7 +15,7 @@ export default function MatchingPage() {
   const [isTimeout, setTimeOut] = useState(false);
   const [socket , setSocket] = useState(null);
   const [isConnected , setIsConnect] = useState(false);
-  const { userEmail } = useSelector((state) => state.authReducer);
+  const { userId, userEmail , jwtToken} = useSelector((state) => state.authReducer);
   const { difficulty} = useSelector((state) => state.matchingReducer);
 
   useEffect(() => {
@@ -35,11 +35,7 @@ export default function MatchingPage() {
 
   useEffect(() => {
     if(isConnected) {
-      const emailAddrs = ["John", "Emily", "Alex"]
-      const e = emailAddrs[Math.floor(Math.random() * 3)];
-      const email = userEmail ? userEmail : e
-
-      socket.emit("findMatch", {email: email, difficulty: difficulty})
+      socket.emit("findMatch", {email: userEmail, difficulty: difficulty, jwtToken: jwtToken, userId: userId})
 
       socket.on("matchSuccess", (res) => {
         const {interviewId} = res.data

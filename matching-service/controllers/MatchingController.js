@@ -20,15 +20,7 @@ function serviceHealthCheck() {
 };
 
 async function searchMatch(socket, io, email, difficulty, jwtToken, id) {
-    var authRes;
-    try {
-        authRes = authJwt.verifyToken(jwtToken, id, socket);
-    }
-    catch (err) {
-        console.log(err)
-        return err;
-    }
-
+    var authRes = authJwt.verifyToken(jwtToken, id, socket);
     if (authRes.message.includes("Unauthorized")) {
         return;
     }

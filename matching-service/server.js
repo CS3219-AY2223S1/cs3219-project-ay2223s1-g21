@@ -42,10 +42,10 @@ io.on('connection', function (socket) {
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log(data.jwtToken)
-                console.log(data.id)
+                console.log(data.userId)
                 
                 try {
-                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.id);
+                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.userId);
                 } catch(error) {
                     console.error('server err', error);
                 }

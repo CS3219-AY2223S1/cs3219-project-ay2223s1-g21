@@ -44,9 +44,9 @@ function verifyToken(token, id, socket) {
         return res
     }
 
-    var verifyRes = jwt.verify(token, authConfig.secret, (err, decoded) => {
+    var verifyRes = jwt.verify(token, process.env.SECRET_AUTH_KEY, (err, decoded) => {
         if (err) {
-            return catchError(err, socket);
+          return catchError(err, socket);
         }
         if (id != decoded.id) {
             var res = { 
@@ -56,9 +56,16 @@ function verifyToken(token, id, socket) {
             console.log("Unauthorized!")
             socket.emit('matchFailed', res)
             return res;
+        } else {
+          var res = { 
+            status: responseStatus.SUCCESS, 
+            message: "SUCCESS"
+          };
+          return res;
         }
     });
 
+    console.log("RES", verifyRes)
     return verifyRes
 };
 
