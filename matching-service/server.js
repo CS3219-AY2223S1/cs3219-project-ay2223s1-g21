@@ -16,7 +16,7 @@ app.options('*', cors())
 
 const server = app.listen(PORT, function () {
     try {
-        mongoose.connect('mongodb://localhost:27017/match-mongodb');
+        mongoose.connect(process.env.DB_LOCAL_URI);
         console.log('Connected to MongoDB');
         console.log(`Match microservice listening on port ${PORT}`);
         console.log(`http://localhost:${PORT}`);
@@ -38,7 +38,7 @@ io.on('connection', function (socket) {
 
     //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
     socket.on('findMatch', async (data) => { 
-                //data = JSON.parse(data)
+                data = JSON.parse(data)
                 console.log(data.email)
                 console.log(data.difficulty)
                 console.log(data.jwtToken)
@@ -51,16 +51,4 @@ io.on('connection', function (socket) {
                 }
             }
     ); 
-
-    socket.on('leaveRoom', async (data) => {
-        console.log(data.email)
-        console.log(data.jwtToken)
-        console.log(data.id)
-
-        try {
-            await fns.endInterview(socket, io, data.email, data.jwtToken, data.id);
-        } catch(error) {
-            console.error('server err', error);
-        }
-    })
 });
