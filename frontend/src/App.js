@@ -1,14 +1,11 @@
 import { useSelector } from "react-redux";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import Home from "./pages/Home";
 import LoadingScreen from "./pages/LoadingScreen";
 import LoginPage from "./pages/LoginPage";
 import PrivateRoute from "./components/PrivateRoute";
+import MatchingPage from "./pages/Matching/Matching";
 import Profile from "./pages/Profile";
 import ForgetPassword from "./pages/ForgetPassword";
 import ResetPassword from "./pages/PasswordReset";
@@ -26,6 +23,7 @@ function App() {
           <Route path="/home" element={<PrivateRoute component={Home} fromUrl={"/home"}/>} />
           <Route path="/change_password" element={<PrivateRoute component={ChangePasswordPage} fromUrl={"/change_password"}/>} />
           <Route path="/profile" element={<PrivateRoute component={Profile} fromUrl={"/profile"}/>} /> 
+          <Route path="/matching" element={<PrivateRoute component={MatchingPage} />} />
           <Route path="*" element={<PrivateRoute component={Home} fromUrl={"*"}/>} /> 
         </Routes>
       </Router>

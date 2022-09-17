@@ -10,8 +10,13 @@ import {
   Button
 } from "./MainElements";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setDifficulty } from "../../redux/actions/matching";
+import { useNavigate } from "react-router-dom";
 
 const MainSection = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [curDifficulty, setCurDifficulty] = useState("");
 
   const handleChooseDifficulty = (difficulty) => {
@@ -19,6 +24,15 @@ const MainSection = () => {
       setCurDifficulty("");  
     } else {
       setCurDifficulty(difficulty);
+    }
+  }
+
+  const handleOnClick = () => {
+    if(curDifficulty == "") {
+      return
+    } else {
+      dispatch(setDifficulty(curDifficulty));
+      navigate("/matching");
     }
   }
 
@@ -36,7 +50,7 @@ const MainSection = () => {
           <Difficulty state="medium" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("medium")}>Medium</Difficulty>
           <Difficulty state="hard" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("hard")}>Hard</Difficulty>
         </DifficultContainer>
-        <Button>
+        <Button onClick={() => handleOnClick()}>
           Match 
         </Button>
       </MainContent>

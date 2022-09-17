@@ -42,7 +42,7 @@ export default function authReducer(state = initialState, action) {
         ...state,
         userEmail: action.payload,
       };
-
+    
     default:
       return state;
   }
