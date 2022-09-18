@@ -54,6 +54,11 @@ export async function createUser(req, res) {
 export async function login(req, res) {
     try {
         const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({message: 'Email and/or Password are missing!'});
+        }
+
         const user = await _getUserByEmail(email);
 
         //User does not exist
@@ -85,14 +90,14 @@ export async function refreshToken(req, res) {
     const requestToken = req.session.refreshToken;
     
     if (requestToken == null) {
-        return res.status(403).json({ message: "Refresh Token is required!" });
+        return res.status(400).json({ message: "Refresh Token is required!" });
     }
 
     try {
         let refreshToken = await _getToken(requestToken);
 
         if (!refreshToken) {
-            return res.status(403).json({ message: "Refresh token does not exist in database!" });
+            return res.status(401).json({ message: "Refresh token does not exist in database!" });
         }
 
         if (refreshToken.expiryDate.getTime() < new Date().getTime()) {
@@ -143,6 +148,10 @@ export async function changePassword(req, res) {
     try {
         const { currentPassword, newPassword, reNewPassword, id } = req.body;
 
+        if (!currentPassword || !newPassword || !reNewPassword || !id) {
+            return res.status(400).json({message: 'Current Password, New Password, Re-Type New Password and/or id are missing!'});
+        }
+
         const user = await _getUserById(id);
 
         //User does not exist
@@ -152,7 +161,7 @@ export async function changePassword(req, res) {
 
         //Different password 
         if (newPassword != reNewPassword) {
-            return res.status(401).json({ message: "Password do not match!" });
+            return res.status(400).json({ message: "Password do not match!" });
         }
 
         //Invalid password
@@ -162,7 +171,7 @@ export async function changePassword(req, res) {
 
         //New password identical to current
         if (currentPassword == newPassword) {
-            return res.status(401).json({ message: "Current and new password are identical!" });
+            return res.status(400).json({ message: "Current and new password are identical!" });
         }
 
         //Does not match password criteria
@@ -181,6 +190,11 @@ export async function changePassword(req, res) {
 export async function requestPasswordReset(req, res) {
     try {
         const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({message: 'Email is missing!'});
+        }
+
         const user = await _getUserByEmail(email);
 
         //User does not exist
@@ -217,6 +231,10 @@ export async function requestPasswordReset(req, res) {
 export async function resetPassword(req, res) {
     try {
         const { userId, token, password } = req.body;
+
+        if (!userId || !token || !password) {
+            return res.status(400).json({message: 'UserID, Token and/or Password are missing!'});
+        }
 
         let resetToken = await _getPasswordToken(userId);
     
