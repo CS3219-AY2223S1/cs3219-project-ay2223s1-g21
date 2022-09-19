@@ -20,7 +20,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../../redux/actions/auth";
-import { ResetPasswordRequest } from "../../services/user_service";
+import { resetPasswordRequest } from "../../services/user_service";
 
 export default function ResetPassword() {
   // setSearchParams not suppose to be used.
@@ -38,7 +38,7 @@ export default function ResetPassword() {
     dispatch(setIsLoading(true));
     e.preventDefault();
     const newPassword = e.target[0].value;
-    ResetPasswordRequest(id, token, newPassword)
+    resetPasswordRequest(id, token, newPassword)
       .then((res) => {
         setDialogMsg(res.data.message);
         setIsDialogOpen(true);

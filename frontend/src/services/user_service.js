@@ -76,23 +76,25 @@ export const refreshJwtToken = (dispatch) => {
 };
 
 export const deleteAccount = (id, jwtToken) => {
-  return axios.post(
+  return axios.delete(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/delete",
-    { id },
     {
+      headers: {
+        "access-token": jwtToken 
+      },
       withCredentials: true,
-      headers: { "access-token": jwtToken },
-    }
+      data: { id }
+    },
   )
 };
 
 export const changePassword = (id, currentPassword, newPassword, reNewPassword, jwtToken) => {
-  return axios.post(
+  return axios.put(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/changepassword",
-    {id, currentPassword, newPassword, reNewPassword},
+    { id, currentPassword, newPassword, reNewPassword },
     {
       withCredentials: true,
-      headers: {"access-token": jwtToken}
+      headers: { "access-token": jwtToken }
     }
   )
 }
@@ -100,17 +102,17 @@ export const changePassword = (id, currentPassword, newPassword, reNewPassword, 
 export const forgetPasswordRequest = (email) => {
   return axios.post(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/requestPasswordReset",
-    {email},
+    { email },
     {
       withCredentials: true
     }
   );
 }
 
-export const ResetPasswordRequest = (userId, token, password) => {
-  return axios.post(
+export const resetPasswordRequest = (userId, token, password) => {
+  return axios.put(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/resetPassword",
-    {userId, token, password},
+    { userId, token, password },
     {
       withCredentials: true
     }

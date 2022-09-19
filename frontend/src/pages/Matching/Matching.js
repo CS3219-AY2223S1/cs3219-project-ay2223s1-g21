@@ -52,7 +52,7 @@ export default function MatchingPage() {
         clearInterval(timer);
       };
     }
-  }, [isConnected])
+  }, [isConnected, difficulty, jwtToken, socket, userEmail, userId])
 
   const loadingScreen = (
     <Box sx={contentBox}>

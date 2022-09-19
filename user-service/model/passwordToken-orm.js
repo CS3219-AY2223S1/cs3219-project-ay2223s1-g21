@@ -35,7 +35,7 @@ export async function ormDeletePasswordToken(id) {
 
 export async function ormGetPasswordToken(id) {
     try {
-        getPasswordToken(id);
+        return await getPasswordToken(id);
     } catch (err) {
         console.log('ERROR: Could not get password token');
         throw err;
