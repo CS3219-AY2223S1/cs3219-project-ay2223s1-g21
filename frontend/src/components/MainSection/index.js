@@ -28,7 +28,7 @@ const MainSection = () => {
   }
 
   const handleOnClick = () => {
-    if(curDifficulty == "") {
+    if(curDifficulty === "") {
       return
     } else {
       dispatch(setDifficulty(curDifficulty));

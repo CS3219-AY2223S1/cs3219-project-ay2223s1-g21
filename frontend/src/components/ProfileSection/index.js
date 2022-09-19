@@ -50,9 +50,12 @@ const ProfileSection = () => {
     axiosPromise
       .then((res) => {
         setSecondDialogMsg(res.data.message)
+        setIsSecondDialogOpen(true);
       })
-      .catch((err) => setSecondDialogMsg(err.response.data.message));
-    setIsSecondDialogOpen(true);
+      .catch((err) => {
+        setSecondDialogMsg(err.response.data.message)
+        setIsSecondDialogOpen(true);
+      });
     dispatch(setIsLoading(false));
   };
 
@@ -61,7 +64,6 @@ const ProfileSection = () => {
     setIsSecondDialogOpen(false);
     dispatch(setIsLoading(false));
     window.location.reload();
-    
   };
 
   return (
