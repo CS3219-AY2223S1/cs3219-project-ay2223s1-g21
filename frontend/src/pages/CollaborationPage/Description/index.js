@@ -32,7 +32,7 @@ export default function Description() {
       })}
       <ExampleTitle>Constraints:</ExampleTitle>
       {Question.constraints.map((constraint, i) => {
-        return <Constraint>{constraint}</Constraint>
+        return <Constraint> <InnerHtmlAdder innerHtml={constraint} /></Constraint>
       })}
     </Container>
   );

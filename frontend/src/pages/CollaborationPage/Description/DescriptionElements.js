@@ -47,7 +47,7 @@ export const ExampleTitle = styled.div`
   color: #dbdbdb;
 `;
 
-export const Constraint = styled.li`
+export const Constraint = styled.div`
   color: #dbdbdb;
   font-size: 13px;
 `;
