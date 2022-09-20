@@ -19,6 +19,7 @@ const MainSection = () => {
   const navigate = useNavigate();
   const [curDifficulty, setCurDifficulty] = useState("");
 
+
   const handleChooseDifficulty = (difficulty) => {
     if (difficulty === curDifficulty) {
       setCurDifficulty("");  
@@ -36,6 +37,7 @@ const MainSection = () => {
     }
   }
 
+  
   return (
     <MainContainer id="home">
       <BgContainer>

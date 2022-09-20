@@ -9,6 +9,7 @@ import MatchingPage from "./pages/Matching/Matching";
 import Profile from "./pages/Profile";
 import ForgetPassword from "./pages/ForgetPassword";
 import ResetPassword from "./pages/PasswordReset";
+import CollaborationPage from "./pages/CollaborationPage";
 
 function App() {
   const { isLoading } = useSelector((state) => state.authReducer);
@@ -24,7 +25,8 @@ function App() {
           <Route path="/change_password" element={<PrivateRoute component={ChangePasswordPage} fromUrl={"/change_password"}/>} />
           <Route path="/profile" element={<PrivateRoute component={Profile} fromUrl={"/profile"}/>} /> 
           <Route path="/matching" element={<PrivateRoute component={MatchingPage} />} />
-          <Route path="*" element={<PrivateRoute component={Home} fromUrl={"*"}/>} /> 
+          <Route path="/collab" element={<PrivateRoute component={CollaborationPage} fromUrl={"/collab"} />} />
+          <Route path="*" element={<PrivateRoute component={Home} fromUrl={"/home"}/>} /> 
         </Routes>
       </Router>
       {isLoading && <LoadingScreen />}

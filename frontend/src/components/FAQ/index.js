@@ -13,9 +13,11 @@ import { useState } from "react";
 import { Data } from "./Data.js";
 import Icon1 from "../../assets/dancing-duck.gif";
 
+
 const FAQ = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  
   const makeOpen = (index) => {
     if (isOpen === index) {
       return setIsOpen(null);
