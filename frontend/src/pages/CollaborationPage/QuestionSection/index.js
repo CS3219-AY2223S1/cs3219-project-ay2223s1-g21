@@ -6,7 +6,6 @@ import { useState } from "react";
 import { FaKeyboard } from "react-icons/fa";
 import { BiChat } from "react-icons/bi";
 import Description from "../Description";
-import ChatBox from "../Chatbox";
 
 export default function QuestionSection() {
   const [selectedText, setSelectedText] = useState("Description");
@@ -28,12 +27,12 @@ export default function QuestionSection() {
           onClick={() => setSelectedText("ChatBox")}
         >
           <BiChat style={{marginRight: '5px'}}/>
-          Chat Box
+          Video 
         </BarText>
         
       </Bar>
       {selectedText === "Description" && <Description />}
-      {selectedText === "ChatBox" && <ChatBox />}
+      {/* {selectedText === "ChatBox" && <ChatBox />} */}
     </>
   );
 }

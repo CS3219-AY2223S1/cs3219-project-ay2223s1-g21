@@ -21,8 +21,8 @@ export const ContentContainer = styled.div`
 export const QuestionContainer = styled.div`
   flex: 1 1 1;
   height: 100%;
-  min-width: 20%;
-  max-width: 80%;
+  max-width: 70%;
+  min-width: 30%;
 `;
 
 export const MiddleSeparator = styled.div`
@@ -75,6 +75,6 @@ export const Item = styled.div`
 export const FooterContainer = styled.div`
   height: 10%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   align-items: center;
 `
