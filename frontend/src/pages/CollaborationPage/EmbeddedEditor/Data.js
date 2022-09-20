@@ -1,6 +1,6 @@
 export const Question = {
   title: "Find Duplicate File in System",
-  difficulty: "Medium",
+  difficulty: "Hard",
   instruction: `<p> Given a list <code>paths</code> of directory info, including the directory path, and all the files with contents 
   in this directory, return <i>all the duplicate files in the file system in terms of their paths.</i> You may return the answer in 
   <strong> any order </strong>. </p> <p> A group of duplicate files consists of at least two files that have the same content. </p> <p> A
@@ -12,12 +12,7 @@ export const Question = {
   examples: [{input:'paths = ["root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)","root 4.txt(efgh)"]', output: '[["root/a/2.txt","root/c/d/4.txt","root/4.txt"],["root/a/1.txt","root/c/3.txt"]]'}, 
   {input: `paths = ["root/a 1.txt(abcd) 2.txt(efgh)","root/c 3.txt(abcd)","root/c/d 4.txt(efgh)"]`, output: `[["root/a/2.txt","root/c/d/4.txt"],["root/a/1.txt","root/c/3.txt"]]`}],
   constraints: ["1 <= paths.length <= 2 * 104", "1 <= paths[i].length <= 3000", "1 <= sum(paths[i].length) <= 5 * 105", `paths[i] consist of English letters, digits, '/', '.', '(', ')', and ' '.`, `You may assume no files or directories share the same name in the same directory.`, `You may assume each given directory info represents a unique directory. A single blank space separates the directory path and file info.`],
-  java: 
-  `class Solution {
-  public List<List<String>> findDuplicate(String[] paths) {
-          
-  }
-}`,
+  java: "class Solution {\npublic List<List<String>> findDuplicate(String[] paths) {\n}\n}",
   javascript: 
   `var findDuplicate = function(paths) {
     

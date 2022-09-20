@@ -14,6 +14,9 @@ import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
 import { useRef } from "react";
 import { useEffect } from "react";
+import {Widget} from 'react-chat-widget';
+import 'react-chat-widget/lib/styles.css';
+import "./chat.css";
 
 export default function CollaborationPage() {
   const separatorRef = useRef(null);
@@ -75,10 +78,17 @@ export default function CollaborationPage() {
         <Button
           variant="outlined"
           color="error"
-          style={{ marginRight: "30px" }}
+          style={{ marginLeft: "30px" }}
         >
           Exit Session
         </Button>
+        <Widget
+          // handleNewUserMessage={this.handleNewUserMessage}
+          // handleQuickButtonClicked={this.handleQuickButtonClicked}
+          // profileAvatar={'text'}
+          // title="Chat"
+          subtitle="Chat here"
+        />
       </FooterContainer>
     </PgContainer>
   );
