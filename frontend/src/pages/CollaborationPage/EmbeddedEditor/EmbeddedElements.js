@@ -3,7 +3,9 @@ import styled from "styled-components";
 
 export const EditorContainer = styled.div`
   height: 100%;
-  width: 50%;
+  flex: 1 1 1;
+  max-width: 80%;
+  min-width: 20%;
 `;
 
 export const Bar = styled.div`

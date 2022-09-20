@@ -51,3 +51,15 @@ export const Constraint = styled.li`
   color: #dbdbdb;
   font-size: 13px;
 `;
+
+export const Difficulty = styled.div`
+  font-size: 13px;
+  font-weight: 500;
+  margin-right: 15px;
+  color: ${({ difficulty }) =>
+    difficulty === "Medium"
+      ? "rgb(239, 108, 0)"
+      : difficulty === "Easy"
+      ? "rgb(67, 160, 71)"
+      : "rgb(233, 30, 99)"};
+`;

@@ -4,16 +4,17 @@ import {
   Instruction,
   ExampleTitle,
   Example,
-  Constraint
+  Constraint,
+  Difficulty
 } from "./DescriptionElements";
-import InnerHtmlAdder from "../../components/InnerHtmlAdder";
-import { Question } from "./Data.js";
+import InnerHtmlAdder from "../../../components/InnerHtmlAdder";
+import { Question } from "../EmbeddedEditor/Data.js";
 import "./markup.css";
 
 export default function Description() {
   return (
     <Container>
-      <Title>{Question.title}</Title>
+      <Title>{Question.title} <Difficulty difficulty={Question.difficulty}> {Question.difficulty} </Difficulty></Title>
       <Instruction>
         <InnerHtmlAdder innerHtml={Question.instruction} />
       </Instruction>

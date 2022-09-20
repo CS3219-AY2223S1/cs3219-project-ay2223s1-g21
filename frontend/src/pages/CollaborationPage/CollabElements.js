@@ -19,12 +19,14 @@ export const ContentContainer = styled.div`
 `;
 
 export const QuestionContainer = styled.div`
-  width: 55%;
+  flex: 1 1 1;
   height: 100%;
+  min-width: 20%;
+  max-width: 80%;
 `;
 
 export const MiddleSeparator = styled.div`
-  width: 20px;
+  width: 3%;
   height: 100%;
   cursor: col-resize;
 `;

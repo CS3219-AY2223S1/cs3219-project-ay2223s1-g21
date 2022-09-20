@@ -1,4 +1,4 @@
-export default function Submissions() {
+export default function ChatBox() {
     return (
         <>
         </>
