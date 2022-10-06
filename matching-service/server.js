@@ -1,66 +1,68 @@
-const { config } = require('dotenv');
-const express = require('express')
-const cors = require('cors');
-const mongoose = require('mongoose')
+const { config } = require("dotenv");
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
 const app = express();
 
 config();
-app.use(express.urlencoded({ extended: true }))
-app.use(express.json())
-const fns = require('./controllers/MatchingController');
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+const fns = require("./controllers/MatchingController");
 
-const PORT = process.env.PORT || 3000; 
+const PORT = process.env.PORT || 3000;
 
-app.use(cors())
-app.options('*', cors())
+app.use(cors());
+app.options("*", cors());
 
 const server = app.listen(PORT, function () {
-    try {
-        mongoose.connect('mongodb://localhost:27017/match-mongodb');
-        console.log('Connected to MongoDB');
-        console.log(`Match microservice listening on port ${PORT}`);
-        console.log(`http://localhost:${PORT}`);
-    } catch (err) {
-        console.log(err)
-    }
+  try {
+    mongoose.connect("mongodb://localhost:27017/match-mongodb");
+    console.log("Connected to MongoDB");
+    console.log(`Match microservice listening on port ${PORT}`);
+    console.log(`http://localhost:${PORT}`);
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-const io = require('socket.io')(server, {cors: {origin: "*"}})
+const io = require("socket.io")(server, { cors: { origin: "*" } });
 
-io.on('connection', function (socket) {
-    console.log("User connected: " + socket.id);
-    io.emit('connectionSuccess', "welcome to the backend");
+io.on("connection", function (socket) {
+  console.log("User connected: " + socket.id);
+  io.emit("connectionSuccess", "welcome to the backend");
 
-    socket.on('checkHealth', () => {
-        console.log('Health is ok')
-        socket.emit('healthStatus', fns.serviceHealthCheck())
-    });
+  socket.on("checkHealth", () => {
+    socket.emit("healthStatus", fns.serviceHealthCheck());
+  });
 
-    //listens to 'findMatch' event, emits 'matchSuccess' or 'matchFailed' event
-    socket.on('findMatch', async (data) => { 
-                //data = JSON.parse(data)
-                console.log(data.email)
-                console.log(data.difficulty)
-                console.log(data.jwtToken)
-                console.log(data.userId)
-                
-                try {
-                    await fns.searchMatch(socket, io, data.email, data.difficulty, data.jwtToken, data.userId);
-                } catch(error) {
-                    console.error('server err', error);
-                }
-            }
-    ); 
+  socket.on("findMatch", async (data) => {
+    console.log("Find Match");
+    try {
+      await fns.searchMatch(
+        socket,
+        io,
+        data.email,
+        data.difficulty,
+        data.jwtToken,
+        data.userId
+      );
+    } catch (error) {
+      console.error("server err", error);
+    }
+  });
 
-    socket.on('leaveRoom', async (data) => {
-        console.log(data.email)
-        console.log(data.jwtToken)
-        console.log(data.id)
-
-        try {
-            await fns.endInterview(socket, io, data.email, data.jwtToken, data.id);
-        } catch(error) {
-            console.error('server err', error);
-        }
-    })
+  socket.on("cancelMatch", async (data) => {
+    console.log("Cancel Match");
+    try {
+      await fns.cancelMatch(
+        socket,
+        data.email,
+        data.difficulty,
+        data.jwtToken,
+        data.userId
+      );
+    } catch (error) {
+      console.error("server err", error);
+    }
+  });
 });
