@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Upgrade NPM
         run: npm install -g npm
+      - name: Install modules
+        run: yarn
       - uses: actions/checkout@v1
       - uses: stefanoeb/eslint-action@1.0.2
       
