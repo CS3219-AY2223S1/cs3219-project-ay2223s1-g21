@@ -3,7 +3,15 @@ export const progressTextBox = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  width: "250px"
+  width: "250px",
+};
+
+export const timeOutBox = {
+  position: "absolute",
+  display: "block",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "250px",
 };
 
 export const contentBox = {

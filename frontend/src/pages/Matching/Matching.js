@@ -3,57 +3,124 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useEffect } from "react";
 import Page from "../layout/Page";
-import { contentBox, progressBox, progressTextBox } from "./styles";
-import { Button } from "@mui/material";
-import io from 'socket.io-client';
-import { useSelector } from "react-redux";
+import { contentBox, progressBox, progressTextBox, timeOutBox } from "./styles";
+import io from "socket.io-client";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { setRoomId } from "../../redux/actions/matching";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
-  const [progress, setProgress] = useState(30);
+  const dispatch = useDispatch();
+  const [cancelTimer, setCancelTimer] = useState(5);
+  const [matchTimer, setmatchTimer] = useState(10);
   const [isTimeout, setTimeOut] = useState(false);
-  const [socket , setSocket] = useState(null);
-  const [isConnected , setIsConnect] = useState(false);
-  const { userId, userEmail , jwtToken} = useSelector((state) => state.authReducer);
-  const { difficulty} = useSelector((state) => state.matchingReducer);
+  const [feedbackMessage, setFeedbackMessage] = useState("No match found");
+  const [socket, setSocket] = useState(null);
+  const [isConnected, setIsConnect] = useState(false);
+  const { userId, userEmail, jwtToken } = useSelector(
+    (state) => state.authReducer
+  );
+  const { difficulty } = useSelector((state) => state.matchingReducer);
 
   useEffect(() => {
-    const socket = io(`http://localhost:${process.env.REACT_APP_MATCHING_PORT}`)
+    const socket = io(
+      `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
+    );
     setSocket(socket);
-    return () => { socket.close()};
+    return () => {
+      console.log("Disconnect Socket");
+      socket.close();
+    };
   }, [setSocket]);
 
   useEffect(() => {
-    if(socket) {
+    if (socket) {
       socket.emit("connection");
       socket.on("connectionSuccess", (message) => {
         setIsConnect(true);
-      })
+        const timer = setInterval(() => {
+          setCancelTimer((prevProgress) =>
+            prevProgress > 0 ? prevProgress - 1 : 0
+          );
+        }, 1000);
+        return () => {
+          clearInterval(timer);
+        };
+      });
     }
-  }, [socket])
+  }, [socket]);
 
   useEffect(() => {
-    if(isConnected) {
-      socket.emit("findMatch", {email: userEmail, difficulty: difficulty, jwtToken: jwtToken, userId: userId})
+    if (isConnected && !cancelTimer) {
+      socket.emit("findMatch", {
+        email: userEmail,
+        difficulty: difficulty,
+        jwtToken: jwtToken,
+        userId: userId,
+      });
+
+      socket.on("unauthorized", (res) => {
+        navigate("/login");
+      });
 
       socket.on("matchSuccess", (res) => {
-        const {interviewId} = res.data
-        window.location.href = `/room/${interviewId}`;
-      })
-      
-      socket.on("matchFailed", (res) => {
-        console.log("Failure to find a match");
-        setTimeOut(true)
+        const { interviewId } = res.data;
+        console.log("Match Found");
+        dispatch(setRoomId(interviewId));
+        navigate(`/collab`);
       });
+
+      socket.on("badRequest", (res) => {
+        console.log("BAD REQUEST", res);
+        setFeedbackMessage(res.message);
+        setTimeOut(true);
+      });
+
       const timer = setInterval(() => {
-        setProgress((prevProgress) => (prevProgress > 0 ? prevProgress - 1 : 0));
+        setmatchTimer((prevProgress) =>
+          prevProgress > 0 ? prevProgress - 1 : 0
+        );
       }, 1000);
+
       return () => {
         clearInterval(timer);
       };
     }
-  }, [isConnected, difficulty, jwtToken, socket, userEmail, userId])
+  }, [
+    isConnected,
+    cancelTimer,
+    difficulty,
+    jwtToken,
+    socket,
+    userEmail,
+    userId,
+  ]);
+
+  useEffect(() => {
+    if (!matchTimer) {
+      socket.emit("cancelMatch", {
+        email: userEmail,
+        difficulty: difficulty,
+        jwtToken: jwtToken,
+        userId: userId,
+      });
+      setTimeOut(true);
+    }
+  }, [matchTimer]);
+
+  const returnHomeButton = (text) => (
+    <Button
+      variant="contained"
+      disableElevation
+      onClick={() => {
+        navigate("/home");
+      }}
+    >
+      {text}
+    </Button>
+  );
 
   const loadingScreen = (
     <Box sx={contentBox}>
@@ -70,39 +137,51 @@ export default function MatchingPage() {
           thickness={2}
         />
         <Box sx={progressTextBox}>
-          <Typography variant={isConnected ? "h2" : "h4"} component="div" color="text.secondary">
-            {isConnected ? `${progress}` : "Connecting to the server" }
+          <Typography
+            variant={isConnected ? "h2" : "h4"}
+            component="div"
+            color="white"
+          >
+            {isConnected
+              ? cancelTimer
+                ? `${cancelTimer}`
+                : `${matchTimer}`
+              : "Connecting to the server"}
           </Typography>
         </Box>
       </Box>
-      <Box
-        sx={{
-          position: "relative",
-          paddingTop: "10%",
-        }}
-      >
-        <Typography variant="h6" color="text.secondary">
-          {isConnected ? "Finding a match , please wait" : ""}
-        </Typography>
-      </Box>
+
+      {isConnected ? (
+        cancelTimer ? (
+          returnHomeButton("Cancel match")
+        ) : (
+          <Box
+            sx={{
+              position: "relative",
+              paddingTop: "10%",
+            }}
+          >
+            <Typography variant="h6" color="white">
+              {"Finding a match , please wait"}
+            </Typography>
+          </Box>
+        )
+      ) : (
+        <></>
+      )}
     </Box>
   );
 
   const timeOutScreen = (
-    <Box sx={contentBox}>
-      <Typography variant="h6" sx={{ textAlign: "center" }} color="white">
-        {"Unfortunately , no match has been found"}
-      </Typography>
-      <Button
-        variant="contained"
-        sx={{ margin: "auto" }}
-        disableElevation
-        onClick={() => {
-          navigate("/home");
-        }}
+    <Box sx={timeOutBox}>
+      <Typography
+        variant="h6"
+        sx={{ textAlign: "center", width: "250px" }}
+        color="white"
       >
-        return to home screen
-      </Button>
+        {feedbackMessage}
+      </Typography>
+      {returnHomeButton("Return to home")}
     </Box>
   );
 
@@ -113,3 +192,16 @@ export default function MatchingPage() {
     </Page>
   );
 }
+
+export const Button = styled.button`
+  padding: 10px 30px;
+  cursor: pointer;
+  display: block;
+  margin: auto;
+  background: linear-gradient(to bottom, #00ffff 0%, #0099cc 65%);
+  border: 0;
+  outline: none;
+  border-radius: 30px;
+  color: #fff;
+  transform: translateY(3rem);
+`;
