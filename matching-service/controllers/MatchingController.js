@@ -9,7 +9,7 @@ const mongoErrMsgs = require('../utilities/errors/MongoError');
 const authJwt = require('../utilities/auth/authJwt');
 
 function serviceHealthCheck() {
-    var res = { 
+    var res = {
         status: responseStatus.SUCCESS, 
         data: {
             message: logMsgs.SERVICE_HEALTHY
