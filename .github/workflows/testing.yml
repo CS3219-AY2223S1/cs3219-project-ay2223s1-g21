@@ -33,4 +33,3 @@ jobs:
           EMAIL_SERVICE: ${{ secrets.EMAIL_SERVICE }}
           EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-          DISABLE_ERRORS: true
