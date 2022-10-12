@@ -23,6 +23,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build --if-present
+      - name: Npm install in the subdirectory
+        run: npm install --save-dev @babel/register
       - name: Create .env file for testing workflow
         run: echo "${{secrets.dev }}" > ./user-service/.env
       - run: npm test --prefix ./user-service
