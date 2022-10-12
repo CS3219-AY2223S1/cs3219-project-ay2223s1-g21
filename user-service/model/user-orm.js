@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 
-import { createUser, userExistsByEmail, deleteUser, updatePassword, getUserByEmail, getUserById, userExistsById } from './user-repository.js';
+import { createUser, userExistsByEmail, deleteUser, updatePassword, getUserByEmail, getUserById, userExistsById, getHistory, updateHistory } from './user-repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreateUser(email, password) {
@@ -70,6 +70,24 @@ export async function ormUserExistsById(id) {
         return await userExistsById(id);
     } catch (err) {
         console.log('ERROR: Could not check if user exists by id');
+        throw err;
+    }
+}
+
+export async function ormGetHistory(id) {
+    try {
+        return await getHistory(id);
+    } catch (err) {
+        console.log('ERROR: Could not get user history');
+        throw err;
+    }
+}
+
+export async function ormUpdateHistory(id, history) {
+    try {
+        await updateHistory(id, history);
+    } catch (err) {
+        console.log('ERROR: Could not update user history');
         throw err;
     }
 }
