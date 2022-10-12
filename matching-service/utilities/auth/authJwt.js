@@ -4,13 +4,13 @@ const { TokenExpiredError } = jwt;
 
 const catchError = (err, socket) => {
   var res = {
-    status: responseStatus.BAD_REQUEST,
+    status: responseStatus.UNAUTHORIZED,
     message: "Unauthorized!",
   };
 
   if (err instanceof TokenExpiredError) {
     res = {
-      status: responseStatus.BAD_REQUEST,
+      status: responseStatus.UNAUTHORIZED,
       message: "Unauthorized! Access Token was expired!",
     };
     console.log("Unauthorized! Access Token was expired!");
@@ -36,7 +36,7 @@ function verifyToken(token, id, socket) {
 
     if (id != decoded.id) {
       var res = {
-        status: responseStatus.BAD_REQUEST,
+        status: responseStatus.UNAUTHORIZED,
         message: "Unauthorized!",
       };
       console.log("Invalid token! Unauthorized!");
