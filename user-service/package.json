@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon index.js",
     "start": "node index.js",
-    "test": "mocha --require babel-register tests/test.js --jobs 1 --timeout 100000 --exit"
+    "test": "mocha --require babel-register tests/test.js --jobs 1 --timeout 10000 --exit"
   },
   "keywords": [],
   "author": "",

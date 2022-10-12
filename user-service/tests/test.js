@@ -16,6 +16,10 @@ beforeEach(async() => {
     mongoose.connect(mongoServer.getUri(), { useNewUrlParser: true, useUnifiedTopology: true })
 });
 
+afterEach(async() => {
+    mongoose.disconnect;
+});
+
 //Tear down in memory db
 after(async function () {
     const collections = await mongoose.connection.db.collections()

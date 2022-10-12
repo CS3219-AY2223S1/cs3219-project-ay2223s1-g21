@@ -21,6 +21,10 @@ jobs:
       - run: npm run build --if-present
       - name: Install in the subdirectory
         run: npm run postinstall
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: [6.0]
       - run: npm test --prefix ./user-service
         env: 
           DB_LOCAL_URI: ${{ secrets.DB_LOCAL_URI }}
