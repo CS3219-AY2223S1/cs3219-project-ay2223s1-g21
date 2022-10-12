@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "postinstall": "cd user-service && npm install"
+  },
   "dependencies": {
     "express": "^4.18.1",
     "nodemon": "^2.0.19",
