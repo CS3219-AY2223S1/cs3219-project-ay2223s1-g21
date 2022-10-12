@@ -57,7 +57,7 @@ export default function EmbeddedEditor({editorRef}) {
           }}
           anchorEl={anchorElLang}
           open={openLang}
-          onClose={() => handleCloseLang("javascript")}
+          onClose={() => handleCloseLang(curMode)}
           TransitionComponent={Fade}
         >
           <MenuItem onClick={() => handleCloseLang("javascript")}>javascript</MenuItem>
@@ -72,7 +72,7 @@ export default function EmbeddedEditor({editorRef}) {
           }}
           anchorEl={anchorElTheme}
           open={openTheme}
-          onClose={() => handleCloseTheme("tomorrow_night")}
+          onClose={() => handleCloseTheme(curTheme)}
           TransitionComponent={Fade}
         > 
           <MenuItem onClick={() => handleCloseTheme("twilight")}>twilight</MenuItem>

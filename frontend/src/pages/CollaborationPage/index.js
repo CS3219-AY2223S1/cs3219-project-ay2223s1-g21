@@ -27,18 +27,21 @@ export default function CollaborationPage() {
     
     const resizableEditorEle = embeddedEditorRef.current;
     const resizerEle = separatorRef.current;
+    const questionEle = questionRef.current;
     const editorEleStyles = window.getComputedStyle(resizableEditorEle);
+    let qWidth = parseInt(window.getComputedStyle(questionEle).width, 10);
     let width = parseInt(editorEleStyles.width, 10);
     let x = 0;
 
     // Right resize
     const onMouseMoveRightResize = (event) => {
       event.preventDefault();
-      const dx = x - event.clientX;
-      x = event.clientX;
+      const dx = 1.5 * (x - event.clientX);
       width = width + dx;
-   
+      qWidth = qWidth - dx;
+      questionEle.style.width = `${qWidth}px`;
       resizableEditorEle.style.width = `${width}px`;
+      x = event.clientX;
     };
 
     const onMouseUpRightResize = (event) => {

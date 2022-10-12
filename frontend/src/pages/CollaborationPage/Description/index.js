@@ -21,13 +21,13 @@ export default function Description() {
 
       {Question.examples.map((example, i) => {
         return (
-          <>
+          <div key={i}>
             <ExampleTitle>Example {i + 1}</ExampleTitle>
             <Example>
               <strong>Input:</strong> {example.input} <br />
               <strong>Output:</strong> {example.output}
             </Example>
-          </>
+          </div>
         );
       })}
       <ExampleTitle>Constraints:</ExampleTitle>
