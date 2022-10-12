@@ -40,3 +40,15 @@ export async function deleteUser(id) {
 export async function updatePassword(id, newPassword) {
     await UserModel.updateOne({ _id: id }, {password: newPassword});
 }
+
+export async function getHistory(id) {
+    let user = await UserModel.findOne({ _id: id });
+    return user.history;
+}
+
+export async function updateHistory(id, history) {
+    let user = await UserModel.findOne({ _id: id });
+    let hist = user.history;
+    hist.push(history);
+    await UserModel.updateOne({ _id: id }, {history: hist});
+}

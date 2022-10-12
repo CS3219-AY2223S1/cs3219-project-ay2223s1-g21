@@ -11,6 +11,9 @@ let UserModelSchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    history: {
+        type: Array,
     }
 })
 
