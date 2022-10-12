@@ -1,7 +1,17 @@
 {
+  "scripts": {
+    "postinstall": "cd user-service && npm install"
+  },
   "dependencies": {
     "express": "^4.18.1",
     "nodemon": "^2.0.19",
     "socket.io": "^4.5.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.24.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.31.8"
   }
 }

@@ -6,7 +6,7 @@ import app from "../index.js";
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-// Configure chai
+// Configure chai.
 chai.use(chaiHttp);
 chai.should();
 
@@ -14,6 +14,10 @@ chai.should();
 beforeEach(async() => {     
     const mongoServer = await MongoMemoryServer.create({ instance: { storageEngine: 'wiredTiger'} });
     mongoose.connect(mongoServer.getUri(), { useNewUrlParser: true, useUnifiedTopology: true })
+});
+
+afterEach(async() => {
+    mongoose.disconnect;
 });
 
 //Tear down in memory db
