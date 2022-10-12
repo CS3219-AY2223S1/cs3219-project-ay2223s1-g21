@@ -6,7 +6,7 @@ import app from "../index.js";
 import mongoose from 'mongoose';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
-// Configure chai
+// Configure chai.
 chai.use(chaiHttp);
 chai.should();
 
