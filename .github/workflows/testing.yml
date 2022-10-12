@@ -23,4 +23,13 @@ jobs:
         run: npm run postinstall
       - run: npm test --prefix ./user-service
         env: 
-          super_secret: ${{ secrets.dev }}
+          DB_LOCAL_URI: ${{ secrets.dev.DB_LOCAL_URI }}
+          ENV: ${{ secrets.dev.ENV }}
+          PORT: ${{ secrets.dev.PORT }}
+          COOKIE_SECRET: ${{ secrets.dev.COOKIE_SECRET }}
+          SECRET_AUTH_KEY: ${{ secrets.dev.SECRET_AUTH_KEY }}
+          SALT_ROUNDS: ${{ secrets.dev.SALT_ROUNDS }}
+          CLIENT_DOMAIN: ${{ secrets.dev.CLIENT_DOMAIN }}
+          EMAIL_SERVICE: ${{ secrets.dev.EMAIL_SERVICE }}
+          EMAIL_USERNAME: ${{ secrets.dev.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.dev.EMAIL_PASSWORD }}
