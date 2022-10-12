@@ -22,5 +22,5 @@ jobs:
       - name: Install in the subdirectory
         run: npm run postinstall
       - name: Create .env file for testing workflow
-        run: echo "${{secrets.dev }}" > ./user-service/.env
+        run: echo "${{secrets.dev}}" > ./user-service/.env
       - run: npm test --prefix ./user-service
