@@ -7,6 +7,7 @@ const requestHelpers = require("../utilities/helpers/HelperFunctions");
 const clientErrMsgs = require("../utilities/errors/ClientError");
 const mongoErrMsgs = require("../utilities/errors/MongoError");
 const authJwt = require("../utilities/auth/authJwt");
+const moment = require("moment");
 
 function serviceHealthCheck() {
   var res = {
@@ -42,7 +43,10 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   // Check if this user has already request pending
   // Mongo Timing of the Delete Operation is every 60 secs
   const dupRequest = await Match.findOne({ email: email });
-  if (dupRequest && Date.now - dupRequest.timeCreated <= 30) {
+  if (
+    dupRequest &&
+    moment().subtract(moment(dupRequest.timeCreated), "seconds") < 30
+  ) {
     var res = {
       status: responseStatus.BAD_REQUEST,
       message: clientErrMsgs.DUPLICATED_REQUEST_ERR,
