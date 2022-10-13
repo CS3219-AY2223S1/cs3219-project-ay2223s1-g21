@@ -17,6 +17,7 @@ import { useEffect } from "react";
 import {Widget} from 'react-chat-widget';
 import 'react-chat-widget/lib/styles.css';
 import "./chat.css";
+import { fetchQuestion } from "../../services/user_service";
 
 export default function CollaborationPage() {
   const separatorRef = useRef(null);
@@ -24,7 +25,11 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
 
   useEffect(() => {
-    
+    // question fetch
+    fetchQuestion.then(res => )
+
+
+    // draggable event listeners
     const resizableEditorEle = embeddedEditorRef.current;
     const resizerEle = separatorRef.current;
     const questionEle = questionRef.current;
