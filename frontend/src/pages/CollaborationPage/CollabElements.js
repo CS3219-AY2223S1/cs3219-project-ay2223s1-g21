@@ -22,13 +22,15 @@ export const QuestionContainer = styled.div`
   flex: 1 1 1;
   height: 100%;
   max-width: 70%;
+  width: 50%;
   min-width: 30%;
 `;
 
 export const MiddleSeparator = styled.div`
-  width: 3%;
+  width: 2%;
   height: 100%;
   cursor: col-resize;
+  margin: 0px 15px 0px 15px;
 `;
 
 export const HeaderContainer = styled.div`

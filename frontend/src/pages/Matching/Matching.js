@@ -41,6 +41,7 @@ export default function MatchingPage() {
         const {interviewId} = res.data
         window.location.href = `/room/${interviewId}`;
       })
+      
       socket.on("matchFailed", (res) => {
         console.log("Failure to find a match");
         setTimeOut(true)

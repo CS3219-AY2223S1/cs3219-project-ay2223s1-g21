@@ -4,4 +4,12 @@ export const UPDATE_JWT_TOKEN = "UPDATE_JWT_TOKEN";
 export const UPDATE_USER_ID = "UPDATE_USER_ID";
 export const UPDATE_USER_EMAIL = "UPDATE_USER_EMAIL";
 export const LOG_OUT_ACCOUNT = "LOG_OUT_ACCOUNT";
-export const UPDATE_DIFFICULTY = "UPDATE_DIFFICULTY"
+
+
+// matching
+export const UPDATE_DIFFICULTY = "UPDATE_DIFFICULTY";
+
+// collab
+export const UPDATE_QUESTION = "UPDATE_QUESTION";
+
+
