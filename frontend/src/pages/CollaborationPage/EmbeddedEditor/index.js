@@ -5,10 +5,10 @@ import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/mode-python";
 // themes
 import "ace-builds/src-noconflict/theme-monokai";
-import 'ace-builds/src-noconflict/theme-tomorrow_night';
-import 'ace-builds/src-noconflict/theme-twilight';
-import 'ace-builds/src-noconflict/theme-solarized_dark';
-import 'ace-builds/src-noconflict/theme-terminal';
+import "ace-builds/src-noconflict/theme-tomorrow_night";
+import "ace-builds/src-noconflict/theme-twilight";
+import "ace-builds/src-noconflict/theme-solarized_dark";
+import "ace-builds/src-noconflict/theme-terminal";
 // this is an optional import just improved the interaction.
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
@@ -18,14 +18,16 @@ import { Bar, EditorContainer, BarItem } from "./EmbeddedElements";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
-import { Question } from "./Data";
+// import { question } from "../Description/Data";
+import { useSelector } from "react-redux";
 
-export default function EmbeddedEditor({editorRef}) {
+export default function EmbeddedEditor({ editorRef }) {
+  const { question } = useSelector((state) => state.collabReducer);
   const [code, setCode] = useState(`console.log("Hello World!");`);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
-  const [curMode, setCurMode] = useState("javascript")
+  const [curMode, setCurMode] = useState("javascript");
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
   const handleLangSelect = (event) => {
@@ -34,7 +36,9 @@ export default function EmbeddedEditor({editorRef}) {
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
     setCurMode(lang);
-    setCode(Question[lang])
+    if (question[lang]) {
+      setCode(question[lang]);
+    }
   };
 
   const handleThemeSelect = (event) => {
@@ -44,7 +48,6 @@ export default function EmbeddedEditor({editorRef}) {
     setAnchorElTheme(null);
     setCurTheme(theme);
   };
-
 
   return (
     <EditorContainer ref={editorRef}>
@@ -60,11 +63,16 @@ export default function EmbeddedEditor({editorRef}) {
           onClose={() => handleCloseLang(curMode)}
           TransitionComponent={Fade}
         >
-          <MenuItem onClick={() => handleCloseLang("javascript")}>javascript</MenuItem>
+          <MenuItem onClick={() => handleCloseLang("javascript")}>
+            javascript
+          </MenuItem>
           <MenuItem onClick={() => handleCloseLang("java")}>java</MenuItem>
           <MenuItem onClick={() => handleCloseLang("python")}>python</MenuItem>
         </Menu>
-        <BarItem onClick={handleThemeSelect}> {processTheme(curTheme)} </BarItem>
+        <BarItem onClick={handleThemeSelect}>
+          {" "}
+          {processTheme(curTheme)}{" "}
+        </BarItem>
         <Menu
           id="fade-menu"
           MenuListProps={{
@@ -74,14 +82,23 @@ export default function EmbeddedEditor({editorRef}) {
           open={openTheme}
           onClose={() => handleCloseTheme(curTheme)}
           TransitionComponent={Fade}
-        > 
-          <MenuItem onClick={() => handleCloseTheme("twilight")}>twilight</MenuItem>
-          <MenuItem onClick={() => handleCloseTheme("monokai")}>monokai</MenuItem>
-          <MenuItem onClick={() => handleCloseTheme("tomorrow_night")}>tomorrow</MenuItem>
-          <MenuItem onClick={() => handleCloseTheme("solarized_dark")}>solarized</MenuItem>
-          <MenuItem onClick={() => handleCloseTheme("terminal")}>terminal</MenuItem>
+        >
+          <MenuItem onClick={() => handleCloseTheme("twilight")}>
+            twilight
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("monokai")}>
+            monokai
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("tomorrow_night")}>
+            tomorrow
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("solarized_dark")}>
+            solarized
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("terminal")}>
+            terminal
+          </MenuItem>
         </Menu>
-
       </Bar>
       <AceEditor
         style={{
@@ -116,6 +133,6 @@ function processTheme(theme) {
     return "solarized";
   } else if (theme === "tomorrow_night") {
     return "tomorrow";
-  } 
+  }
   return theme;
 }

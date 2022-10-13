@@ -14,20 +14,34 @@ import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
 import { useRef } from "react";
 import { useEffect } from "react";
-import {Widget} from 'react-chat-widget';
-import 'react-chat-widget/lib/styles.css';
+import { Widget } from "react-chat-widget";
+import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/user_service";
+import { setIsLoading } from "../../redux/actions/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { setQuestion } from "../../redux/actions/collab";
 
 export default function CollaborationPage() {
   const separatorRef = useRef(null);
   const questionRef = useRef(null);
   const embeddedEditorRef = useRef(null);
+  const dispatch = useDispatch();
+  const { difficulty } = useSelector((state) => state.matchingReducer);
 
   useEffect(() => {
     // question fetch
-    fetchQuestion.then(res => )
-
+    dispatch(setIsLoading(true));
+    fetchQuestion(difficulty)
+      .then((res) => {
+        console.log(res)
+        dispatch(setQuestion(res.data[0]));
+        dispatch(setIsLoading(false));
+      })
+      .catch((err) => {
+        console.log(err);
+        dispatch(setIsLoading(false));
+      });
 
     // draggable event listeners
     const resizableEditorEle = embeddedEditorRef.current;
@@ -60,12 +74,14 @@ export default function CollaborationPage() {
     };
 
     // Add mouse down event listener
-    
+
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
     return () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
     };
-  }, [])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <PgContainer>
@@ -83,11 +99,7 @@ export default function CollaborationPage() {
         <EmbeddedEditor editorRef={embeddedEditorRef} />
       </ContentContainer>
       <FooterContainer>
-        <Button
-          variant="outlined"
-          color="error"
-          style={{ marginLeft: "30px" }}
-        >
+        <Button variant="outlined" color="error" style={{ marginLeft: "30px" }}>
           Exit Session
         </Button>
         <Widget

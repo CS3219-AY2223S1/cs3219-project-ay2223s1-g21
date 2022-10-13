@@ -5,21 +5,29 @@ import {
   ExampleTitle,
   Example,
   Constraint,
-  Difficulty
+  Difficulty,
 } from "./DescriptionElements";
 import InnerHtmlAdder from "../../../components/InnerHtmlAdder";
-import { Question } from "../EmbeddedEditor/Data.js";
+// import { question } from "./Data.js";
+import { useSelector } from "react-redux";
 import "./markup.css";
 
 export default function Description() {
+  const { question } = useSelector((state) => state.collabReducer);
+
   return (
     <Container>
-      <Title>{Question.title} <Difficulty difficulty={Question.difficulty}> {Question.difficulty} </Difficulty></Title>
+      <Title>
+        {question.title}
+        <Difficulty difficulty={question?.difficulty && question.difficulty}>
+          {question?.difficulty && question.difficulty}
+        </Difficulty>
+      </Title>
       <Instruction>
-        <InnerHtmlAdder innerHtml={Question.instruction} />
+        <InnerHtmlAdder innerHtml={question.instruction} />
       </Instruction>
 
-      {Question.examples.map((example, i) => {
+      {question.examples.map((example, i) => {
         return (
           <div key={i}>
             <ExampleTitle>Example {i + 1}</ExampleTitle>
@@ -31,8 +39,12 @@ export default function Description() {
         );
       })}
       <ExampleTitle>Constraints:</ExampleTitle>
-      {Question.constraints.map((constraint, i) => {
-        return <Constraint> <InnerHtmlAdder innerHtml={constraint} /></Constraint>
+      {question.constraints.map((constraint, i) => {
+        return (
+          <Constraint>
+            <InnerHtmlAdder innerHtml={constraint} />
+          </Constraint>
+        );
       })}
     </Container>
   );
