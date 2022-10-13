@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
 
-import { createUser, login, logout, deleteUser, changePassword, refreshToken, requestPasswordReset, resetPassword } from './controller/user-controller.js';
+import { createUser, login, logout, deleteUser, changePassword, refreshToken, requestPasswordReset, resetPassword, getHistory, updateHistory } from './controller/user-controller.js';
 import { verifyToken } from './middleware/authJwt.js';
 
 const app = express();
@@ -35,6 +35,8 @@ router.put('/changepassword', [verifyToken], changePassword)
 router.get('/refreshtoken', refreshToken)
 router.post('/requestPasswordReset', requestPasswordReset)
 router.put('/resetPassword', resetPassword)
+router.get('/getHistory', [verifyToken], getHistory)
+router.put('/updateHistory', [verifyToken], updateHistory)
 
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json');

@@ -12,6 +12,10 @@ let QuestionModelSchema = new Schema({
         required: true,
         index: true,
     },
+    link: {
+        type: String,
+        required: true,
+    },
     instruction: {
         type: String,
         required: true,
