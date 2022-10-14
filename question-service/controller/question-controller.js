@@ -3,7 +3,7 @@ import CONSTANTS from "../util/constants.js";
 
 export async function getRandomQuestion(req, res) {
     try {
-        const { difficulty } = req.body;
+        const { difficulty } = req.query;
 
         if (!difficulty) {
             return res.status(400).json({message: 'difficulty is missing!'});

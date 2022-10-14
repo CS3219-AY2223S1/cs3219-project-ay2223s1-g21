@@ -6,6 +6,7 @@ export const EditorContainer = styled.div`
   flex: 1 1 1;
   max-width: 70%;
   min-width: 40%;
+  width: 50%;
 `;
 
 export const Bar = styled.div`

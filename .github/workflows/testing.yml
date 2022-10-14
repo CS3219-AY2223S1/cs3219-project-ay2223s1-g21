@@ -1,0 +1,40 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    name: build and test
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+        mongodb-version: ['6.0']
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: npm ci
+      - run: npm run build --if-present
+      - name: Install in the subdirectory
+        run: npm run postinstall
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.8.0
+        with:
+          mongodb-version: ${{ matrix.mongodb-version }}
+      - run: npm test --prefix ./user-service
+        env: 
+          DB_LOCAL_URI: ${{ secrets.DB_LOCAL_URI }}
+          ENV: ${{ secrets.ENV }}
+          PORT: ${{ secrets.PORT }}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
+          SECRET_AUTH_KEY: ${{ secrets.SECRET_AUTH_KEY }}
+          SALT_ROUNDS: ${{ secrets.SALT_ROUNDS }}
+          CLIENT_DOMAIN: ${{ secrets.CLIENT_DOMAIN }}
+          EMAIL_SERVICE: ${{ secrets.EMAIL_SERVICE }}
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}

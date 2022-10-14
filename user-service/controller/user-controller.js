@@ -8,7 +8,9 @@ import {
     ormGetUserByEmail as _getUserByEmail,
     ormGetUserById as _getUserById,
     ormUserExistsByEmail as _userExistsByEmail,
-    ormUserExistsById as _userExistsById } 
+    ormUserExistsById as _userExistsById,
+    ormGetHistory as _getHistory,
+    ormUpdateHistory as _updateHistory } 
     from '../model/user-orm.js'
 import { 
     ormCreateToken as _createToken, 
@@ -132,7 +134,7 @@ export async function deleteUser(req, res) {
         const { id } = req.body;
 
         if (id == null) {
-            return res.status(400).json({ message: "User does not exist!" });    
+            return res.status(400).json({ message: "id is missing" });    
         }
 
         await _deleteUser(id);
@@ -273,3 +275,53 @@ export async function resetPassword(req, res) {
         return res.status(500).json({ message: `Reset Password failed. Error: ${err}` });
     }
 };
+
+export async function getHistory(req, res) {
+    try {
+        const { id } = req.body;
+
+        if (id == null) {
+            return res.status(400).json({ message: "id is missing" });
+        }
+
+        //User does not exist
+        if (!await _userExistsById(id)) {
+            return res.status(404).json({ message: "User Not found!" });
+        }
+
+        let history = await _getHistory(id);
+        console.log("History retrived successfully!");
+        return res.status(200).json({ history: history, message: "History retrived successfully!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Get history failed. Error: ${err}` });
+    }
+}
+
+export async function updateHistory(req, res) {
+    try {
+        const { id, history } = req.body;
+
+        if (id == null || history == null) {
+            return res.status(400).json({ message: "id and/or history is missing" });
+        }
+
+        //User does not exist
+        if (!await _userExistsById(id)) {
+            return res.status(404).json({ message: "User Not found!" });
+        }
+
+        let hist = {
+            title: history.title,
+            difficulty: history.difficulty,
+            link: history.link,
+            time: new Date().toLocaleString()
+        }
+
+        await _updateHistory(id, hist);
+
+        console.log("History updated successfully!");
+        return res.status(200).json({ message: "History updated successfully!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Update history failed. Error: ${err}` });
+    }
+}
