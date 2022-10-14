@@ -14,13 +14,17 @@ import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
 import { useRef } from "react";
 import { useEffect } from "react";
-import { Widget } from "react-chat-widget";
+import { Widget, addResponseMessage } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/user_service";
 import { setIsLoading } from "../../redux/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestion } from "../../redux/actions/collab";
+import { setLogout } from "../../redux/actions/auth";
+import { handleLogoutAccount } from "../../services/user_service";
+import { useSyncedStore } from "@syncedstore/react";
+import { store } from "./store";
 
 export default function CollaborationPage() {
   const separatorRef = useRef(null);
@@ -28,13 +32,17 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const dispatch = useDispatch();
   const { difficulty } = useSelector((state) => state.matchingReducer);
+  const { userId } = useSelector((state) => state.authReducer);
 
   useEffect(() => {
+    // init syncedstore
+    state.collab.message = {}
+    
     // question fetch
     dispatch(setIsLoading(true));
     fetchQuestion(difficulty)
       .then((res) => {
-        console.log(res)
+        console.log(res);
         dispatch(setQuestion(res.data[0]));
         dispatch(setIsLoading(false));
       })
@@ -82,13 +90,30 @@ export default function CollaborationPage() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const state = useSyncedStore(store);
+  const handleLogout = () => {
+    handleLogoutAccount();
+    dispatch(setLogout());
+  };
+
+  useEffect(() => {
+    const msg = state.collab.message;
+    if (msg.id && msg.id !== userId) {
+      addResponseMessage(msg.text);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.collab.message]);
+
+  const handleNewUserMessage = (newMessage) => {
+    state.collab.message = {id: userId, text: newMessage};
+  };
 
   return (
     <PgContainer>
       <HeaderContainer>
         <Logo>PeerPrep</Logo>
         <MenuItems>
-          <Item>Logout</Item>
+          <Item onClick={handleLogout}>Logout</Item>
         </MenuItems>
       </HeaderContainer>
       <ContentContainer>
@@ -103,10 +128,7 @@ export default function CollaborationPage() {
           Exit Session
         </Button>
         <Widget
-          // handleNewUserMessage={this.handleNewUserMessage}
-          // handleQuickButtonClicked={this.handleQuickButtonClicked}
-          // profileAvatar={'text'}
-          // title="Chat"
+          handleNewUserMessage={handleNewUserMessage}
           subtitle="Chat here"
         />
       </FooterContainer>

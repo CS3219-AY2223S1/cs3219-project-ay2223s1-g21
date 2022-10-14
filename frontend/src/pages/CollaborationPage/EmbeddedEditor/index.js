@@ -13,23 +13,31 @@ import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
 import AceEditor from "react-ace";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Bar, EditorContainer, BarItem } from "./EmbeddedElements";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 // import { question } from "../Description/Data";
 import { useSelector } from "react-redux";
+import { useSyncedStore } from "@syncedstore/react";
+import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { question } = useSelector((state) => state.collabReducer);
-  const [code, setCode] = useState(`console.log("Hello World!");`);
+
+  const state = useSyncedStore(store);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
   const [curMode, setCurMode] = useState("javascript");
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
+  useEffect(() => {
+    state.collab["code"] = `console.log("Hello World!");`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
   };
@@ -37,7 +45,7 @@ export default function EmbeddedEditor({ editorRef }) {
     setAnchorElLang(null);
     setCurMode(lang);
     if (question[lang]) {
-      setCode(question[lang]);
+      state.collab["code"] = question[lang];
     }
   };
 
@@ -110,12 +118,12 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => setCode(currentCode)}
+        onChange={(currentCode) => state.collab["code"] = currentCode}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
         highlightActiveLine={true}
-        value={code}
+        value={state.collab.code}
         setOptions={{
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true,

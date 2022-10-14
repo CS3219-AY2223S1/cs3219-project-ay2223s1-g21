@@ -24,10 +24,10 @@ export default function QuestionSection() {
         <BarText
           curSelected={selectedText}
           text="ChatBox"
-          onClick={() => setSelectedText("ChatBox")}
+          onClick={() => setSelectedText("Result")}
         >
           <BiChat style={{marginRight: '5px'}}/>
-          Video 
+          Result 
         </BarText>
         
       </Bar>
