@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { Widget, addResponseMessage } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
-import { fetchQuestion } from "../../services/user_service";
+import { fetchQuestion } from "../../services/question_service";
 import { setIsLoading } from "../../redux/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import { setQuestion } from "../../redux/actions/collab";

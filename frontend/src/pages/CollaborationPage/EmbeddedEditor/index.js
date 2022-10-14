@@ -52,14 +52,20 @@ export default function EmbeddedEditor({ editorRef }) {
   const handleThemeSelect = (event) => {
     setAnchorElTheme(event.currentTarget);
   };
+  
   const handleCloseTheme = (theme) => {
     setAnchorElTheme(null);
     setCurTheme(theme);
   };
 
+  const submitCompileRequest = () => {
+    
+  }
+
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
+        <BarItem onClick={submitCompileRequest}> Compile </BarItem>
         <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
         <Menu
           id="fade-menu"
