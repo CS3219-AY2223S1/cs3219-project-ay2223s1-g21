@@ -1,4 +1,4 @@
-import { UPDATE_QUESTION } from "../actionTypes";
+import { UPDATE_EXECUTION_RESULT, UPDATE_IS_CODE_RUNNING, UPDATE_QUESTION, UPDATE_TAB } from "../actionTypes";
 
 const initialState = {
   question: {
@@ -8,6 +8,9 @@ const initialState = {
     examples: [],
     constraints: [],
   },
+  isCodeRunning: false,
+  selectedTab: 'Description',
+  codeResult: 'Press Run Code or Ctrl + Enter to run your code.'
 };
 
 export default function collabReducer(state = initialState, action) {
@@ -17,6 +20,24 @@ export default function collabReducer(state = initialState, action) {
         ...state,
         question: action.payload,
       };
+
+    case UPDATE_IS_CODE_RUNNING:
+      return {
+        ...state,
+        isCodeRunning: action.payload
+      }
+
+    case UPDATE_EXECUTION_RESULT:
+      return {
+        ...state,
+        codeResult: action.payload
+      }
+
+    case UPDATE_TAB:
+      return {
+        ...state,
+        selectedTab: action.payload
+      }
 
     default:
       return state;

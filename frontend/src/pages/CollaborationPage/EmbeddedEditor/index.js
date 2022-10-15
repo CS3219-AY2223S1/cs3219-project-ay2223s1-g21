@@ -13,30 +13,35 @@ import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
 import AceEditor from "react-ace";
-import { useEffect, useState } from "react";
-import { Bar, EditorContainer, BarItem } from "./EmbeddedElements";
+import { useState } from "react";
+import {
+  Bar,
+  EditorContainer,
+  BarItem,
+  RunCodeButton,
+} from "./EmbeddedElements";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 // import { question } from "../Description/Data";
-import { useSelector } from "react-redux";
-import { useSyncedStore } from "@syncedstore/react";
-import { store } from "../store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  requestCompilation,
+  getCompilationResult,
+} from "../../../services/compile_service";
+import { setCodeExecutionResult, setIsCodeRunning, setTab } from "../../../redux/actions/collab";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { question } = useSelector((state) => state.collabReducer);
-
-  const state = useSyncedStore(store);
+  const [code, setCode] = useState(`console.log("Hello World!");`);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
   const [curMode, setCurMode] = useState("javascript");
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
-  useEffect(() => {
-    state.collab["code"] = `console.log("Hello World!");`;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const dispatch = useDispatch();
+  const { isCodeRunning } = useSelector((state) => state.collabReducer);
 
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
@@ -44,28 +49,47 @@ export default function EmbeddedEditor({ editorRef }) {
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
     setCurMode(lang);
-    if (question[lang]) {
-      state.collab["code"] = question[lang];
-    }
+    setCode(question[lang]);
   };
 
   const handleThemeSelect = (event) => {
     setAnchorElTheme(event.currentTarget);
   };
-  
+
   const handleCloseTheme = (theme) => {
     setAnchorElTheme(null);
     setCurTheme(theme);
   };
 
-  const submitCompileRequest = () => {
-    
-  }
+  const submitCompileRequest = async (curMode, code) => {
+    if (!isCodeRunning) {
+      dispatch(setTab("Result"))
+      dispatch(setIsCodeRunning(true))
+      const responseUrl = await requestCompilation(
+        curMode.toUpperCase(),
+        code
+      ).then((res) => res.data.resultUrl).catch(err => {
+        dispatch(setCodeExecutionResult(err.message))
+        dispatch(setIsCodeRunning(false))  
+      });
+
+      getCompilationResult(responseUrl).then(res => {
+        dispatch(setCodeExecutionResult(res.data))
+        dispatch(setIsCodeRunning(false))
+      }).catch(err => {
+        dispatch(setCodeExecutionResult(err.message))
+        dispatch(setIsCodeRunning(false))  
+      });
+    }
+  };
 
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
-        <BarItem onClick={submitCompileRequest}> Compile </BarItem>
+        <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
+          {" "}
+          Run Code{" "}
+        </RunCodeButton>
         <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
         <Menu
           id="fade-menu"
@@ -124,12 +148,12 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => state.collab["code"] = currentCode}
+        onChange={(currentCode) => setCode(currentCode)}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
         highlightActiveLine={true}
-        value={state.collab.code}
+        value={code}
         setOptions={{
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true,

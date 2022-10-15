@@ -39,3 +39,25 @@ export const BarItem = styled.div`
     background-color: #272822;
   }
 `;
+
+export const RunCodeButton = styled.div`
+text-overflow: ellipsis;
+position: relative;
+background: #374850;
+flex: 1 1 140px;
+margin: 10px;
+display: flex;
+justify-content: center;
+border: 1px solid #374850;
+border-radius: 10px;
+align-items: center;
+color: #a08459;
+cursor: pointer;
+font-size: 15px;
+max-width: 100px;
+text-align: center;
+
+&:hover {
+  background-color: #272822;
+}
+`;
