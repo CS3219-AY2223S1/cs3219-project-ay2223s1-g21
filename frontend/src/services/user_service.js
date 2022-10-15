@@ -119,8 +119,3 @@ export const resetPasswordRequest = (userId, token, password) => {
   )
 }
 
-export const fetchQuestion = (difficulty) => {
-  return axios.get(
-    process.env.REACT_APP_QUESTION_SERVER_URL + "/question?difficulty=" + difficulty,
-  )
-}

@@ -2,12 +2,12 @@
     background-color: #20222a;
   }
   
-  .rcw-message > .rcw-response {
-    background-color: black;
+  .rcw-response .rcw-message-text {
+    background-color: #252525;
     color: white;
   }
   
   .rcw-client .rcw-message-text {
-    background-color: #282a31;
+    background-color: #523985;
     color: white;
   }
