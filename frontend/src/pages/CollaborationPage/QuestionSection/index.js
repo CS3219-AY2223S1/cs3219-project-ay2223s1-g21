@@ -1,6 +1,6 @@
 import { Bar, BarText } from "./QuestionSectionElements";
 import { FaKeyboard } from "react-icons/fa";
-import { BiChat } from "react-icons/bi";
+import { TbFileText } from "react-icons/tb";
 import Description from "../Description";
 import Result from "../Result/index.js";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +27,7 @@ export default function QuestionSection() {
           text="Result"
           onClick={() => dispatch(setTab("Result"))}
         >
-          <BiChat style={{ marginRight: "5px" }} />
+          <TbFileText style={{ marginRight: "5px" }} />
           Result
         </BarText>
       </Bar>

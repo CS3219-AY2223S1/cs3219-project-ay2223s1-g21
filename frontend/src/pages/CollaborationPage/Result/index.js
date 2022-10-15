@@ -5,14 +5,16 @@ import { useSelector } from "react-redux";
 import { Title } from "../Description/DescriptionElements";
 
 export default function Result() {
-  const { isCodeRunning,  codeResult } = useSelector((state) => state.collabReducer);
+  const { isCodeRunning, codeResult } = useSelector(
+    (state) => state.collabReducer
+  );
 
   return (
     <Container>
       {isCodeRunning ? (
         <>
           <h2>
-            <LinearProgress color="inherit" />
+            <LinearProgress />
           </h2>
           <div
             style={{
@@ -21,6 +23,7 @@ export default function Result() {
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              color: "grey.500",
             }}
           >
             <CircularProgress color="inherit" />
@@ -28,12 +31,17 @@ export default function Result() {
         </>
       ) : (
         <>
-        <Title>
-            Execution Result
-        </Title>
-        <div style={{width: '100%', height: '80%', whiteSpace: 'pre-wrap'}}>
+          <Title>Execution Result</Title>
+          <div
+            style={{
+              width: "100%",
+              height: "80%",
+              whiteSpace: "pre-wrap",
+              color: "#fff",
+            }}
+          >
             {codeResult}
-        </div>
+          </div>
         </>
       )}
     </Container>

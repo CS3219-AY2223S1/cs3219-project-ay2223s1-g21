@@ -49,7 +49,6 @@ const getResultUrl = async (status_update_url) => {
       const result = await axios
         .get(status_update_url, { headers: headers })
         .then((res) => {
-          console.log(res.data.result)
           return res.data.result.compile_status == "OK"
             ? (res.data.result.run_status.status == "AC" ? res.data.result.run_status.output : res.data.result.run_status.stderr)
             : res.data.result.compile_status == "Compiling..."

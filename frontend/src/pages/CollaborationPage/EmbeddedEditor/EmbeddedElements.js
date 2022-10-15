@@ -43,7 +43,7 @@ export const BarItem = styled.div`
 export const RunCodeButton = styled.div`
 text-overflow: ellipsis;
 position: relative;
-background: #374850;
+background: #273a40;
 flex: 1 1 140px;
 margin: 10px;
 display: flex;
@@ -51,7 +51,7 @@ justify-content: center;
 border: 1px solid #374850;
 border-radius: 10px;
 align-items: center;
-color: #a08459;
+color: #fff;
 cursor: pointer;
 font-size: 15px;
 max-width: 100px;

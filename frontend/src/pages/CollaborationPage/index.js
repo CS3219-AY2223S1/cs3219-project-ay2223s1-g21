@@ -12,7 +12,7 @@ import {
 import EmbeddedEditor from "./EmbeddedEditor";
 import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useEffect } from "react";
 import { Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
@@ -20,9 +20,18 @@ import "./chat.css";
 import { fetchQuestion } from "../../services/question_service";
 import { setIsLoading } from "../../redux/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
-import { setQuestion } from "../../redux/actions/collab";
+import {
+  setQuestion,
+  setIsCodeRunning,
+  setTab,
+  setCodeExecutionResult,
+} from "../../redux/actions/collab";
 import { setLogout } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
+import {
+  getCompilationResult,
+  requestCompilation,
+} from "../../services/compile_service";
 
 export default function CollaborationPage() {
   const separatorRef = useRef(null);
@@ -30,9 +39,52 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const dispatch = useDispatch();
   const { difficulty } = useSelector((state) => state.matchingReducer);
+  const { curMode, code, isCodeRunning } = useSelector(
+    (state) => state.collabReducer
+  );
+
+  const submitCompileRequest = async (curMode, curCode) => {
+    if (!isCodeRunning) {
+      dispatch(setTab("Result"));
+      dispatch(setIsCodeRunning(true));
+      requestCompilation(curMode.toUpperCase(), curCode)
+        .then((res) => {
+          getCompilationResult(res.data.resultUrl)
+            .then((res) => {
+              dispatch(setCodeExecutionResult(res.data));
+              dispatch(setIsCodeRunning(false));
+            })
+            .catch((err) => {
+              dispatch(setCodeExecutionResult(err.response.data.message));
+              dispatch(setIsCodeRunning(false));
+            });
+        })
+        .catch((err) => {
+          dispatch(setCodeExecutionResult(err.response.data.message));
+          dispatch(setIsCodeRunning(false));
+        });
+    }
+  };
+
+  const submitCompileReqCallback = useCallback(submitCompileRequest, [
+    dispatch,
+    isCodeRunning,
+  ]);
 
   useEffect(() => {
-  
+    const onCtrlEnterKeyDown = (event) => {
+      if (event.keyCode === 13 && event.ctrlKey) {
+        submitCompileReqCallback(curMode, code);
+      }
+    };
+
+    document.addEventListener("keydown", onCtrlEnterKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onCtrlEnterKeyDown);
+    };
+  }, [code, curMode, submitCompileReqCallback]);
+
+  useEffect(() => {
     // question fetch
     dispatch(setIsLoading(true));
     fetchQuestion(difficulty)
@@ -76,16 +128,16 @@ export default function CollaborationPage() {
       document.addEventListener("mouseup", onMouseUpRightResize);
     };
 
-    // Add mouse down event listener
-
+    // Add event listeners
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
+
     return () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
+
   const handleLogout = () => {
     handleLogoutAccount();
     dispatch(setLogout());

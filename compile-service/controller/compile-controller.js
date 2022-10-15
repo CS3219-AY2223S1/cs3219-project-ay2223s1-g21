@@ -10,9 +10,13 @@ export const submitCompileRequest = async (req, res) => {
       source,
       input
     )
-      .then((res) => res.data.status_update_url)
-      .catch((err) => res.status(400).json({ message: err }));
-    res.status(200).json({ resultUrl: result });
+      .then((response) =>
+        res.status(200).json({ resultUrl: response.data.status_update_url })
+      )
+      .catch((err) => {
+        console.log(err.response.data.message)
+        res.status(400).json({ message: err.response.data.message })
+      });
   } catch (err) {
     return res
       .status(500)
@@ -22,10 +26,9 @@ export const submitCompileRequest = async (req, res) => {
 
 export const getCompileResult = async (req, res) => {
   try {
-    
     const { url } = req.body;
     if (url) {
-      const result = await getCompileResponse(url)
+      const result = await getCompileResponse(url);
       return res.status(200).send(result);
     }
     return res.status(400).json({ message: "Please provide a url." });

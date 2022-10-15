@@ -1,4 +1,4 @@
-import { UPDATE_IS_CODE_RUNNING, UPDATE_QUESTION, UPDATE_TAB, UPDATE_EXECUTION_RESULT } from "../actionTypes"
+import { UPDATE_IS_CODE_RUNNING, UPDATE_QUESTION, UPDATE_TAB, UPDATE_EXECUTION_RESULT, UPDATE_CODE, UPDATE_CURRENT_MODE } from "../actionTypes"
 
 export const setQuestion = (question) => {
   return {
@@ -27,3 +27,18 @@ export const setTab = (tab) => {
     payload: tab
   }
 }
+
+export const setCode = (code) => {
+  return {
+    type: UPDATE_CODE,
+    payload: code
+  }
+}
+
+export const setMode = (mode) => {
+  return {
+    type: UPDATE_CURRENT_MODE,
+    payload: mode
+  }
+}
+

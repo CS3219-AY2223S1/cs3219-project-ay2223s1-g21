@@ -30,14 +30,15 @@ import {
   getCompilationResult,
 } from "../../../services/compile_service";
 import { setCodeExecutionResult, setIsCodeRunning, setTab } from "../../../redux/actions/collab";
+import { setMode, setCode } from "../../../redux/actions/collab";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { question } = useSelector((state) => state.collabReducer);
-  const [code, setCode] = useState(`console.log("Hello World!");`);
+  const { code, curMode } = useSelector(state => state.collabReducer);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
-  const [curMode, setCurMode] = useState("javascript");
+  
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
   const dispatch = useDispatch();
@@ -48,8 +49,9 @@ export default function EmbeddedEditor({ editorRef }) {
   };
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
-    setCurMode(lang);
-    setCode(question[lang]);
+    dispatch(setMode(lang));
+    // dispatch(setCode(question[lang]));
+    dispatch(setCode("Dummy text because currently no question")); // remember
   };
 
   const handleThemeSelect = (event) => {
@@ -61,23 +63,23 @@ export default function EmbeddedEditor({ editorRef }) {
     setCurTheme(theme);
   };
 
-  const submitCompileRequest = async (curMode, code) => {
+  const submitCompileRequest = async (curMode, curCode) => {
     if (!isCodeRunning) {
       dispatch(setTab("Result"))
       dispatch(setIsCodeRunning(true))
-      const responseUrl = await requestCompilation(
+      requestCompilation(
         curMode.toUpperCase(),
-        code
-      ).then((res) => res.data.resultUrl).catch(err => {
-        dispatch(setCodeExecutionResult(err.message))
-        dispatch(setIsCodeRunning(false))  
-      });
-
-      getCompilationResult(responseUrl).then(res => {
-        dispatch(setCodeExecutionResult(res.data))
-        dispatch(setIsCodeRunning(false))
+        curCode
+      ).then((res) => {
+        getCompilationResult(res.data.resultUrl).then(res => {
+          dispatch(setCodeExecutionResult(res.data))
+          dispatch(setIsCodeRunning(false))  
+        }).catch(err => {
+          dispatch(setCodeExecutionResult(err.response.data.message))
+          dispatch(setIsCodeRunning(false))  
+        });
       }).catch(err => {
-        dispatch(setCodeExecutionResult(err.message))
+        dispatch(setCodeExecutionResult(err.response.data.message))        
         dispatch(setIsCodeRunning(false))  
       });
     }
@@ -148,7 +150,7 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => setCode(currentCode)}
+        onChange={(currentCode) => dispatch(setCode(currentCode))}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
