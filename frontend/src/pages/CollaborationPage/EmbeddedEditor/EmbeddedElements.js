@@ -6,6 +6,7 @@ export const EditorContainer = styled.div`
   flex: 1 1 1;
   max-width: 70%;
   min-width: 40%;
+  width: 50%;
 `;
 
 export const Bar = styled.div`
@@ -37,4 +38,26 @@ export const BarItem = styled.div`
   &:hover {
     background-color: #272822;
   }
+`;
+
+export const RunCodeButton = styled.div`
+text-overflow: ellipsis;
+position: relative;
+background: #273a40;
+flex: 1 1 140px;
+margin: 10px;
+display: flex;
+justify-content: center;
+border: 1px solid #374850;
+border-radius: 10px;
+align-items: center;
+color: #fff;
+cursor: pointer;
+font-size: 15px;
+max-width: 100px;
+text-align: center;
+
+&:hover {
+  background-color: #272822;
+}
 `;

@@ -13,107 +13,90 @@ import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
 import AceEditor from "react-ace";
-import React, { useState } from "react";
-import { Bar, EditorContainer, BarItem } from "./EmbeddedElements";
+import { useState } from "react";
+import {
+  Bar,
+  EditorContainer,
+  BarItem,
+  RunCodeButton,
+} from "./EmbeddedElements";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
-import { Question } from "./Data";
-import sharedb from "sharedb/lib/client";
-import io from "socket.io-client";
+// import { question } from "../Description/Data";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  requestCompilation,
+  getCompilationResult,
+} from "../../../services/compile_service";
+import {
+  setCodeExecutionResult,
+  setIsCodeRunning,
+  setTab,
+} from "../../../redux/actions/collab";
+import { setMode, setCode } from "../../../redux/actions/collab";
 
 export default function EmbeddedEditor({ editorRef }) {
-  const [doc, setDoc] = useState(null);
-  const [ioSocket, setIoSocket] = useState(null);
-  const [code, setCode] = useState(`console.log("Hello World!");`);
+  const { question } = useSelector((state) => state.collabReducer);
+  const { code, curMode } = useSelector((state) => state.collabReducer);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
-  const [curMode, setCurMode] = useState("javascript");
+
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
+  const dispatch = useDispatch();
+  const { isCodeRunning } = useSelector((state) => state.collabReducer);
+
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
   };
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
-    setCurMode(lang);
-    setCode(Question[lang]);
+    dispatch(setMode(lang));
+    // dispatch(setCode(question[lang]));
+    dispatch(setCode("Dummy text because currently no question")); // remember
   };
 
   const handleThemeSelect = (event) => {
     setAnchorElTheme(event.currentTarget);
   };
+
   const handleCloseTheme = (theme) => {
     setAnchorElTheme(null);
     setCurTheme(theme);
   };
 
-  const updateTextEditor = (text, event) => {
-    // console.log(text, event);
-    // doc.submitOp([{ p: ["counter"], na: 1 }]);
-    if (ioSocket) {
-      ioSocket.emit("sendTextUpdate", { text: text, roomId: "12345" });
+  const submitCompileRequest = async (curMode, curCode) => {
+    if (!isCodeRunning) {
+      dispatch(setTab("Result"));
+      dispatch(setIsCodeRunning(true));
+      requestCompilation(curMode.toUpperCase(), curCode)
+        .then((res) => {
+          getCompilationResult(res.data.resultUrl)
+            .then((res) => {
+              dispatch(setCodeExecutionResult(res.data));
+              dispatch(setIsCodeRunning(false));
+            })
+            .catch((err) => {
+              dispatch(setCodeExecutionResult(err.response.data.message));
+              dispatch(setIsCodeRunning(false));
+            });
+        })
+        .catch((err) => {
+          dispatch(setCodeExecutionResult(err.response.data.message));
+          dispatch(setIsCodeRunning(false));
+        });
     }
   };
-
-  React.useEffect(() => {
-    // const ws = new WebSocket("ws://localhost:3005");
-    // ws.addEventListener("open", () => {
-    //   console.log("Connected With Server");
-    // });
-    // const connection = new sharedb.Connection(ws);
-    // const doc = connection.get("documents", "12345");
-    // // If doc.type is undefined, the document has not been created, so let's create it
-    // if (!doc.type) {
-    //   doc.create({ counter: 0 }, (error) => {
-    //     if (error) console.error(error);
-    //   });
-    // }
-    // setDoc(doc);
-    // doc.subscribe(() => {
-    //   console.log("TEST", doc.data.counter);
-    // });
-    // doc.on("op", () => {
-    //   console.log("Test", doc);
-    //   setCode(doc.data);
-    // });
-    // doc.on("op", (op) => {
-    //   console.log("count", doc.data.counter);
-    // });
-  }, []);
-
-  // Socket io method
-  React.useEffect(() => {
-    const socket = io(`http://localhost:3005`);
-    socket.on("connectionSuccess", () => {
-      setIoSocket(socket);
-    });
-
-    return () => {
-      console.log("Disconnect Socket");
-      ioSocket.close();
-    };
-  }, []);
-
-  React.useEffect(() => {
-    if (ioSocket) {
-      ioSocket.emit("joinRoom", "12345");
-
-      ioSocket.on("joinSuccess", () => {
-        console.log("Joined Room");
-      });
-
-      ioSocket.on("textUpdate", (text) => {
-        console.log("Recieved Text Update");
-        setCode(text);
-      });
-    }
-  }, [ioSocket]);
 
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
+        <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
+          {" "}
+          Run Code{" "}
+        </RunCodeButton>
         <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
         <Menu
           id="fade-menu"
@@ -122,7 +105,7 @@ export default function EmbeddedEditor({ editorRef }) {
           }}
           anchorEl={anchorElLang}
           open={openLang}
-          onClose={() => handleCloseLang("javascript")}
+          onClose={() => handleCloseLang(curMode)}
           TransitionComponent={Fade}
         >
           <MenuItem onClick={() => handleCloseLang("javascript")}>
@@ -142,7 +125,7 @@ export default function EmbeddedEditor({ editorRef }) {
           }}
           anchorEl={anchorElTheme}
           open={openTheme}
-          onClose={() => handleCloseTheme("tomorrow_night")}
+          onClose={() => handleCloseTheme(curTheme)}
           TransitionComponent={Fade}
         >
           <MenuItem onClick={() => handleCloseTheme("twilight")}>
@@ -172,7 +155,7 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={updateTextEditor}
+        onChange={(currentCode) => dispatch(setCode(currentCode))}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
