@@ -19,7 +19,8 @@ app.use(
     cookieSession({
       name: "peer-prep-session",
       secret: process.env.COOKIE_SECRET,
-      httpOnly: true
+      httpOnly: true,
+      maxAge: 86400,   // 24 hour
     })
   );
 
