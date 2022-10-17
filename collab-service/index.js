@@ -1,23 +1,9 @@
-// import express from "express";
-// import cors from "cors";
-// import { WebSocketServer } from "ws";
-// import sharedb from "sharedb";
-// import { Server } from "socket.io";
-// import roomModel from "./model/roomModel.js";
-// import { config } from "dotenv";
-// import type from "rich-text";
-// import { joinRoom } from "./controller/index.js";
-// import WebSocketJSONStream from "@teamwork/websocket-json-stream";
 const { config } = require("dotenv");
 const express = require("express");
 const cors = require("cors");
-const { WebSocketServer } = require("ws");
-const sharedb = require("sharedb");
 const { Server } = require("socket.io");
-const roomModel = require("./model/roomModel.js");
-const richText = require("rich-text");
-const { joinRoom } = require("./controller/index.js");
-const WebSocketJSONStream = require("@teamwork/websocket-json-stream");
+const roomModel = require("./model/roomModel");
+const mongoose = require("mongoose");
 
 config();
 const app = express();
@@ -30,6 +16,7 @@ const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, async function () {
   try {
+    mongoose.connect(process.env.DB_LOCAL_URI);
     console.log(`Collab microservice listening on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
   } catch (err) {
@@ -37,34 +24,48 @@ const server = app.listen(PORT, async function () {
   }
 });
 
-sharedb.types.register(richText.type);
 const ioSocket = new Server(server, { cors: { origin: "*" } });
-// const shareDBSocketServer = new WebSocketServer({ server: server });
-// const sharedDb = new sharedb();
-// const connection = sharedDb.connect();
-
-// shareDBSocketServer.on("connection", (ws) => {
-//   console.log("TEST");
-//   const jsonStream = new WebSocketJSONStream(ws);
-//   sharedDb.listen(jsonStream);
-// });
 
 // Socket io method
-ioSocket.on("connection", function connection(socket, data) {
+ioSocket.on("connection", function connection(socket) {
   console.log("User connected: " + socket.id);
 
   ioSocket.emit("connectionSuccess", "welcome to the backend");
 
-  socket.on("joinRoom", (data) => {
-    console.log(data);
-    socket.join(data);
-    ioSocket.to(socket.id).emit("joinSuccess");
+  socket.on("joinRoom", async (data) => {
+    const { roomId, userId } = data;
+
+    // check if user is already in an room
+    const userRoom = await roomModel.findOne({ partipants: userId });
+    if (userRoom) {
+      ioSocket.emit("alreadyInRoom");
+      return;
+    }
+
+    // check if room exist
+    const room = await roomModel.findOne({ roomId: roomId });
+    if (room) {
+      const copy = room.partipants;
+      copy.push(userId);
+      await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
+    } else {
+      const newRoom = new roomModel({
+        roomId: roomId,
+        partipants: [userId],
+      });
+      await newRoom.save();
+    }
+    socket.join(roomId);
+    if (room) {
+      ioSocket.to(socket.id).emit("joinSuccessNew");
+    } else {
+      ioSocket.to(socket.id).emit("joinSuccess");
+    }
   });
 
-  socket.on("sendTextUpdate", (data) => {
-    const { text, roomId } = data;
-    ioSocket.to(roomId).emit("textUpdate", text);
+  socket.on("startCall", (data) => {
+    const { peerid, roomId } = data;
+    console.log("start call", data);
+    ioSocket.to(roomId).emit("callPeer", peerid);
   });
-
-  // ... do other service stuff with socket.io
 });

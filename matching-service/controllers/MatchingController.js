@@ -25,7 +25,7 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   // Not authorised
   if (authRes.status === responseStatus.UNAUTHORIZED) {
     socket.emit("unauthorized", authRes);
-    console.log("Unauthorized");
+    console.log("Unauthorized", authRes);
     return;
   }
 

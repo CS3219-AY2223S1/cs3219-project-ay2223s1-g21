@@ -13,7 +13,7 @@ import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
 import AceEditor from "react-ace";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bar,
   EditorContainer,
@@ -35,10 +35,15 @@ import {
   setTab,
 } from "../../../redux/actions/collab";
 import { setMode, setCode } from "../../../redux/actions/collab";
+import { useSyncedStore } from "@syncedstore/react";
+import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
-  const { question } = useSelector((state) => state.collabReducer);
-  const { code, curMode } = useSelector((state) => state.collabReducer);
+  const { roomId } = useSelector((state) => state.matchingReducer);
+  const { code, curMode, question, ioSocket } = useSelector(
+    (state) => state.collabReducer
+  );
+
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
@@ -89,6 +94,8 @@ export default function EmbeddedEditor({ editorRef }) {
         });
     }
   };
+
+  const state = useSyncedStore(store);
 
   return (
     <EditorContainer ref={editorRef}>
@@ -155,12 +162,14 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => dispatch(setCode(currentCode))}
+        onChange={(currentCode) =>
+          (state.collab["code-" + roomId] = currentCode)
+        }
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
         highlightActiveLine={true}
-        value={code}
+        value={state.collab["code-" + roomId]}
         setOptions={{
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true,
