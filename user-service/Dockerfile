@@ -12,6 +12,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE 8000
 
 ENTRYPOINT npm run start
