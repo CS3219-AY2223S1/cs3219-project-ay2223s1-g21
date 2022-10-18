@@ -14,44 +14,84 @@ import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/ext-beautify";
 import AceEditor from "react-ace";
 import { useState } from "react";
-import { Bar, EditorContainer, BarItem } from "./EmbeddedElements";
+import {
+  Bar,
+  EditorContainer,
+  BarItem,
+  RunCodeButton,
+} from "./EmbeddedElements";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Fade from "@mui/material/Fade";
 // import { question } from "../Description/Data";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  requestCompilation,
+  getCompilationResult,
+} from "../../../services/compile_service";
+import { setCodeExecutionResult, setIsCodeRunning, setTab } from "../../../redux/actions/collab";
+import { setMode, setCode } from "../../../redux/actions/collab";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { question } = useSelector((state) => state.collabReducer);
-  const [code, setCode] = useState(`console.log("Hello World!");`);
+  const { code, curMode } = useSelector(state => state.collabReducer);
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
-  const [curMode, setCurMode] = useState("javascript");
+  
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
+  const dispatch = useDispatch();
+  const { isCodeRunning } = useSelector((state) => state.collabReducer);
+
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
   };
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
-    setCurMode(lang);
-    if (question[lang]) {
-      setCode(question[lang]);
-    }
+    dispatch(setMode(lang));
+    // dispatch(setCode(question[lang]));
+    dispatch(setCode("Dummy text because currently no question")); // remember
   };
 
   const handleThemeSelect = (event) => {
     setAnchorElTheme(event.currentTarget);
   };
+
   const handleCloseTheme = (theme) => {
     setAnchorElTheme(null);
     setCurTheme(theme);
   };
 
+  const submitCompileRequest = async (curMode, curCode) => {
+    if (!isCodeRunning) {
+      dispatch(setTab("Result"))
+      dispatch(setIsCodeRunning(true))
+      requestCompilation(
+        curMode.toUpperCase(),
+        curCode
+      ).then((res) => {
+        getCompilationResult(res.data.resultUrl).then(res => {
+          dispatch(setCodeExecutionResult(res.data))
+          dispatch(setIsCodeRunning(false))  
+        }).catch(err => {
+          dispatch(setCodeExecutionResult(err.response.data.message))
+          dispatch(setIsCodeRunning(false))  
+        });
+      }).catch(err => {
+        dispatch(setCodeExecutionResult(err.response.data.message))        
+        dispatch(setIsCodeRunning(false))  
+      });
+    }
+  };
+
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
+        <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
+          {" "}
+          Run Code{" "}
+        </RunCodeButton>
         <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
         <Menu
           id="fade-menu"
@@ -110,7 +150,7 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => setCode(currentCode)}
+        onChange={(currentCode) => dispatch(setCode(currentCode))}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}

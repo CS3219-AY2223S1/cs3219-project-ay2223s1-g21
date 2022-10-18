@@ -1,38 +1,38 @@
-import {
-  Bar,
-  BarText,
-} from "./QuestionSectionElements";
-import { useState } from "react";
+import { Bar, BarText } from "./QuestionSectionElements";
 import { FaKeyboard } from "react-icons/fa";
-import { BiChat } from "react-icons/bi";
+import { TbFileText } from "react-icons/tb";
 import Description from "../Description";
+import Result from "../Result/index.js";
+import { useDispatch, useSelector } from "react-redux";
+import { setTab } from "../../../redux/actions/collab";
 
 export default function QuestionSection() {
-  const [selectedText, setSelectedText] = useState("Description");
+  
+  const { selectedTab } = useSelector(state => state.collabReducer)
+  const dispatch = useDispatch();
 
   return (
     <>
       <Bar>
         <BarText
-          curSelected={selectedText}
+          curSelected={selectedTab}
           text="Description"
-          onClick={() => setSelectedText("Description")}
+          onClick={() => dispatch(setTab("Description"))}
         >
-          <FaKeyboard style={{marginRight: '5px'}}/>
+          <FaKeyboard style={{ marginRight: "5px" }} />
           Description
         </BarText>
         <BarText
-          curSelected={selectedText}
-          text="ChatBox"
-          onClick={() => setSelectedText("ChatBox")}
+          curSelected={selectedTab}
+          text="Result"
+          onClick={() => dispatch(setTab("Result"))}
         >
-          <BiChat style={{marginRight: '5px'}}/>
-          Video 
+          <TbFileText style={{ marginRight: "5px" }} />
+          Result
         </BarText>
-        
       </Bar>
-      {selectedText === "Description" && <Description />}
-      {/* {selectedText === "ChatBox" && <ChatBox />} */}
+      {selectedTab === "Description" && <Description />}
+      {selectedTab === "Result" && <Result />}
     </>
   );
 }

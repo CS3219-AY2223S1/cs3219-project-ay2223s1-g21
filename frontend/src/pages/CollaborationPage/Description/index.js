@@ -38,7 +38,7 @@ export default function Description() {
           </div>
         );
       })}
-      <ExampleTitle>Constraints:</ExampleTitle>
+      <ExampleTitle>{question?.difficulty && "Constraints:"}</ExampleTitle>
       {question.constraints.map((constraint, i) => {
         return (
           <Constraint>
