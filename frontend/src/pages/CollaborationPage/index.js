@@ -14,7 +14,7 @@ import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import { addResponseMessage, Widget } from "react-chat-widget";
+import { addResponseMessage, dropMessages, Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/question_service";
@@ -32,9 +32,7 @@ import {
   getCompilationResult,
   requestCompilation,
 } from "../../services/compile_service";
-import { setIoSocket } from "../../redux/actions/collab";
 import io from "socket.io-client";
-//import Peer from "simple-peer";
 import { disconnect } from "./store";
 import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
@@ -235,11 +233,26 @@ export default function CollaborationPage() {
           addResponseMessage(newMessage);
         }
       });
+
+      ioSocket.on("leaveRoom", () => {
+        alert("A participant has left the room");
+      });
+
+      ioSocket.on("badRequest", () => {
+        navigate("/home");
+      });
     }
   }, [ioSocket, peer]);
 
   const handleNewUserMessage = (newMessage) => {
     ioSocket.emit("sendChatMsg", { roomId, userId, newMessage });
+  };
+
+  const handleExitSession = () => {
+    console.log("Exit");
+    ioSocket.emit("exitRoom", { roomId });
+    dropMessages();
+    navigate("/home");
   };
 
   return (
@@ -258,7 +271,12 @@ export default function CollaborationPage() {
         <EmbeddedEditor editorRef={embeddedEditorRef} />
       </ContentContainer>
       <FooterContainer>
-        <Button variant="outlined" color="error" style={{ marginLeft: "30px" }}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleExitSession}
+          style={{ marginLeft: "30px" }}
+        >
           Exit Session
         </Button>
         <Widget

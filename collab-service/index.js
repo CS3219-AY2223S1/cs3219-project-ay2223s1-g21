@@ -35,6 +35,13 @@ ioSocket.on("connection", function connection(socket) {
   socket.on("joinRoom", async (data) => {
     const { roomId, userId } = data;
 
+    console.log(roomId, !!!roomId);
+
+    if (!!!roomId) {
+      ioSocket.emit("badRequest");
+      return;
+    }
+
     // check if user is already in an room
     const userRoom = await roomModel.findOne({ partipants: userId });
     if (userRoom) {
@@ -73,5 +80,11 @@ ioSocket.on("connection", function connection(socket) {
     const { roomId, userId, newMessage } = data;
     console.log("New Chat Message", data);
     ioSocket.to(roomId).emit("newChatMsg", { userId, newMessage });
+  });
+
+  socket.on("exitRoom", async (data) => {
+    const { roomId } = data;
+    await roomModel.findOneAndDelete({ roomId: roomId });
+    ioSocket.to(roomId).emit("leaveRoom");
   });
 });
