@@ -97,6 +97,10 @@ export default function EmbeddedEditor({ editorRef }) {
 
   const state = useSyncedStore(store);
 
+  useEffect(() => {
+    state.collab["code-" + roomId] = `console.log("Hello World!");`;
+  }, []);
+
   return (
     <EditorContainer ref={editorRef}>
       <Bar>

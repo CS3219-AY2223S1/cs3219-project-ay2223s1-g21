@@ -14,7 +14,7 @@ import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
 import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import { Widget } from "react-chat-widget";
+import { addResponseMessage, Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/question_service";
@@ -52,7 +52,6 @@ export default function CollaborationPage() {
   );
   const { userId } = useSelector((state) => state.authReducer);
   const { roomId } = useSelector((state) => state.matchingReducer);
-  const [stream, setStream] = useState(null);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
 
@@ -228,8 +227,20 @@ export default function CollaborationPage() {
         disconnect();
         navigate("/home");
       });
+
+      ioSocket.on("newChatMsg", (data) => {
+        console.log("Received new chat message", data);
+        const { userId: id, newMessage } = data;
+        if (id && id !== userId) {
+          addResponseMessage(newMessage);
+        }
+      });
     }
   }, [ioSocket, peer]);
+
+  const handleNewUserMessage = (newMessage) => {
+    ioSocket.emit("sendChatMsg", { roomId, userId, newMessage });
+  };
 
   return (
     <PgContainer>
@@ -251,7 +262,7 @@ export default function CollaborationPage() {
           Exit Session
         </Button>
         <Widget
-          // handleNewUserMessage={handleNewUserMessage}
+          handleNewUserMessage={handleNewUserMessage}
           subtitle="Chat here"
         />
       </FooterContainer>

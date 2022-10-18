@@ -68,4 +68,10 @@ ioSocket.on("connection", function connection(socket) {
     console.log("start call", data);
     ioSocket.to(roomId).emit("callPeer", peerid);
   });
+
+  socket.on("sendChatMsg", (data) => {
+    const { roomId, userId, newMessage } = data;
+    console.log("New Chat Message", data);
+    ioSocket.to(roomId).emit("newChatMsg", { userId, newMessage });
+  });
 });
