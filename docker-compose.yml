@@ -1,0 +1,60 @@
+version: '3'
+
+services:
+
+  frontend:
+    image: peerprep-frontend
+    build: 
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./frontend:/usr/src/app
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+    env_file:
+      - ./frontend/.env
+
+  matching:
+    image: peerprep-matching
+    build: 
+      context: ./matching-service
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./matching-service:/usr/src/app
+    ports:
+      - "3001:3001"
+    networks:
+      - default
+    env_file:
+      - ./matching-service/.env
+  
+  question:
+    image: peerprep-question
+    build: 
+      context: ./question-service
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./question-service:/usr/src/app
+    ports:
+      - "8001:8001"
+    networks:
+      - default
+    env_file:
+      - ./question-service/.env
+
+  user:
+    image: peerprep-user
+    build: 
+      context: ./user-service
+      dockerfile: ./Dockerfile
+    volumes:
+      - ./user-service:/usr/src/app
+    ports:
+      - "8000:8000"
+    networks:
+      - default
+    env_file:
+      - ./user-service/.env
+
