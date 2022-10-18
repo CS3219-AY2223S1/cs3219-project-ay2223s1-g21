@@ -33,7 +33,7 @@ import {
   requestCompilation,
 } from "../../services/compile_service";
 import io from "socket.io-client";
-import { disconnect } from "./store";
+import { connect, disconnect } from "./store";
 import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
 
@@ -163,9 +163,13 @@ export default function CollaborationPage() {
     console.log("Peer Id :", peer.id);
     setPeer(peer);
 
+    connect();
+
     return () => {
       console.log("Disconnect Socket");
       socket.close();
+      peer.destroy();
+      disconnect();
     };
   }, []);
 
@@ -249,7 +253,6 @@ export default function CollaborationPage() {
   };
 
   const handleExitSession = () => {
-    console.log("Exit");
     ioSocket.emit("exitRoom", { roomId });
     dropMessages();
     navigate("/home");
