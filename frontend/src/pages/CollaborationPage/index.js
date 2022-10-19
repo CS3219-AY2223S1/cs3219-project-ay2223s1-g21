@@ -201,7 +201,7 @@ export default function CollaborationPage() {
           });
       });
 
-      ioSocket.on("joinSuccessNew", () => {
+      ioSocket.on("joinSuccess", () => {
         ioSocket.emit("startCall", {
           peerid: peer.id,
           roomId: roomId,

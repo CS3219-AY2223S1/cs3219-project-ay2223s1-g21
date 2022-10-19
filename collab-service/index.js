@@ -64,9 +64,9 @@ ioSocket.on("connection", function connection(socket) {
     }
     socket.join(roomId);
     if (room) {
-      ioSocket.to(socket.id).emit("joinSuccessNew");
-    } else {
       ioSocket.to(socket.id).emit("joinSuccess");
+    } else {
+      ioSocket.to(socket.id).emit("joinSuccessNew");
     }
   });
 

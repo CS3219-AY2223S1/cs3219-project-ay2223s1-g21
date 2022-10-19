@@ -14,7 +14,7 @@ export default function MatchingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [cancelTimer, setCancelTimer] = useState(5);
-  const [matchTimer, setmatchTimer] = useState(10);
+  const [matchTimer, setmatchTimer] = useState(30);
   const [isTimeout, setTimeOut] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("No match found");
   const [socket, setSocket] = useState(null);
