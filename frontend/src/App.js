@@ -19,14 +19,42 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/passwordReset" element={< ResetPassword />} />
-          <Route path="/forget_password" element={< ForgetPassword />} />
-          <Route path="/home" element={<PrivateRoute component={Home} fromUrl={"/home"}/>} />
-          <Route path="/change_password" element={<PrivateRoute component={ChangePasswordPage} fromUrl={"/change_password"}/>} />
-          <Route path="/profile" element={<PrivateRoute component={Profile} fromUrl={"/profile"}/>} /> 
-          <Route path="/matching" element={<PrivateRoute component={MatchingPage} />} />
-          <Route path="/collab" element={<PrivateRoute component={CollaborationPage} fromUrl={"/collab"} />} />
-          <Route path="*" element={<PrivateRoute component={Home} fromUrl={"/home"}/>} /> 
+          <Route path="/passwordReset" element={<ResetPassword />} />
+          <Route path="/forget_password" element={<ForgetPassword />} />
+          <Route
+            path="/home"
+            element={<PrivateRoute component={Home} fromUrl={"/home"} />}
+          />
+          <Route
+            path="/change_password"
+            element={
+              <PrivateRoute
+                component={ChangePasswordPage}
+                fromUrl={"/change_password"}
+              />
+            }
+          />
+          <Route
+            path="/profile"
+            element={<PrivateRoute component={Profile} fromUrl={"/profile"} />}
+          />
+          <Route
+            path="/matching"
+            element={<PrivateRoute component={MatchingPage} />}
+          />
+          <Route
+            path="/collab/*"
+            element={
+              <PrivateRoute
+                component={CollaborationPage}
+                fromUrl={"/collab/*"}
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={<PrivateRoute component={Home} fromUrl={"/home"} />}
+          />
         </Routes>
       </Router>
       {isLoading && <LoadingScreen />}

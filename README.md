@@ -1,6 +1,4 @@
-# CS3219-AY22-23-Project-Skeleton
-
-This is a template repository for CS3219 project.
+# CS3219-AY22-23-G21
 
 ## User Service
 1. Rename `.env.sample` file to `.env`.
