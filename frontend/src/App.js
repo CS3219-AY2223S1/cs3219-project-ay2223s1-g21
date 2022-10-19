@@ -13,7 +13,7 @@ import CollaborationPage from "./pages/CollaborationPage";
 
 function App() {
   const { isLoading } = useSelector((state) => state.authReducer);
-
+  
   return (
     <div className="App">
       <Router>
