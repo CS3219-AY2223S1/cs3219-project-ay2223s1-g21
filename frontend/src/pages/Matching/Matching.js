@@ -13,6 +13,8 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { motion } from "framer-motion";
+import { animationThree, transition } from "../animation";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -77,7 +79,7 @@ export default function MatchingPage() {
         console.log("Match Found");
         setFoundMatch(true);
         dispatch(setRoomId(interviewId));
-        await new Promise(r => setTimeout(r, 2000))
+        await new Promise((r) => setTimeout(r, 2000));
         navigate(`/collab/${interviewId}`);
       });
 
@@ -128,23 +130,27 @@ export default function MatchingPage() {
   };
 
   return (
-    <>
+    <motion.div
+      initial="out"
+      animate="in"
+      exit="out"
+      variants={animationThree}
+      transition={transition}
+    >
       {isConnected && !cancelTimer ? (
-        <MatchingScreen matchTimer={matchTimer} foundMatch={foundMatch}/>
+        <MatchingScreen matchTimer={matchTimer} foundMatch={foundMatch} />
       ) : (
         <LoadingScreen />
       )}
       <Dialog open={feedbackMessage} onClose={closeDialog}>
         <DialogTitle>Bad Request</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            {feedbackMessage}
-          </DialogContentText>
+          <DialogContentText>{feedbackMessage}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDialog}>Ok</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </motion.div>
   );
 }
