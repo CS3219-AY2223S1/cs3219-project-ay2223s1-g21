@@ -94,7 +94,7 @@ export default function EmbeddedEditor({ editorRef }) {
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
-        <Tooltip title="Click to run your code.">
+        <Tooltip title="Click or press Ctrl + Enter to run your code.">
           <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
             Run Code
           </RunCodeButton>
