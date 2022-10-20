@@ -3,17 +3,8 @@ import styled from "styled-components";
 export const FAQContainer = styled.div`
   height: 1100px;
   background: #010606;
-  display: grid;
-  grid-template-columns: 40% 60%;
-  grid-template-rows: 20% 80%;
-  grid-template-areas: "header header" "gif qns";
-  @media screen and (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-    height: auto + 100px;
-    justify-content: center;
-    align-items: center;
-  }
+  padding: 5%;
+  
   @media screen and (max-width: 450px) and (max-height: 900px) {
     height: 1000px;
   }
@@ -21,9 +12,8 @@ export const FAQContainer = styled.div`
 
 export const FAQH1 = styled.h1`
   font-size: 3rem;
-  grid-area: header;
   color: #fff;
-  margin-top: 60px;
+
   text-align: center;
   @media screen and (max-width: 768px) {
     font-size: 2rem;
@@ -36,8 +26,16 @@ export const FAQH1 = styled.h1`
   }
 `;
 
+export const BlockContainer = styled.div`
+  display: flex;
+  with: 100vw;
+  height: 60%;
+  justify-content: center;
+  align-items: center;
+`
+
 export const FAQWrapper = styled.div`
-  width: 80%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   height: fit-content;
@@ -103,15 +101,5 @@ export const Answer = styled.p`
 `;
 
 export const Image = styled.img`
-  object-fit: contain;
-  grid-area: gif;
-  transform: translateX(150%);
-  @media screen and (max-width: 1200px) {
-    margin-left: 10%;
-    height: 280px;
-    width: 280px;
-  }
-  @media screen and (max-width: 768px) {
-    display: none;
-  }
+  margin-right: 5%;
 `;
