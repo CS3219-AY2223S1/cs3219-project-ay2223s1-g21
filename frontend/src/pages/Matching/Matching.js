@@ -1,22 +1,25 @@
-import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
-import CircularProgress from "@mui/material/CircularProgress";
 import { useState, useEffect } from "react";
-import Page from "../layout/Page";
-import { contentBox, progressBox, progressTextBox, timeOutBox } from "./styles";
 import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import { setRoomId } from "../../redux/actions/matching";
+import MatchingScreen from "./MatchingScreen";
+import LoadingScreen from "./LoadingScreen";
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+} from "@mui/material";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [cancelTimer, setCancelTimer] = useState(10);
   const [matchTimer, setmatchTimer] = useState(30);
-  const [isTimeout, setTimeOut] = useState(false);
-  const [feedbackMessage, setFeedbackMessage] = useState("No match found");
+  const [feedbackMessage, setFeedbackMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnect] = useState(false);
   const { userId, userEmail, jwtToken } = useSelector(
@@ -52,6 +55,9 @@ export default function MatchingPage() {
     }
   }, [socket]);
 
+  const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
+  const MATCH_ERROR_MSG = "Some error occurred. Please try again.";
+
   useEffect(() => {
     if (isConnected && !cancelTimer) {
       socket.emit("findMatch", {
@@ -62,20 +68,20 @@ export default function MatchingPage() {
       });
 
       socket.on("unauthorized", (res) => {
-        navigate("/login");
+        setFeedbackMessage(LOGIN_ERROR_MSG);
       });
 
-      socket.on("matchSuccess", (res) => {
+      socket.on("matchSuccess", async (res) => {
         const { interviewId } = res.data;
         console.log("Match Found");
         dispatch(setRoomId(interviewId));
+        await new Promise(r => setTimeout(r, 2000))
         navigate(`/collab/${interviewId}`);
       });
 
       socket.on("badRequest", (res) => {
         console.log("BAD REQUEST", res);
-        setFeedbackMessage(res.message);
-        setTimeOut(true);
+        setFeedbackMessage(MATCH_ERROR_MSG);
       });
 
       const timer = setInterval(() => {
@@ -91,11 +97,13 @@ export default function MatchingPage() {
   }, [
     isConnected,
     cancelTimer,
-    difficulty,
     jwtToken,
     socket,
     userEmail,
     userId,
+    dispatch,
+    difficulty,
+    navigate,
   ]);
 
   useEffect(() => {
@@ -106,102 +114,35 @@ export default function MatchingPage() {
         jwtToken: jwtToken,
         userId: userId,
       });
-      setTimeOut(true);
     }
-  }, [matchTimer]);
+  }, [matchTimer, difficulty, jwtToken, userId, socket, userEmail]);
 
-  const returnHomeButton = (text) => (
-    <Button
-      variant="contained"
-      disableElevation
-      onClick={() => {
-        navigate("/home");
-      }}
-    >
-      {text}
-    </Button>
-  );
-
-  const loadingScreen = (
-    <Box sx={contentBox}>
-      <Box sx={progressBox}>
-        <CircularProgress
-          variant="indeterminate"
-          disableShrink
-          sx={{
-            display: "flex",
-            color: "#308fe8",
-            animationDuration: "550ms",
-          }}
-          size={300}
-          thickness={2}
-        />
-        <Box sx={progressTextBox}>
-          <Typography
-            variant={isConnected ? "h2" : "h4"}
-            component="div"
-            color="white"
-          >
-            {isConnected
-              ? cancelTimer
-                ? `${cancelTimer}`
-                : `${matchTimer}`
-              : "Connecting to the server"}
-          </Typography>
-        </Box>
-      </Box>
-
-      {isConnected ? (
-        cancelTimer ? (
-          returnHomeButton("Cancel match")
-        ) : (
-          <Box
-            sx={{
-              position: "relative",
-              paddingTop: "10%",
-            }}
-          >
-            <Typography variant="h6" color="white">
-              {"Finding a match , please wait"}
-            </Typography>
-          </Box>
-        )
-      ) : (
-        <></>
-      )}
-    </Box>
-  );
-
-  const timeOutScreen = (
-    <Box sx={timeOutBox}>
-      <Typography
-        variant="h6"
-        sx={{ textAlign: "center", width: "250px" }}
-        color="white"
-      >
-        {feedbackMessage}
-      </Typography>
-      {returnHomeButton("Return to home")}
-    </Box>
-  );
+  const closeDialog = () => {
+    if (feedbackMessage === MATCH_ERROR_MSG) {
+      navigate("/home");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
-    <Page>
-      {!isTimeout && loadingScreen}
-      {isTimeout && timeOutScreen}
-    </Page>
+    <>
+      {isConnected && !cancelTimer ? (
+        <MatchingScreen matchTimer={matchTimer} />
+      ) : (
+        <LoadingScreen />
+      )}
+      <Dialog open={feedbackMessage} onClose={closeDialog}>
+        <DialogTitle>Bad Request</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {feedbackMessage}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDialog}>Ok</Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 }
-
-export const Button = styled.button`
-  padding: 10px 30px;
-  cursor: pointer;
-  display: block;
-  margin: auto;
-  background: linear-gradient(to bottom, #00ffff 0%, #0099cc 65%);
-  border: 0;
-  outline: none;
-  border-radius: 30px;
-  color: #fff;
-  transform: translateY(3rem);
-`;

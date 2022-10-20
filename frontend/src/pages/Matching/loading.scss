@@ -1,0 +1,131 @@
+.bounce {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  transform: translate(-51%, -50%);
+}
+
+.bounce div {
+  width: 25px;
+  height: 25px;
+  background: #1b5f70;
+  border-radius: 50%;
+  animation: bouncing 0.5s cubic-bezier(0.19, 0.57, 0.3, 0.98) infinite
+    alternate;
+}
+
+.bounce div:nth-child(2) {
+  animation-delay: 0.1s;
+  opacity: 0.8;
+}
+
+.bounce div:nth-child(3) {
+  animation-delay: 0.2s;
+  opacity: 0.6;
+}
+
+.bounce div:nth-child(4) {
+  animation-delay: 0.3s;
+  opacity: 0.4;
+}
+
+@keyframes bouncing {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-30px);
+  }
+}
+
+@mixin animation($animate...) {
+  $max: length($animate);
+  $animations: "";
+
+  @for $i from 1 through $max {
+    $animations: #{$animations + nth($animate, $i)};
+
+    @if $i < $max {
+      $animations: #{$animations + ", "};
+    }
+  }
+  -webkit-animation: $animations;
+  -moz-animation: $animations;
+  -o-animation: $animations;
+  animation: $animations;
+}
+
+@mixin centre($axis: "both") {
+  position: absolute;
+  @if $axis == "y" {
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -o-transform: translateY(-50%);
+    transform: translateY(-50%);
+  }
+  @if $axis == "x" {
+    left: 50%;
+    -webkit-transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -ms-transform: translateX(-50%);
+    -o-transform: translateX(-50%);
+    transform: translateX(-50%);
+  }
+  @if $axis == "both" {
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-51%, -50%);
+    -moz-transform: translate(-51%, -50%);
+    -ms-transform: translate(-51%, -50%);
+    -o-transform: translate(-51%, -50%);
+    transform: translate(-51%, -50%);
+  }
+}
+
+@mixin font-size($sizeValue: 1.6, $lineHeight: 2.4) {
+  font-size: ($sizeValue * 10) + px;
+  font-size: $sizeValue + rem;
+  line-height: ($lineHeight * 10) + px;
+}
+
+.loadingdescription {
+  @include font-size(1.4, 13);
+  @include animation("textColour 1s alternate linear infinite");
+  position: absolute;
+  box-sizing: border-box;
+  width: 140px;
+  height: 140px;
+  left: 51%;
+  top: 70%;
+  transform: translate(-51%, -50%);
+}
+
+.cancel {
+  font-size: 12px;
+  position: absolute;
+  box-sizing: border-box;
+  width: 120px;
+  text-align: center;
+  vertical-align: center;
+  line-height: 60px;
+  height: auto;
+  left: 50%;
+  top: 80%;
+  color: #00ffff;
+  border-radius: 10px;
+  cursor: pointer;
+  transform: translate(-51%, -50%);
+  border: 1px solid #00ffff;
+
+  &:hover{
+    color: #fff;
+    border: 1px solid #fff;
+  }
+}
