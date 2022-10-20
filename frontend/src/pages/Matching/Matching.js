@@ -13,8 +13,6 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
-import { motion } from "framer-motion";
-import { animationThree, transition } from "../animation";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -130,13 +128,7 @@ export default function MatchingPage() {
   };
 
   return (
-    <motion.div
-      initial="out"
-      animate="in"
-      exit="out"
-      variants={animationThree}
-      transition={transition}
-    >
+    <>
       {isConnected && !cancelTimer ? (
         <MatchingScreen matchTimer={matchTimer} foundMatch={foundMatch} />
       ) : (
@@ -151,6 +143,6 @@ export default function MatchingPage() {
           <Button onClick={closeDialog}>Ok</Button>
         </DialogActions>
       </Dialog>
-    </motion.div>
+    </>
   );
 }

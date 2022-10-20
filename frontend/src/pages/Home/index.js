@@ -7,7 +7,7 @@ import Sidebar from "../../components/Sidebar";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   const toggle = () => {
     setIsOpen(!isOpen);
   };
@@ -20,6 +20,5 @@ export default function Home() {
       <AboutSection />
       <FAQ />
     </>
-  )
+  );
 }
-

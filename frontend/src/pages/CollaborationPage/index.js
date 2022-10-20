@@ -139,7 +139,7 @@ export default function CollaborationPage() {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    handleLogoutAccount().then(res => {
+    handleLogoutAccount().then((res) => {
       dispatch(setIsLoading(false));
       dispatch(setLogout());
     });
