@@ -19,6 +19,7 @@ export default function MatchingPage() {
   const dispatch = useDispatch();
   const [cancelTimer, setCancelTimer] = useState(10);
   const [matchTimer, setmatchTimer] = useState(30);
+  const [foundMatch, setFoundMatch] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnect] = useState(false);
@@ -74,6 +75,7 @@ export default function MatchingPage() {
       socket.on("matchSuccess", async (res) => {
         const { interviewId } = res.data;
         console.log("Match Found");
+        setFoundMatch(true);
         dispatch(setRoomId(interviewId));
         await new Promise(r => setTimeout(r, 2000))
         navigate(`/collab/${interviewId}`);
@@ -128,7 +130,7 @@ export default function MatchingPage() {
   return (
     <>
       {isConnected && !cancelTimer ? (
-        <MatchingScreen matchTimer={matchTimer} />
+        <MatchingScreen matchTimer={matchTimer} foundMatch={foundMatch}/>
       ) : (
         <LoadingScreen />
       )}

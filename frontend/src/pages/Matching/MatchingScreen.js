@@ -2,10 +2,8 @@ import { PageContainer } from "./MatchingElements";
 import "./matching.scss";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
-export default function MatchingScreen({matchTimer}) {
-  const { roomId } = useSelector(state => state.matchingReducer);
+export default function MatchingScreen({matchTimer, foundMatch}) {
   const [string, setString] = useState("Matching");
   const navigate = useNavigate();
 
@@ -28,8 +26,8 @@ export default function MatchingScreen({matchTimer}) {
           <span class="e-text"> {matchTimer > 0 && matchTimer} </span>
         </div>
       </div>
-      <span class="description"> {roomId ? "Match Found!" : matchTimer > 0 ? string : "No Match"} </span>
-      {!matchTimer && <span class="okay" onClick={() => navigate("/home")}> Go Back Home </span>}
+      <span class="description"> {foundMatch ? "Match Found!" : matchTimer > 0 ? string : "No Match"} </span>
+      {!matchTimer && !foundMatch && <span class="okay" onClick={() => navigate("/home")}> Go Back Home </span>}
     </PageContainer>
   );
 }
