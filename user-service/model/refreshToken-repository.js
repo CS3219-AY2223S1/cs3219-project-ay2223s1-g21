@@ -15,9 +15,9 @@ export async function createToken(params) {
     return new RefreshTokenModel(params)
 }
 
-export async function getAllToken() {
+export async function getToken(hash) {
     try {
-        const doc = await RefreshTokenModel.find({});
+        const doc = await RefreshTokenModel.findOne({token: hash});
         return doc;
     } catch (err) {
         console.log(`ERROR: RefreshTokenModel database ${err}`);
