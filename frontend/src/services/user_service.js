@@ -56,10 +56,8 @@ export const handleLogin = async (email, password) => {
 export const handleLogoutAccount = () => {
   const LOG_OUT_ENDPT =
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/logout";
-  axios
+  return axios
     .post(LOG_OUT_ENDPT, null, { withCredentials: true })
-    .then(console.log)
-    .catch(console.log);
 };
 
 export const refreshJwtToken = (dispatch) => {

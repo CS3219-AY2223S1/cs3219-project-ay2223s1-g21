@@ -5,7 +5,7 @@ import { FaTimes } from "react-icons/fa";
 
 export const SidebarContainer = styled.aside`
   position: fixed;
-  z-index: 999;
+  z-index: 9;
   width: 100%;
   height: 100%;
   background: #0d0d0d;
@@ -62,7 +62,7 @@ export const SidebarLink = styled(LinkS)`
   }
 `;
 
-export const SidebarProfile = styled(LinkR)`
+export const SidebarLogout = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,3 +78,18 @@ export const SidebarProfile = styled(LinkR)`
   }
 `;
 
+export const SidebarProfile = styled(LinkR)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  text-decoration: none;
+  list-style: none;
+  transition: 0.2s ease-in-out;
+  color: #fff;
+  cursor: pointer;
+  &:hover {
+    color: #6ddcd9;
+    transition: all 0.2s ease-in-out;
+  }
+`;

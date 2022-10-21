@@ -1,6 +1,11 @@
 {
   "scripts": {
-    "postinstall": "cd user-service && npm install"
+    "postinstall": "cd user-service && npm install",
+    "user-service": "cd user-service && npm start",
+    "matching-service": "cd matching-service && npm start",
+    "compile-service": "cd compile-service && npm start",
+    "frontend": "cd frontend && npm start",
+    "start": "concurrently --kill-others \"npm run user-service\" \"npm run matching-service\" \"npm run compile-service\" \"npm run frontend\""
   },
   "dependencies": {
     "express": "^4.18.1",
@@ -8,6 +13,7 @@
     "socket.io": "^4.5.2"
   },
   "devDependencies": {
+    "concurrently": "^7.4.0",
     "eslint": "^8.24.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^8.5.0",

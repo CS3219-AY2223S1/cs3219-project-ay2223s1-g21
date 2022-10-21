@@ -12,7 +12,7 @@ import { FaBars } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import { useDispatch } from "react-redux";
-import { setLogout } from "../../redux/actions/auth";
+import { setLogout, setIsLoading } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
 import lifeGoesOn from "../../assets/homeScreenBgm.mp3"
 
@@ -52,8 +52,11 @@ const Navbar = (props) => {
   };
 
   const handleLogout = () => {
-    handleLogoutAccount();
-    dispatch(setLogout());
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then(res => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
   };
 
   return (
