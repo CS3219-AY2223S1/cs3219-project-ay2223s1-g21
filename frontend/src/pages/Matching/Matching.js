@@ -152,16 +152,3 @@ export default function MatchingPage() {
     </>
   );
 }
-
-export const Button = styled.button`
-  padding: 10px 30px;
-  cursor: pointer;
-  display: block;
-  margin: auto;
-  background: linear-gradient(to bottom, #00ffff 0%, #0099cc 65%);
-  border: 0;
-  outline: none;
-  border-radius: 30px;
-  color: #fff;
-  transform: translateY(3rem);
-`;
