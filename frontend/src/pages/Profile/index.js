@@ -9,11 +9,10 @@ const Profile = () => {
     setIsOpen(!isOpen);
   };
 
-
   return (
     <>
-      <Sidebar isOpen={isOpen} toggle={toggle} />
-      <Navbar />
+      <Sidebar isOpen={isOpen} toggle={toggle} isProfilePage={true} />
+      <Navbar toggle={toggle} />
       <ProfileSection />
     </>
   );

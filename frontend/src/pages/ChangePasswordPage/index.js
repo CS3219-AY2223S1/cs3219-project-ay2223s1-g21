@@ -5,7 +5,7 @@ import {
   SubmitButton,
   FormTitle,
   FormGrp,
-  BackButton
+  BackButton,
 } from "./changePasswordElements";
 import {
   Dialog,
@@ -22,7 +22,6 @@ import { setIsLoading } from "../../redux/actions/auth";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 
-
 export default function ChangePasswordPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
@@ -33,7 +32,7 @@ export default function ChangePasswordPage() {
   const closeDialog = () => {
     setIsDialogOpen(false);
     if (success) {
-      navigate('/profile');
+      navigate("/profile");
     }
   };
 
@@ -71,31 +70,42 @@ export default function ChangePasswordPage() {
   };
 
   const navigateBack = () => {
-    navigate('/profile');
-  }
+    navigate("/profile");
+  };
 
   return (
-    <PageContainer>
-      <Navbar />
-      <Form>
-        <FormGrp onSubmit={handleChangePassword}>
-          <FormTitle> Change Password Form </FormTitle>
-          <TextField type="password" placeholder="Type in your current password" />
-          <TextField type="password" placeholder="Type in your new password" />
-          <TextField type="password" placeholder="Re-type your new passowrd" />
-          <SubmitButton type="submit"> Submit </SubmitButton>
-          <BackButton onClick={navigateBack}> Back </BackButton>
-        </FormGrp>
-      </Form>
-      <Dialog open={isDialogOpen} onClose={closeDialog}>
-        <DialogTitle>Change Password Notification</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{dialogMsg}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeDialog}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    </PageContainer>
+    <>
+      <PageContainer>
+        <Navbar />
+        <Form>
+          <FormGrp onSubmit={handleChangePassword}>
+            <FormTitle> Change Password Form </FormTitle>
+            <TextField
+              type="password"
+              placeholder="Type in your current password"
+            />
+            <TextField
+              type="password"
+              placeholder="Type in your new password"
+            />
+            <TextField
+              type="password"
+              placeholder="Re-type your new passowrd"
+            />
+            <SubmitButton type="submit"> Submit </SubmitButton>
+            <BackButton onClick={navigateBack}> Back </BackButton>
+          </FormGrp>
+        </Form>
+        <Dialog open={isDialogOpen} onClose={closeDialog}>
+          <DialogTitle>Change Password Notification</DialogTitle>
+          <DialogContent>
+            <DialogContentText>{dialogMsg}</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeDialog}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      </PageContainer>
+    </>
   );
 }

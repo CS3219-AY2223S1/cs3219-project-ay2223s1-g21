@@ -18,7 +18,6 @@ import { Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/question_service";
-import { setIsLoading } from "../../redux/actions/auth";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setQuestion,
@@ -26,7 +25,7 @@ import {
   setTab,
   setCodeExecutionResult,
 } from "../../redux/actions/collab";
-import { setLogout } from "../../redux/actions/auth";
+import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
 import {
   getCompilationResult,
@@ -139,8 +138,11 @@ export default function CollaborationPage() {
   }, []);
 
   const handleLogout = () => {
-    handleLogoutAccount();
-    dispatch(setLogout());
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then((res) => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
   };
 
   return (

@@ -8,12 +8,12 @@ import {
   Difficulty,
 } from "./DescriptionElements";
 import InnerHtmlAdder from "../../../components/InnerHtmlAdder";
-// import { question } from "./Data.js";
+import { question } from "./Data.js";
 import { useSelector } from "react-redux";
 import "./markup.css";
 
 export default function Description() {
-  const { question } = useSelector((state) => state.collabReducer);
+  // const { question } = useSelector((state) => state.collabReducer);
 
   return (
     <Container>
