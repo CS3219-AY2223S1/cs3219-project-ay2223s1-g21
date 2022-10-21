@@ -34,8 +34,14 @@ export default function MatchingPage() {
     );
     setSocket(socket);
     return () => {
-      console.log("Disconnect Socket");
+      socket.emit("cancelMatch", {
+        email: userEmail,
+        difficulty: difficulty,
+        jwtToken: jwtToken,
+        userId: userId,
+      });
       socket.close();
+      console.log("Disconnect Socket");
     };
   }, [setSocket]);
 

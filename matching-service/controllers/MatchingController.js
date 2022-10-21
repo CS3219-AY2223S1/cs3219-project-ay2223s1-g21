@@ -25,7 +25,7 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   // Not authorised
   if (authRes.status === responseStatus.UNAUTHORIZED) {
     socket.emit("unauthorized", authRes);
-    console.log("Unauthorized");
+    console.log("Unauthorized", authRes);
     return;
   }
 
@@ -57,7 +57,10 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
 
   // Check if there is an existing match waiting
   const matchExists = await Match.findOne({ difficulty: difficulty });
-  if (!matchExists) {
+  if (
+    !matchExists ||
+    moment().subtract(moment(matchExists.timeCreated), "seconds") > 30
+  ) {
     const match = new Match({
       email: email,
       difficulty: difficulty,
@@ -104,7 +107,7 @@ async function cancelMatch(socket, email, difficulty, jwtToken, userId) {
     return;
   }
 
-  await Match.findOneAndDelete({ email: email, difficulty: difficulty });
+  await Match.deleteMany({ email: email, difficulty: difficulty });
 }
 
 module.exports = {

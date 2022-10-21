@@ -2,7 +2,7 @@ import { UPDATE_DIFFICULTY, UPDATE_ROOM_ID } from "../actionTypes";
 
 const initialState = {
   difficulty: "",
-  roomId: "",
+  roomId: null,
 };
 
 export default function matchingReducer(state = initialState, action) {

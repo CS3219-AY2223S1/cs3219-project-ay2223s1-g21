@@ -35,12 +35,11 @@ export default function LoginPage() {
   const { isLoading, jwtToken } = useSelector((state) => state.authReducer);
   const [isRegister, setIsRegister] = useState(true);
 
-
   useEffect(() => {
     silentLogin(jwtToken, dispatch, navigate, location?.state?.from);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jwtToken]);
-  
+
   const handleToggle = () => {
     if (isRegister) {
       loginRef.current.style.left = "-400px";
@@ -52,7 +51,6 @@ export default function LoginPage() {
       btnRef.current.style.left = "0px";
     }
     setIsRegister(!isRegister);
-    
   };
 
   const closeDialog = () => {

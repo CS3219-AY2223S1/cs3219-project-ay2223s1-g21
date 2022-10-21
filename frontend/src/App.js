@@ -43,11 +43,12 @@ function App() {
             element={<PrivateRoute component={MatchingPage} />}
           />
           <Route
-            path="/collab/*"
+            exact
+            path="/collab/:interviewId"
             element={
               <PrivateRoute
                 component={CollaborationPage}
-                fromUrl={"/collab/*"}
+                fromUrl={"/collab/:interviewId"}
               />
             }
           />

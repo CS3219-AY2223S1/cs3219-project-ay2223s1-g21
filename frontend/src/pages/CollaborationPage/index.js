@@ -12,9 +12,9 @@ import {
 import EmbeddedEditor from "./EmbeddedEditor";
 import QuestionSection from "./QuestionSection";
 import Button from "@mui/material/Button";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useEffect } from "react";
-import { Widget } from "react-chat-widget";
+import { addResponseMessage, dropMessages, Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
 import { fetchQuestion } from "../../services/question_service";
@@ -31,16 +31,26 @@ import {
   getCompilationResult,
   requestCompilation,
 } from "../../services/compile_service";
+import io from "socket.io-client";
+import { connect, disconnect } from "./store";
+import { useNavigate } from "react-router-dom";
+import { Peer } from "peerjs";
 
 export default function CollaborationPage() {
+  const navigate = useNavigate();
   const separatorRef = useRef(null);
   const questionRef = useRef(null);
   const embeddedEditorRef = useRef(null);
+  const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
   const { difficulty } = useSelector((state) => state.matchingReducer);
   const { curMode, code, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
+  const { userId } = useSelector((state) => state.authReducer);
+  const { roomId } = useSelector((state) => state.matchingReducer);
+  const [peer, setPeer] = useState(false);
+  const [ioSocket, setIoSocket] = useState(null);
 
   const submitCompileRequest = async (curMode, curCode) => {
     if (!isCodeRunning) {
@@ -99,9 +109,9 @@ export default function CollaborationPage() {
 
     // draggable event listeners
     const resizableEditorEle = embeddedEditorRef.current;
+    const editorEleStyles = window.getComputedStyle(resizableEditorEle);
     const resizerEle = separatorRef.current;
     const questionEle = questionRef.current;
-    const editorEleStyles = window.getComputedStyle(resizableEditorEle);
     let qWidth = parseInt(window.getComputedStyle(questionEle).width, 10);
     let width = parseInt(editorEleStyles.width, 10);
     let x = 0;
@@ -115,25 +125,24 @@ export default function CollaborationPage() {
       questionEle.style.width = `${qWidth}px`;
       resizableEditorEle.style.width = `${width}px`;
       x = event.clientX;
+
+      const onMouseUpRightResize = (event) => {
+        document.removeEventListener("mousemove", onMouseMoveRightResize);
+      };
+
+      const onMouseDownRightResize = (event) => {
+        x = event.clientX;
+        document.addEventListener("mousemove", onMouseMoveRightResize);
+        document.addEventListener("mouseup", onMouseUpRightResize);
+      };
+
+      // Add event listeners
+      resizerEle.addEventListener("mousedown", onMouseDownRightResize);
+
+      return () => {
+        resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
+      };
     };
-
-    const onMouseUpRightResize = (event) => {
-      document.removeEventListener("mousemove", onMouseMoveRightResize);
-    };
-
-    const onMouseDownRightResize = (event) => {
-      x = event.clientX;
-      document.addEventListener("mousemove", onMouseMoveRightResize);
-      document.addEventListener("mouseup", onMouseUpRightResize);
-    };
-
-    // Add event listeners
-    resizerEle.addEventListener("mousedown", onMouseDownRightResize);
-
-    return () => {
-      resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
-    };
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -143,6 +152,112 @@ export default function CollaborationPage() {
       dispatch(setIsLoading(false));
       dispatch(setLogout());
     });
+  };
+
+  // Socket io method
+  useEffect(() => {
+    const socket = io(`http://localhost:3005`);
+    socket.on("connectionSuccess", () => {
+      setIoSocket(socket);
+    });
+
+    const peer = new Peer(`${roomId}-${userId}`);
+    console.log("Peer Id :", peer.id);
+    setPeer(peer);
+
+    connect();
+
+    return () => {
+      console.log("Disconnect Socket");
+      socket.close();
+      peer.destroy();
+      disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (ioSocket && !ioSocket.connected) {
+      disconnect();
+      navigate("/home");
+    }
+    if (ioSocket && peer) {
+      ioSocket.emit("joinRoom", { roomId: roomId, userId: userId });
+
+      peer.on("connection", () => {
+        console.log("Someone is connecting to me");
+      });
+
+      peer.on("call", (call) => {
+        navigator.mediaDevices
+          .getUserMedia({ video: false, audio: true })
+          .then((stream) => {
+            call.answer(stream); // Answer the call with an A/V stream.
+            call.on("stream", (remoteStream) => {
+              console.log("Got stream", remoteStream);
+              voiceChatRef.current.srcObject = remoteStream;
+              voiceChatRef.current.play();
+            });
+          })
+          .catch((err) => {
+            console.error("Failed to get local stream", err);
+          });
+      });
+
+      ioSocket.on("joinSuccess", () => {
+        ioSocket.emit("startCall", {
+          peerid: peer.id,
+          roomId: roomId,
+        });
+      });
+
+      ioSocket.on("callPeer", (peerId) => {
+        if (peerId !== peer.id) {
+          navigator.mediaDevices
+            .getUserMedia({ video: false, audio: true })
+            .then((stream) => {
+              console.log("New Call Request", peerId);
+              const call = peer.call(peerId, stream);
+              call.on("stream", (remoteStream) => {
+                console.log("Got stream", remoteStream);
+                voiceChatRef.current.srcObject = remoteStream;
+                voiceChatRef.current.play();
+              });
+            });
+        }
+      });
+
+      ioSocket.on("alreadyInRoom", () => {
+        console.log("Already in Room");
+        disconnect();
+        navigate("/home");
+      });
+
+      ioSocket.on("newChatMsg", (data) => {
+        console.log("Received new chat message", data);
+        const { userId: id, newMessage } = data;
+        if (id && id !== userId) {
+          addResponseMessage(newMessage);
+        }
+      });
+
+      ioSocket.on("leaveRoom", () => {
+        alert("A participant has left the room");
+      });
+
+      ioSocket.on("badRequest", () => {
+        navigate("/home");
+      });
+    }
+  }, [ioSocket, peer]);
+
+  const handleNewUserMessage = (newMessage) => {
+    ioSocket.emit("sendChatMsg", { roomId, userId, newMessage });
+  };
+
+  const handleExitSession = () => {
+    ioSocket.emit("exitRoom", { roomId });
+    dropMessages();
+    navigate("/home");
   };
 
   return (
@@ -161,14 +276,20 @@ export default function CollaborationPage() {
         <EmbeddedEditor editorRef={embeddedEditorRef} />
       </ContentContainer>
       <FooterContainer>
-        <Button variant="outlined" color="error" style={{ marginLeft: "30px" }}>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleExitSession}
+          style={{ marginLeft: "30px" }}
+        >
           Exit Session
         </Button>
         <Widget
-          // handleNewUserMessage={handleNewUserMessage}
+          handleNewUserMessage={handleNewUserMessage}
           subtitle="Chat here"
         />
       </FooterContainer>
+      <audio ref={voiceChatRef}></audio>
     </PgContainer>
   );
 }

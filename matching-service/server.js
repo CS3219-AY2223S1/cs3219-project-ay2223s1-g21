@@ -11,8 +11,12 @@ const fns = require("./controllers/MatchingController");
 
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.options("*", cors());
+app.use(
+  cors({
+    origin: process.env.CLIENT_DOMAIN,
+    credentials: true,
+  })
+);
 
 const server = app.listen(PORT, function () {
   try {
