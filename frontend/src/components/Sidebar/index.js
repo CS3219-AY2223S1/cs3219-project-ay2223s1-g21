@@ -30,12 +30,12 @@ const Sidebar = ({ isOpen, toggle, isProfilePage }) => {
       </Icon>
       <SidebarWrapper>
         <SidebarMenu>
-          {isProfilePage && <SidebarProfile to="/home">Home</SidebarProfile>}
+          {isProfilePage && <SidebarProfile onClick={toggle} to="/home">Home</SidebarProfile>}
           {!isProfilePage && (
-            <SidebarProfile to="/profile">Profile</SidebarProfile>
+            <SidebarProfile onClick={toggle} to="/profile">Profile</SidebarProfile>
           )}
-          {!isProfilePage && <SidebarLink to="about">About</SidebarLink>}
-          {!isProfilePage && <SidebarLink to="faq">FAQs</SidebarLink>}
+          {!isProfilePage && <SidebarLink onClick={toggle} to="about">About</SidebarLink>}
+          {!isProfilePage && <SidebarLink onClick={toggle} to="faq">FAQs</SidebarLink>}
           <SidebarLogout onClick={handleLogout}>Logout</SidebarLogout>
         </SidebarMenu>
       </SidebarWrapper>
