@@ -32,7 +32,7 @@ export async function createUser(req, res) {
                 return res.status(400).json({message: CONSTANTS.INVALID_PASSWORD_MESSAGE});
             }
             
-            const resp = await _createUser(email, password);
+            const resp = await _createUser(email.toLowerCase(), password);
             
             if (resp.err) {
                 return res.status(400).json({message: 'Could not create a new user!'});
@@ -61,10 +61,10 @@ export async function login(req, res) {
             return res.status(400).json({message: 'Email and/or Password are missing!'});
         }
 
-        const user = await _getUserByEmail(email);
+        const user = await _getUserByEmail(email.toLowerCase());
 
         //User does not exist
-        if (!await _userExistsByEmail(email)) {
+        if (!await _userExistsByEmail(email.toLowerCase())) {
             return res.status(404).json({ message: "User Not found! Please try again." });
         }
 
@@ -197,10 +197,10 @@ export async function requestPasswordReset(req, res) {
             return res.status(400).json({message: 'Email is missing!'});
         }
 
-        const user = await _getUserByEmail(email);
+        const user = await _getUserByEmail(email.toLowerCase());
 
         //User does not exist
-        if (!await _userExistsByEmail(email)) {
+        if (!await _userExistsByEmail(email.toLowerCase())) {
             return res.status(404).json({ message: "User Not found!" });
         }
 
