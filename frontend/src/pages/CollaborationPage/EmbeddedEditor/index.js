@@ -106,7 +106,7 @@ export default function EmbeddedEditor({ editorRef }) {
     <EditorContainer ref={editorRef}>
       <Bar>
         <Tooltip title="Click or press Ctrl + Enter to run your code.">
-          <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
+          <RunCodeButton onClick={() => submitCompileRequest(curMode, state.collab["code-" + roomId])}>
             Run Code
           </RunCodeButton>
         </Tooltip>
