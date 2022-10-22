@@ -13,6 +13,9 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { setIsLoading } from "../../redux/actions/auth";
+import { handleLogoutAccount } from "../../services/user_service";
+import { setLogout } from "../../redux/actions/auth";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -33,13 +36,22 @@ export default function MatchingPage() {
     }, 1000);
 
   const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
-  const MATCH_ERROR_MSG = "Some error occurred. Please try again.";
+  const MATCH_ERROR_MSG = "Please try again. Some error occurred. ";
+
+  const handleLogout = () => {
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then((res) => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
+  };
+
 
   const closeDialog = () => {
-    if (feedbackMessage === MATCH_ERROR_MSG) {
-      navigate("/home");
+    if (feedbackMessage === LOGIN_ERROR_MSG) {
+      handleLogout();
     } else {
-      navigate("/login");
+      navigate("/home");
     }
   };
 
@@ -99,7 +111,7 @@ export default function MatchingPage() {
 
       socket.on("badRequest", (res) => {
         console.log("BAD REQUEST", res);
-        setFeedbackMessage(MATCH_ERROR_MSG);
+        setFeedbackMessage(MATCH_ERROR_MSG + " " + res.message);
       });
     }
     return () => {
