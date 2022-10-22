@@ -35,13 +35,13 @@ import {
   setIsCodeRunning,
   setTab,
 } from "../../../redux/actions/collab";
-import { setMode, setCode } from "../../../redux/actions/collab";
+import { setMode } from "../../../redux/actions/collab";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { roomId } = useSelector((state) => state.matchingReducer);
-  const { code, curMode, question, ioSocket } = useSelector(
+  const {  curMode } = useSelector(
     (state) => state.collabReducer
   );
 
@@ -60,8 +60,6 @@ export default function EmbeddedEditor({ editorRef }) {
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
     dispatch(setMode(lang));
-    // dispatch(setCode(question[lang]));
-    dispatch(setCode("Dummy text because currently no question")); // remember
   };
 
   const handleThemeSelect = (event) => {
@@ -100,6 +98,7 @@ export default function EmbeddedEditor({ editorRef }) {
 
   useEffect(() => {
     state.collab["code-" + roomId] = `console.log("Hello World!");`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

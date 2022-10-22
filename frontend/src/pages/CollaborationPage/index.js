@@ -125,37 +125,22 @@ export default function CollaborationPage() {
       questionEle.style.width = `${qWidth}px`;
       resizableEditorEle.style.width = `${width}px`;
       x = event.clientX;
-
-      const onMouseUpRightResize = (event) => {
-        document.removeEventListener("mousemove", onMouseMoveRightResize);
-      };
-
-      const onMouseDownRightResize = (event) => {
-        x = event.clientX;
-        document.addEventListener("mousemove", onMouseMoveRightResize);
-        document.addEventListener("mouseup", onMouseUpRightResize);
-      };
-
-      // Add event listeners
-      resizerEle.addEventListener("mousedown", onMouseDownRightResize);
-
-      return () => {
-        resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
-      };
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  const handleLogout = () => {
-    dispatch(setIsLoading(true));
-    handleLogoutAccount().then((res) => {
-      dispatch(setIsLoading(false));
-      dispatch(setLogout());
-    });
-  };
+    const onMouseUpRightResize = (event) => {
+      document.removeEventListener("mousemove", onMouseMoveRightResize);
+    };
 
-  // Socket io method
-  useEffect(() => {
+    const onMouseDownRightResize = (event) => {
+      x = event.clientX;
+      document.addEventListener("mousemove", onMouseMoveRightResize);
+      document.addEventListener("mouseup", onMouseUpRightResize);
+    };
+
+    // Add event listeners
+    resizerEle.addEventListener("mousedown", onMouseDownRightResize);
+
+    // Socket io method
     const socket = io(`http://localhost:3005`);
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
@@ -168,12 +153,24 @@ export default function CollaborationPage() {
     connect();
 
     return () => {
+      resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
+
+      //socket io cleanup
       console.log("Disconnect Socket");
       socket.close();
       peer.destroy();
       disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleLogout = () => {
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then((res) => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
+  };
 
   useEffect(() => {
     if (ioSocket && !ioSocket.connected) {
@@ -248,6 +245,7 @@ export default function CollaborationPage() {
         navigate("/home");
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ioSocket, peer]);
 
   const handleNewUserMessage = (newMessage) => {

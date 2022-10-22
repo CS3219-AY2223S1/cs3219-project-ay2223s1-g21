@@ -3,8 +3,7 @@ import {
   UPDATE_EXECUTION_RESULT,
   UPDATE_IS_CODE_RUNNING,
   UPDATE_QUESTION,
-  UPDATE_TAB,
-  UPDATE_CODE
+  UPDATE_TAB
 } from "../actionTypes";
 
 const initialState = {
@@ -18,7 +17,6 @@ const initialState = {
   isCodeRunning: false,
   selectedTab: "Description",
   codeResult: "Press Run Code or Ctrl + Enter to run your code.",
-  code: `console.log("Hello World!");`,
   curMode: "javascript",
 };
 
@@ -52,12 +50,6 @@ export default function collabReducer(state = initialState, action) {
       return {
         ...state,
         curMode: action.payload,
-      };
-
-    case UPDATE_CODE:
-      return {
-        ...state,
-        code: action.payload,
       };
 
     default:
