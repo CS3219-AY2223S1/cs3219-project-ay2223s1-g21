@@ -1,9 +1,9 @@
 import { getRandomQuestionByDifficulty } from './question-repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
-export async function ormGetRandomQuestion(difficulty) {
+export async function ormGetRandomQuestion(difficulty, exclude) {
     try {
-        const question = await getRandomQuestionByDifficulty(difficulty);
+        const question = await getRandomQuestionByDifficulty(difficulty, exclude);
         
         if (question.length == 0) {
             throw "No question found";
@@ -11,7 +11,7 @@ export async function ormGetRandomQuestion(difficulty) {
 
         return question;
     } catch (err) {
-        console.log('ERROR: Could not create new user');
+        console.log('ERROR: Could not get random question');
         throw err;
     }
 }
