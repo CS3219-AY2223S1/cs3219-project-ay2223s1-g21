@@ -35,6 +35,8 @@ import io from "socket.io-client";
 import { connect, disconnect } from "./store";
 import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
+import { useSyncedStore } from "@syncedstore/react";
+import { store } from "./store";
 
 export default function CollaborationPage() {
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ export default function CollaborationPage() {
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
   const { difficulty } = useSelector((state) => state.matchingReducer);
-  const { curMode, code, isCodeRunning } = useSelector(
+  const { curMode, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
   const { userId } = useSelector((state) => state.authReducer);
@@ -83,7 +85,7 @@ export default function CollaborationPage() {
   useEffect(() => {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
-        submitCompileReqCallback(curMode, code);
+        submitCompileReqCallback(curMode, state.collab["code-" + roomId]);
       }
     };
 
@@ -91,7 +93,8 @@ export default function CollaborationPage() {
     return () => {
       document.removeEventListener("keydown", onCtrlEnterKeyDown);
     };
-  }, [code, curMode, submitCompileReqCallback]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [curMode, submitCompileReqCallback]);
 
   useEffect(() => {
     // question fetch
@@ -125,37 +128,22 @@ export default function CollaborationPage() {
       questionEle.style.width = `${qWidth}px`;
       resizableEditorEle.style.width = `${width}px`;
       x = event.clientX;
-
-      const onMouseUpRightResize = (event) => {
-        document.removeEventListener("mousemove", onMouseMoveRightResize);
-      };
-
-      const onMouseDownRightResize = (event) => {
-        x = event.clientX;
-        document.addEventListener("mousemove", onMouseMoveRightResize);
-        document.addEventListener("mouseup", onMouseUpRightResize);
-      };
-
-      // Add event listeners
-      resizerEle.addEventListener("mousedown", onMouseDownRightResize);
-
-      return () => {
-        resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
-      };
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  const handleLogout = () => {
-    dispatch(setIsLoading(true));
-    handleLogoutAccount().then((res) => {
-      dispatch(setIsLoading(false));
-      dispatch(setLogout());
-    });
-  };
+    const onMouseUpRightResize = (event) => {
+      document.removeEventListener("mousemove", onMouseMoveRightResize);
+    };
 
-  // Socket io method
-  useEffect(() => {
+    const onMouseDownRightResize = (event) => {
+      x = event.clientX;
+      document.addEventListener("mousemove", onMouseMoveRightResize);
+      document.addEventListener("mouseup", onMouseUpRightResize);
+    };
+
+    // Add event listeners
+    resizerEle.addEventListener("mousedown", onMouseDownRightResize);
+
+    // Socket io method
     const socket = io(`http://localhost:3005`);
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
@@ -168,12 +156,25 @@ export default function CollaborationPage() {
     connect();
 
     return () => {
+      resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
+
+      //socket io cleanup
       console.log("Disconnect Socket");
       socket.close();
       peer.destroy();
       disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const state = useSyncedStore(store);
+  const handleLogout = () => {
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then((res) => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
+  };
 
   useEffect(() => {
     if (ioSocket && !ioSocket.connected) {
@@ -248,6 +249,7 @@ export default function CollaborationPage() {
         navigate("/home");
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ioSocket, peer]);
 
   const handleNewUserMessage = (newMessage) => {

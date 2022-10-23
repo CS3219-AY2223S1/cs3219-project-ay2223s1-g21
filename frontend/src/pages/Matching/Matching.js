@@ -13,11 +13,14 @@ import {
   DialogTitle,
   Button,
 } from "@mui/material";
+import { setIsLoading } from "../../redux/actions/auth";
+import { handleLogoutAccount } from "../../services/user_service";
+import { setLogout } from "../../redux/actions/auth";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [cancelTimer, setCancelTimer] = useState(10);
+  const [cancelTimer, setCancelTimer] = useState(3);
   const [matchTimer, setmatchTimer] = useState(30);
   const [foundMatch, setFoundMatch] = useState(false);
   const [feedbackMessage, setFeedbackMessage] = useState("");
@@ -27,12 +30,46 @@ export default function MatchingPage() {
     (state) => state.authReducer
   );
   const { difficulty } = useSelector((state) => state.matchingReducer);
+  const timerCreator = (setter) =>
+    setInterval(() => {
+      setter((prevProgress) => (prevProgress > 0 ? prevProgress - 1 : 0));
+    }, 1000);
+
+  const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
+  const MATCH_ERROR_MSG = "Please try again. Some error occurred. ";
+
+  const handleLogout = () => {
+    dispatch(setIsLoading(true));
+    handleLogoutAccount().then((res) => {
+      dispatch(setIsLoading(false));
+      dispatch(setLogout());
+    });
+  };
+
+
+  const closeDialog = () => {
+    if (feedbackMessage === LOGIN_ERROR_MSG) {
+      handleLogout();
+    } else {
+      navigate("/home");
+    }
+  };
 
   useEffect(() => {
     const socket = io(
       `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
     );
     setSocket(socket);
+
+    let cancelMatchTimer;
+    if (socket) {
+      socket.emit("connection");
+      socket.on("connectionSuccess", (message) => {
+        setIsConnect(true);
+        cancelMatchTimer = timerCreator(setCancelTimer);
+      });
+    }
+
     return () => {
       socket.emit("cancelMatch", {
         email: userEmail,
@@ -42,31 +79,16 @@ export default function MatchingPage() {
       });
       socket.close();
       console.log("Disconnect Socket");
+
+      clearInterval(cancelMatchTimer);
     };
-  }, [setSocket]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
-    if (socket) {
-      socket.emit("connection");
-      socket.on("connectionSuccess", (message) => {
-        setIsConnect(true);
-        const timer = setInterval(() => {
-          setCancelTimer((prevProgress) =>
-            prevProgress > 0 ? prevProgress - 1 : 0
-          );
-        }, 1000);
-        return () => {
-          clearInterval(timer);
-        };
-      });
-    }
-  }, [socket]);
-
-  const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
-  const MATCH_ERROR_MSG = "Some error occurred. Please try again.";
-
-  useEffect(() => {
+    let normalMatchTimer;
     if (isConnected && !cancelTimer) {
+      normalMatchTimer = timerCreator(setmatchTimer);
       socket.emit("findMatch", {
         email: userEmail,
         difficulty: difficulty,
@@ -89,49 +111,14 @@ export default function MatchingPage() {
 
       socket.on("badRequest", (res) => {
         console.log("BAD REQUEST", res);
-        setFeedbackMessage(MATCH_ERROR_MSG);
-      });
-
-      const timer = setInterval(() => {
-        setmatchTimer((prevProgress) =>
-          prevProgress > 0 ? prevProgress - 1 : 0
-        );
-      }, 1000);
-
-      return () => {
-        clearInterval(timer);
-      };
-    }
-  }, [
-    isConnected,
-    cancelTimer,
-    jwtToken,
-    socket,
-    userEmail,
-    userId,
-    dispatch,
-    difficulty,
-    navigate,
-  ]);
-
-  useEffect(() => {
-    if (!matchTimer) {
-      socket.emit("cancelMatch", {
-        email: userEmail,
-        difficulty: difficulty,
-        jwtToken: jwtToken,
-        userId: userId,
+        setFeedbackMessage(MATCH_ERROR_MSG + " " + res.message);
       });
     }
-  }, [matchTimer, difficulty, jwtToken, userId, socket, userEmail]);
-
-  const closeDialog = () => {
-    if (feedbackMessage === MATCH_ERROR_MSG) {
-      navigate("/home");
-    } else {
-      navigate("/login");
-    }
-  };
+    return () => {
+      clearInterval(normalMatchTimer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isConnected, cancelTimer]);
 
   return (
     <>
@@ -140,7 +127,7 @@ export default function MatchingPage() {
       ) : (
         <LoadingScreen />
       )}
-      <Dialog open={feedbackMessage} onClose={closeDialog}>
+      <Dialog open={feedbackMessage}>
         <DialogTitle>Bad Request</DialogTitle>
         <DialogContent>
           <DialogContentText>{feedbackMessage}</DialogContentText>

@@ -35,15 +35,13 @@ import {
   setIsCodeRunning,
   setTab,
 } from "../../../redux/actions/collab";
-import { setMode, setCode } from "../../../redux/actions/collab";
+import { setMode } from "../../../redux/actions/collab";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { roomId } = useSelector((state) => state.matchingReducer);
-  const { code, curMode, question, ioSocket } = useSelector(
-    (state) => state.collabReducer
-  );
+  const { curMode } = useSelector((state) => state.collabReducer);
 
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
@@ -60,8 +58,6 @@ export default function EmbeddedEditor({ editorRef }) {
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
     dispatch(setMode(lang));
-    // dispatch(setCode(question[lang]));
-    dispatch(setCode("Dummy text because currently no question")); // remember
   };
 
   const handleThemeSelect = (event) => {
@@ -100,13 +96,14 @@ export default function EmbeddedEditor({ editorRef }) {
 
   useEffect(() => {
     state.collab["code-" + roomId] = `console.log("Hello World!");`;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
         <Tooltip title="Click or press Ctrl + Enter to run your code.">
-          <RunCodeButton onClick={() => submitCompileRequest(curMode, code)}>
+          <RunCodeButton onClick={() => submitCompileRequest(curMode,  state.collab["code-" + roomId])}>
             Run Code
           </RunCodeButton>
         </Tooltip>
@@ -114,23 +111,21 @@ export default function EmbeddedEditor({ editorRef }) {
           <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
         </Tooltip>
         <Menu
-            id="fade-menu"
-            MenuListProps={{
-              "aria-labelledby": "fade-button",
-            }}
-            anchorEl={anchorElLang}
-            open={openLang}
-            onClose={() => handleCloseLang(curMode)}
-            TransitionComponent={Fade}
-          >
-            <MenuItem onClick={() => handleCloseLang("javascript")}>
-              javascript
-            </MenuItem>
-            <MenuItem onClick={() => handleCloseLang("java")}>java</MenuItem>
-            <MenuItem onClick={() => handleCloseLang("python")}>
-              python
-            </MenuItem>
-          </Menu>
+          id="fade-menu"
+          MenuListProps={{
+            "aria-labelledby": "fade-button",
+          }}
+          anchorEl={anchorElLang}
+          open={openLang}
+          onClose={() => handleCloseLang(curMode)}
+          TransitionComponent={Fade}
+        >
+          <MenuItem onClick={() => handleCloseLang("javascript")}>
+            javascript
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseLang("java")}>java</MenuItem>
+          <MenuItem onClick={() => handleCloseLang("python")}>python</MenuItem>
+        </Menu>
         <Tooltip title="Select a theme.">
           <BarItem onClick={handleThemeSelect}>
             {" "}
@@ -138,31 +133,31 @@ export default function EmbeddedEditor({ editorRef }) {
           </BarItem>
         </Tooltip>
         <Menu
-            id="fade-menu"
-            MenuListProps={{
-              "aria-labelledby": "fade-button",
-            }}
-            anchorEl={anchorElTheme}
-            open={openTheme}
-            onClose={() => handleCloseTheme(curTheme)}
-            TransitionComponent={Fade}
-          >
-            <MenuItem onClick={() => handleCloseTheme("twilight")}>
-              twilight
-            </MenuItem>
-            <MenuItem onClick={() => handleCloseTheme("monokai")}>
-              monokai
-            </MenuItem>
-            <MenuItem onClick={() => handleCloseTheme("tomorrow_night")}>
-              tomorrow
-            </MenuItem>
-            <MenuItem onClick={() => handleCloseTheme("solarized_dark")}>
-              solarized
-            </MenuItem>
-            <MenuItem onClick={() => handleCloseTheme("terminal")}>
-              terminal
-            </MenuItem>
-          </Menu>
+          id="fade-menu"
+          MenuListProps={{
+            "aria-labelledby": "fade-button",
+          }}
+          anchorEl={anchorElTheme}
+          open={openTheme}
+          onClose={() => handleCloseTheme(curTheme)}
+          TransitionComponent={Fade}
+        >
+          <MenuItem onClick={() => handleCloseTheme("twilight")}>
+            twilight
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("monokai")}>
+            monokai
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("tomorrow_night")}>
+            tomorrow
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("solarized_dark")}>
+            solarized
+          </MenuItem>
+          <MenuItem onClick={() => handleCloseTheme("terminal")}>
+            terminal
+          </MenuItem>
+        </Menu>
       </Bar>
       <AceEditor
         style={{
@@ -174,9 +169,9 @@ export default function EmbeddedEditor({ editorRef }) {
         mode={curMode}
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) =>
-          (state.collab["code-" + roomId] = currentCode)
-        }
+        onChange={(currentCode) => {
+          state.collab["code-" + roomId] = currentCode;
+        }}
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
