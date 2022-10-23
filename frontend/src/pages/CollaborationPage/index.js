@@ -17,10 +17,8 @@ import { useEffect } from "react";
 import { addResponseMessage, dropMessages, Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
-import { fetchQuestion } from "../../services/question_service";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setQuestion,
   setIsCodeRunning,
   setTab,
   setCodeExecutionResult,
@@ -45,7 +43,6 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { difficulty } = useSelector((state) => state.matchingReducer);
   const { curMode, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
@@ -97,19 +94,6 @@ export default function CollaborationPage() {
   }, [curMode, submitCompileReqCallback]);
 
   useEffect(() => {
-    // question fetch
-    dispatch(setIsLoading(true));
-    fetchQuestion(difficulty)
-      .then((res) => {
-        console.log(res);
-        dispatch(setQuestion(res.data[0]));
-        dispatch(setIsLoading(false));
-      })
-      .catch((err) => {
-        console.log(err);
-        dispatch(setIsLoading(false));
-      });
-
     // draggable event listeners
     const resizableEditorEle = embeddedEditorRef.current;
     const editorEleStyles = window.getComputedStyle(resizableEditorEle);

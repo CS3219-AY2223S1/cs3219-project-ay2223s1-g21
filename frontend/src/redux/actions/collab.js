@@ -1,17 +1,9 @@
 import {
   UPDATE_IS_CODE_RUNNING,
-  UPDATE_QUESTION,
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
 } from "../actionTypes";
-
-export const setQuestion = (question) => {
-  return {
-    type: UPDATE_QUESTION,
-    payload: question,
-  };
-};
 
 export const setIsCodeRunning = (isCodeRunning) => {
   return {

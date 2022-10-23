@@ -8,6 +8,7 @@ const clientErrMsgs = require("../utilities/errors/ClientError");
 const mongoErrMsgs = require("../utilities/errors/MongoError");
 const authJwt = require("../utilities/auth/authJwt");
 const moment = require("moment");
+const axios = require("axios");
 
 function serviceHealthCheck() {
   var res = {
@@ -85,12 +86,19 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   });
   await interview.save();
 
+  const question = await axios.get(
+    process.env.REACT_APP_QUESTION_SERVER_URL +
+      "/question?difficulty=" +
+      difficulty
+  );
+
   var res = {
     status: responseStatus.SUCCESS,
     data: {
       interviewId: interview.interviewId,
       partnerEmail: matchExists.email,
       difficulty: difficulty,
+      question: question.data[0],
     },
   };
 
