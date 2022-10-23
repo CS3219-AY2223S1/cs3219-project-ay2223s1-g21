@@ -106,16 +106,10 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   socket.emit("matchSuccess", res);
 }
 
-async function cancelMatch(socket, email, difficulty, jwtToken, userId) {
-  var authRes = authJwt.verifyToken(jwtToken, userId, socket);
-
-  // Not authorised
-  if (authRes.status === responseStatus.UNAUTHORIZED) {
-    socket.emit("unauthorized", authRes);
-    return;
-  }
-
-  await Match.deleteMany({ email: email, difficulty: difficulty });
+async function cancelMatch(socketId) {
+  await Match.deleteOne({
+    socketId: socketId,
+  });
 }
 
 module.exports = {

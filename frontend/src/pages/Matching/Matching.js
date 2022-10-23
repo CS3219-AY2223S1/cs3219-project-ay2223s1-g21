@@ -16,6 +16,7 @@ import {
 import { setIsLoading } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
+import { useCallback } from "react";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -70,15 +71,7 @@ export default function MatchingPage() {
     }
 
     return () => {
-      socket.emit("cancelMatch", {
-        email: userEmail,
-        difficulty: difficulty,
-        jwtToken: jwtToken,
-        userId: userId,
-      });
       socket.close();
-      console.log("Disconnect Socket");
-
       clearInterval(cancelMatchTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
