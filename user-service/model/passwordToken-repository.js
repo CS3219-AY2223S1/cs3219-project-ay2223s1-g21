@@ -7,7 +7,8 @@ import mongoose from 'mongoose';
 // let mongoDB = process.env.ENV == "PROD" ? process.env.DB_CLOUD_URI : process.env.DB_LOCAL_URI;
 const PASSWORD = process.env.PASSWORD
 const DB_NAME = process.env.DB_NAME
-const ATLAS_URI = `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
+let ATLAS_URI = process.env.ENV == "DEV" ? process.env.DB_LOCAL_URI :
+    `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
     || process.env.DB_LOCAL_URI;
 
 mongoose.connect(ATLAS_URI,
