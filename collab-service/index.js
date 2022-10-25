@@ -12,11 +12,19 @@ app.use(express.json());
 app.use(cors());
 app.options("*", cors());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3005;
+
+const PASSWORD = process.env.PASSWORD;
+const DB_NAME = process.env.DB_NAME;
+const ATLAS_URI = `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority` 
+  || process.env.DB_LOCAL_URI;
 
 const server = app.listen(PORT, async function () {
   try {
-    mongoose.connect(process.env.DB_LOCAL_URI);
+    mongoose.connect(ATLAS_URI,
+      { useNewUrlParser: true, useUnifiedTopology: true },
+      () => console.log(" Mongoose is connected"));
+    console.log("Connected to MongoDB: ", ATLAS_URI);
     console.log(`Collab microservice listening on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
   } catch (err) {
