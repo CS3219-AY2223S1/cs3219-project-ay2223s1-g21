@@ -1,8 +1,13 @@
-import { UPDATE_DIFFICULTY, UPDATE_ROOM_ID } from "../actionTypes";
+import {
+  UPDATE_DIFFICULTY,
+  UPDATE_QUESTION,
+  UPDATE_ROOM_ID,
+} from "../actionTypes";
 
 const initialState = {
   difficulty: "",
   roomId: null,
+  question: null,
 };
 
 export default function matchingReducer(state = initialState, action) {
@@ -16,6 +21,11 @@ export default function matchingReducer(state = initialState, action) {
       return {
         ...state,
         roomId: action.payload,
+      };
+    case UPDATE_QUESTION:
+      return {
+        ...state,
+        question: action.payload,
       };
     default:
       return state;
