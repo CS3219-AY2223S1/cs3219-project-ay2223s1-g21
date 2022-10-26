@@ -3,6 +3,7 @@ import {
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
+  UPDATE_QUESTION,
 } from "../actionTypes";
 
 export const setIsCodeRunning = (isCodeRunning) => {
@@ -30,5 +31,12 @@ export const setMode = (mode) => {
   return {
     type: UPDATE_CURRENT_MODE,
     payload: mode,
+  };
+};
+
+export const setQuestion = (question) => {
+  return {
+    type: UPDATE_QUESTION,
+    payload: question,
   };
 };

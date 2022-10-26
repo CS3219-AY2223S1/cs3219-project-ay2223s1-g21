@@ -4,6 +4,7 @@ const cors = require("cors");
 const { Server } = require("socket.io");
 const roomModel = require("./model/roomModel");
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 config();
 const app = express();
@@ -33,9 +34,8 @@ ioSocket.on("connection", function connection(socket) {
   ioSocket.emit("connectionSuccess", "welcome to the backend");
 
   socket.on("joinRoom", async (data) => {
+    console.log("Join Room", data);
     const { roomId, userId } = data;
-
-    console.log(roomId, !!!roomId);
 
     if (!!!roomId) {
       ioSocket.emit("badRequest");
@@ -49,25 +49,40 @@ ioSocket.on("connection", function connection(socket) {
       return;
     }
 
+    socket.join(roomId);
     // check if room exist
     const room = await roomModel.findOne({ roomId: roomId });
     if (room) {
       const copy = room.partipants;
       copy.push(userId);
       await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
+      ioSocket.to(socket.id).emit("joinSuccess");
     } else {
       const newRoom = new roomModel({
         roomId: roomId,
         partipants: [userId],
       });
       await newRoom.save();
+      ioSocket.to(socket.id).emit("joinSuccessFirst");
     }
-    socket.join(roomId);
-    if (room) {
-      ioSocket.to(socket.id).emit("joinSuccess");
-    } else {
-      ioSocket.to(socket.id).emit("joinSuccessNew");
-    }
+  });
+
+  socket.on("getQn", async (data) => {
+    const { roomId, difficulty } = data;
+
+    const response = await axios.get(
+      process.env.REACT_APP_QUESTION_SERVER_URL +
+        "/question?difficulty=" +
+        difficulty
+    );
+
+    const question = response.data[0];
+    const room = await roomModel.findOne({ roomId: roomId });
+    const copy = room.questionIds.length ? room.questionIds : [];
+    copy.push(question._id);
+    console.log("TEST", question, copy);
+    await roomModel.updateOne({ roomId: roomId }, { questionIds: copy });
+    ioSocket.to(roomId).emit("recieveQn", question);
   });
 
   socket.on("startCall", (data) => {

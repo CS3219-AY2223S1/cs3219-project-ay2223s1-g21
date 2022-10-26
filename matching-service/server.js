@@ -40,7 +40,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("findMatch", async (data) => {
-    console.log("Find Match");
+    console.log("Find Match", data);
     try {
       await fns.searchMatch(
         socket,

@@ -10,6 +10,9 @@ const roomSchema = new Schema({
     type: Array,
     required: true,
   },
+  questionIds: {
+    type: Array,
+  },
 });
 
 module.exports = mongoose.model("roomModel", roomSchema);

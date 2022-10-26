@@ -22,6 +22,7 @@ import {
   setIsCodeRunning,
   setTab,
   setCodeExecutionResult,
+  setQuestion,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
@@ -47,7 +48,7 @@ export default function CollaborationPage() {
     (state) => state.collabReducer
   );
   const { userId } = useSelector((state) => state.authReducer);
-  const { roomId } = useSelector((state) => state.matchingReducer);
+  const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
 
@@ -166,7 +167,7 @@ export default function CollaborationPage() {
       navigate("/home");
     }
     if (ioSocket && peer) {
-      ioSocket.emit("joinRoom", { roomId: roomId, userId: userId });
+      ioSocket.emit("joinRoom", { roomId, userId, difficulty });
 
       peer.on("connection", () => {
         console.log("Someone is connecting to me");
@@ -188,11 +189,20 @@ export default function CollaborationPage() {
           });
       });
 
+      ioSocket.on("joinSuccessFirst", () => {
+        console.log("TEST");
+        ioSocket.emit("getQn", { roomId, difficulty });
+      });
+
       ioSocket.on("joinSuccess", () => {
         ioSocket.emit("startCall", {
           peerid: peer.id,
           roomId: roomId,
         });
+      });
+
+      ioSocket.on("recieveQn", (question) => {
+        dispatch(setQuestion(question));
       });
 
       ioSocket.on("callPeer", (peerId) => {

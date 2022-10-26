@@ -8,32 +8,25 @@ import {
   Difficulty,
 } from "./DescriptionElements";
 import InnerHtmlAdder from "../../../components/InnerHtmlAdder";
-import { default_question } from "./Data.js";
 import { useSelector } from "react-redux";
 import "./markup.css";
 
 export default function Description() {
-  const { question } = useSelector((state) => state.matchingReducer);
-
-  const questionToDisplay = question ?? default_question;
+  const { question } = useSelector((state) => state.collabReducer);
 
   return (
     <Container>
       <Title>
-        {questionToDisplay.title}
-        <Difficulty
-          difficulty={
-            questionToDisplay?.difficulty && questionToDisplay.difficulty
-          }
-        >
-          {questionToDisplay?.difficulty && questionToDisplay.difficulty}
+        {question.title}
+        <Difficulty difficulty={question?.difficulty && question.difficulty}>
+          {question?.difficulty && question.difficulty}
         </Difficulty>
       </Title>
       <Instruction>
-        <InnerHtmlAdder innerHtml={questionToDisplay.instruction} />
+        <InnerHtmlAdder innerHtml={question.instruction} />
       </Instruction>
 
-      {questionToDisplay.examples.map((example, i) => {
+      {question.examples.map((example, i) => {
         return (
           <div key={i}>
             <ExampleTitle>Example {i + 1}</ExampleTitle>
@@ -44,10 +37,8 @@ export default function Description() {
           </div>
         );
       })}
-      <ExampleTitle>
-        {questionToDisplay?.difficulty && "Constraints:"}
-      </ExampleTitle>
-      {questionToDisplay.constraints.map((constraint, i) => {
+      <ExampleTitle>{question?.difficulty && "Constraints:"}</ExampleTitle>
+      {question.constraints.map((constraint, i) => {
         return (
           <Constraint>
             <InnerHtmlAdder innerHtml={constraint} />

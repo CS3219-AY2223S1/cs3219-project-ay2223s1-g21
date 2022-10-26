@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setQuestion, setRoomId } from "../../redux/actions/matching";
+import { setRoomId } from "../../redux/actions/matching";
 import MatchingScreen from "./MatchingScreen";
 import LoadingScreen from "./LoadingScreen";
 import {
@@ -16,7 +16,6 @@ import {
 import { setIsLoading } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
-import { useCallback } from "react";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -93,11 +92,10 @@ export default function MatchingPage() {
       });
 
       socket.on("matchSuccess", async (res) => {
-        const { interviewId, question } = res.data;
+        const { interviewId } = res.data;
         console.log("Match Found");
         setFoundMatch(true);
         dispatch(setRoomId(interviewId));
-        dispatch(setQuestion(question));
         await new Promise((r) => setTimeout(r, 2000));
         navigate(`/collab/${interviewId}`);
       });
