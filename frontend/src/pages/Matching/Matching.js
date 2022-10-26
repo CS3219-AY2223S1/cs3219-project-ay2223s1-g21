@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { setQuestion, setRoomId } from "../../redux/actions/matching";
+import { setRoomId } from "../../redux/actions/matching";
 import MatchingScreen from "./MatchingScreen";
 import LoadingScreen from "./LoadingScreen";
 import {
@@ -14,12 +14,14 @@ import {
   Button,
 } from "@mui/material";
 import { setIsLoading } from "../../redux/actions/auth";
-import { handleLogoutAccount, updateHistory } from "../../services/user_service";
+import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
+import { handleCheckAvaliabilty } from "../../services/collab_service";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isAvaliable, setIsAvaiable] = useState(null);
   const [cancelTimer, setCancelTimer] = useState(3);
   const [matchTimer, setmatchTimer] = useState(30);
   const [foundMatch, setFoundMatch] = useState(false);
@@ -37,6 +39,8 @@ export default function MatchingPage() {
 
   const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
   const MATCH_ERROR_MSG = "Please try again. Some error occurred. ";
+  const ALREADY_IN_ROOM_ERROR_MSG =
+    "You are in another session. Please exit before finding a new match";
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
@@ -55,26 +59,39 @@ export default function MatchingPage() {
   };
 
   useEffect(() => {
-    const socket = io(
-      `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
-    );
-    setSocket(socket);
-
-    let cancelMatchTimer;
-    if (socket) {
-      socket.emit("connection");
-      socket.on("connectionSuccess", (message) => {
-        setIsConnect(true);
-        cancelMatchTimer = timerCreator(setCancelTimer);
-      });
-    }
-
-    return () => {
-      socket.close();
-      clearInterval(cancelMatchTimer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    handleCheckAvaliabilty(userId).then((response) => {
+      const { avaliability } = response.data;
+      if (!avaliability) {
+        setFeedbackMessage(ALREADY_IN_ROOM_ERROR_MSG);
+      } else {
+        setIsAvaiable(avaliability);
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    if (isAvaliable) {
+      const socket = io(
+        `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
+      );
+      setSocket(socket);
+
+      let cancelMatchTimer;
+      if (socket) {
+        socket.emit("connection");
+        socket.on("connectionSuccess", (message) => {
+          setIsConnect(true);
+          cancelMatchTimer = timerCreator(setCancelTimer);
+        });
+      }
+
+      return () => {
+        socket.close();
+        clearInterval(cancelMatchTimer);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }
+  }, [isAvaliable]);
 
   useEffect(() => {
     let normalMatchTimer;
@@ -92,12 +109,10 @@ export default function MatchingPage() {
       });
 
       socket.on("matchSuccess", async (res) => {
-        const { interviewId, question } = res.data;
+        const { interviewId } = res.data;
         console.log("Match Found");
         setFoundMatch(true);
         dispatch(setRoomId(interviewId));
-        dispatch(setQuestion(question));
-        updateHistory(userId, jwtToken, question)
         await new Promise((r) => setTimeout(r, 2000));
         navigate(`/collab/${interviewId}`);
       });
