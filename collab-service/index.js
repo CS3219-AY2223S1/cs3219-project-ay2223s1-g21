@@ -1,12 +1,11 @@
-const { config } = require("dotenv");
-const express = require("express");
-const cors = require("cors");
-const { Server } = require("socket.io");
-const roomModel = require("./model/roomModel");
-const mongoose = require("mongoose");
-const axios = require("axios");
+import express from "express";
+import cors from "cors";
+import { Server } from "socket.io";
+import roomModel from "./model/roomModel.js";
+import mongoose from "mongoose";
+import axios from "axios";
+import "dotenv/config";
 
-config();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

@@ -14,10 +14,7 @@ import {
   Button,
 } from "@mui/material";
 import { setIsLoading } from "../../redux/actions/auth";
-import {
-  handleLogoutAccount,
-  updateHistory,
-} from "../../services/user_service";
+import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
 
 export default function MatchingPage() {
@@ -99,7 +96,6 @@ export default function MatchingPage() {
         console.log("Match Found");
         setFoundMatch(true);
         dispatch(setRoomId(interviewId));
-        updateHistory(userId, jwtToken, question);
         await new Promise((r) => setTimeout(r, 2000));
         navigate(`/collab/${interviewId}`);
       });

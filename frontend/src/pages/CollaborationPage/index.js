@@ -26,7 +26,10 @@ import {
   resetCollabPg,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
+import {
+  handleLogoutAccount,
+  updateHistory,
+} from "../../services/user_service";
 import {
   getCompilationResult,
   requestCompilation,
@@ -48,7 +51,7 @@ export default function CollaborationPage() {
   const { curMode, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
-  const { userId } = useSelector((state) => state.authReducer);
+  const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
@@ -203,6 +206,7 @@ export default function CollaborationPage() {
 
       ioSocket.on("recieveQn", (question) => {
         dispatch(setQuestion(question));
+        updateHistory(userId, jwtToken, question);
       });
 
       ioSocket.on("callPeer", (peerId) => {
