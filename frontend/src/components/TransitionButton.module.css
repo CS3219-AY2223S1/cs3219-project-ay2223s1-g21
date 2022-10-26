@@ -1,0 +1,28 @@
+.formButton {
+  width: 210px;
+  margin: 35px auto;
+  position: relative;
+  box-shadow: 0 0 20px 9px #6bcdfa42;
+  border-radius: 38px;
+}
+
+.btnTransition {
+  top: 0;
+  left: 0;
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  background: linear-gradient(to bottom, #00ffff 0%, #0099cc 65%);
+  border-radius: 30px;
+  transition: 0.5s;
+}
+
+.button {
+  padding: 10px 30px;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  outline: none;
+  position: relative;
+  color: #e6ebfc;
+}

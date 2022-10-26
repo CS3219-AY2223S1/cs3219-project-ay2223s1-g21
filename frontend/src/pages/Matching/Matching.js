@@ -14,9 +14,8 @@ import {
   Button,
 } from "@mui/material";
 import { setIsLoading } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
+import { handleLogoutAccount, updateHistory } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
-import { useCallback } from "react";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
@@ -98,6 +97,7 @@ export default function MatchingPage() {
         setFoundMatch(true);
         dispatch(setRoomId(interviewId));
         dispatch(setQuestion(question));
+        updateHistory(userId, jwtToken, question)
         await new Promise((r) => setTimeout(r, 2000));
         navigate(`/collab/${interviewId}`);
       });
@@ -111,7 +111,7 @@ export default function MatchingPage() {
       clearInterval(normalMatchTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, cancelTimer]);
+  }, [isConnected, cancelTimer, userId, userEmail]);
 
   return (
     <>

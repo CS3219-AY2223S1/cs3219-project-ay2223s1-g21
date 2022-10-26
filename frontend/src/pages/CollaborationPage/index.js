@@ -22,6 +22,7 @@ import {
   setIsCodeRunning,
   setTab,
   setCodeExecutionResult,
+  resetCollabPg,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
@@ -243,6 +244,7 @@ export default function CollaborationPage() {
   const handleExitSession = () => {
     ioSocket.emit("exitRoom", { roomId });
     dropMessages();
+    dispatch(resetCollabPg());
     navigate("/home");
   };
 

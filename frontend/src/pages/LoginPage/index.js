@@ -21,6 +21,7 @@ import {
 } from "../../redux/actions/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import silentLogin from "./silentLogin";
+import TransitionButton from "../../components/TransitionButton";
 
 export default function LoginPage() {
   const location = useLocation();
@@ -107,15 +108,7 @@ export default function LoginPage() {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.form}>
-        <div className={styles.formButton}>
-          <div ref={btnRef} className={styles.btnTransition} />
-          <button className={styles.button} onClick={handleToggle}>
-            Log in
-          </button>
-          <button className={styles.button} onClick={handleToggle}>
-            Sign Up
-          </button>
-        </div>
+        <TransitionButton btnRef={btnRef} name1={"Log In"} name2={"Sign Up"} handleToggle={handleToggle}/>
         <h2 className={styles.h2}> Welcome to PeerPrep!</h2>
         <form
           ref={loginRef}
