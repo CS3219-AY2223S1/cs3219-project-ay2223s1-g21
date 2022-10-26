@@ -278,8 +278,8 @@ export async function resetPassword(req, res) {
 
 export async function getHistory(req, res) {
     try {
-        const { id } = req.body;
-
+        const { id } = req.query;
+        console.log(id)
         if (id == null) {
             return res.status(400).json({ message: "id is missing" });
         }
