@@ -56,6 +56,9 @@ ioSocket.on("connection", function connection(socket) {
       copy.push(userId);
       await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
       ioSocket.to(socket.id).emit("joinSuccess");
+      if (room.question) {
+        ioSocket.to(socket.id).emit("recieveQn", room.question);
+      }
     } else {
       const newRoom = new roomModel({
         roomId: roomId,
@@ -68,22 +71,29 @@ ioSocket.on("connection", function connection(socket) {
 
   socket.on("TriggerFetchQn", async (data) => {
     const { roomId, difficulty } = data;
+    console.log("Trigger Fetch Question");
     try {
+      const room = await roomModel.findOne({ roomId: roomId });
       const response = await axios.get(
         process.env.REACT_APP_QUESTION_SERVER_URL +
           "/question?difficulty=" +
-          difficulty
+          difficulty,
+        {
+          params: { exclude: room.questionIds },
+        }
       );
 
       const question = response.data[0];
-      const room = await roomModel.findOne({ roomId: roomId });
       const copy = room.questionIds.length ? room.questionIds : [];
       copy.push(question._id);
 
-      await roomModel.updateOne({ roomId: roomId }, { questionIds: copy });
-      ioSocket.to(roomId).emit("recieveQn", question);
+      await roomModel.updateOne(
+        { roomId: roomId },
+        { question: JSON.stringify(question), questionIds: copy }
+      );
+      ioSocket.to(roomId).emit("recieveQn", JSON.stringify(question));
     } catch (err) {
-      console.log("Error with fetching question", err.data);
+      console.log("Error with fetching question", err);
     }
   });
 

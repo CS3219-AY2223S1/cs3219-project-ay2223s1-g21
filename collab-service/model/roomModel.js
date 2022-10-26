@@ -10,6 +10,9 @@ const roomSchema = new Schema({
     type: Array,
     required: true,
   },
+  question: {
+    type: String,
+  },
   questionIds: {
     type: Array,
   },

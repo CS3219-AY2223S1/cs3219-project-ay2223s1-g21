@@ -205,7 +205,8 @@ export default function CollaborationPage() {
       });
 
       ioSocket.on("recieveQn", (question) => {
-        dispatch(setQuestion(question));
+        console.log("Recieved Question");
+        dispatch(setQuestion(JSON.parse(question)));
         updateHistory(userId, jwtToken, question);
       });
 
