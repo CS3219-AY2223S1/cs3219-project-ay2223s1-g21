@@ -144,7 +144,10 @@ export default function CollaborationPage() {
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
 
     // Socket io method
-    const socket = io(`http://localhost:3005`);
+    const socket = io(
+      process.env.REACT_APP_COLLAB_SERVER_URL, 
+      {transports: ['websocket']} 
+    );
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
     });

@@ -57,7 +57,8 @@ export default function MatchingPage() {
 
   useEffect(() => {
     const socket = io(
-      `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
+      process.env.REACT_APP_MATCHING_SERVER_URL, 
+      {transports: ['websocket']} 
     );
     setSocket(socket);
 

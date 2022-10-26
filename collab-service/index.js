@@ -32,7 +32,7 @@ const server = app.listen(PORT, async function () {
   }
 });
 
-const ioSocket = new Server(server, { cors: { origin: "*" } });
+const ioSocket = new Server(server, { cors: { origin: process.env.CLIENT_DOMAIN } });
 
 // Socket io method
 ioSocket.on("connection", function connection(socket) {

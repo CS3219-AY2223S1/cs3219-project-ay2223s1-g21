@@ -36,7 +36,7 @@ const server = app.listen(PORT, function () {
   }
 });
 
-const io = require("socket.io")(server, { cors: { origin: "*" } });
+const io = require("socket.io")(server, { cors: { origin: process.env.CLIENT_DOMAIN } });
 
 io.on("connection", function (socket) {
   console.log("User connected: " + socket.id);
