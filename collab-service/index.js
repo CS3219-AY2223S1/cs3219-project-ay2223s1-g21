@@ -5,6 +5,7 @@ import roomModel from "./model/roomModel.js";
 import mongoose from "mongoose";
 import axios from "axios";
 import "dotenv/config";
+import { checkAvaliability } from "./controller/index.js";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -23,6 +24,9 @@ const server = app.listen(PORT, async function () {
     console.log(err);
   }
 });
+
+app.get("/", (_, res) => res.send("Hello World from collab service"));
+app.get("/MatchingAvaliability", checkAvaliability);
 
 const ioSocket = new Server(server, { cors: { origin: "*" } });
 
