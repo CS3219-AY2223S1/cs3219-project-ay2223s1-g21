@@ -190,8 +190,7 @@ export default function CollaborationPage() {
       });
 
       ioSocket.on("joinSuccessFirst", () => {
-        console.log("TEST");
-        ioSocket.emit("getQn", { roomId, difficulty });
+        ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
       });
 
       ioSocket.on("joinSuccess", () => {

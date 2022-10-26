@@ -67,22 +67,25 @@ ioSocket.on("connection", function connection(socket) {
     }
   });
 
-  socket.on("getQn", async (data) => {
+  socket.on("TriggerFetchQn", async (data) => {
     const { roomId, difficulty } = data;
+    try {
+      const response = await axios.get(
+        process.env.REACT_APP_QUESTION_SERVER_URL +
+          "/question?difficulty=" +
+          difficulty
+      );
 
-    const response = await axios.get(
-      process.env.REACT_APP_QUESTION_SERVER_URL +
-        "/question?difficulty=" +
-        difficulty
-    );
+      const question = response.data[0];
+      const room = await roomModel.findOne({ roomId: roomId });
+      const copy = room.questionIds.length ? room.questionIds : [];
+      copy.push(question._id);
 
-    const question = response.data[0];
-    const room = await roomModel.findOne({ roomId: roomId });
-    const copy = room.questionIds.length ? room.questionIds : [];
-    copy.push(question._id);
-    console.log("TEST", question, copy);
-    await roomModel.updateOne({ roomId: roomId }, { questionIds: copy });
-    ioSocket.to(roomId).emit("recieveQn", question);
+      await roomModel.updateOne({ roomId: roomId }, { questionIds: copy });
+      ioSocket.to(roomId).emit("recieveQn", question);
+    } catch (err) {
+      console.log("Error with fetching question", err.data);
+    }
   });
 
   socket.on("startCall", (data) => {
