@@ -262,6 +262,10 @@ export default function CollaborationPage() {
     navigate("/home");
   };
 
+  const handleNewQuestion = () => {
+    ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+  };
+
   return (
     <PgContainer>
       <HeaderContainer>
@@ -285,6 +289,14 @@ export default function CollaborationPage() {
           style={{ marginLeft: "30px" }}
         >
           Exit Session
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleNewQuestion}
+          style={{ marginLeft: "30px" }}
+        >
+          New Question
         </Button>
         <Widget
           handleNewUserMessage={handleNewUserMessage}
