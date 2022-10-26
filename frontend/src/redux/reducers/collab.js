@@ -4,6 +4,7 @@ import {
   UPDATE_IS_CODE_RUNNING,
   UPDATE_TAB,
   UPDATE_QUESTION,
+  RESTE_COLLAB_PG,
 } from "../actionTypes";
 
 const initialState = {
@@ -16,6 +17,9 @@ const initialState = {
 
 export default function collabReducer(state = initialState, action) {
   switch (action.type) {
+    case RESTE_COLLAB_PG:
+      return initialState;
+
     case UPDATE_IS_CODE_RUNNING:
       return {
         ...state,

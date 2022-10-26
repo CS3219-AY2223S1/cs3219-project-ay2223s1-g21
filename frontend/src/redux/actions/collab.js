@@ -4,6 +4,7 @@ import {
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
   UPDATE_QUESTION,
+  RESTE_COLLAB_PG,
 } from "../actionTypes";
 
 export const setIsCodeRunning = (isCodeRunning) => {
@@ -38,5 +39,10 @@ export const setQuestion = (question) => {
   return {
     type: UPDATE_QUESTION,
     payload: question,
+  };
+};
+export const resetCollabPg = () => {
+  return {
+    type: RESTE_COLLAB_PG,
   };
 };
