@@ -3,6 +3,7 @@ import {
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
+  RESTE_COLLAB_PG
 } from "../actionTypes";
 
 export const setIsCodeRunning = (isCodeRunning) => {
@@ -32,3 +33,9 @@ export const setMode = (mode) => {
     payload: mode,
   };
 };
+
+export const resetCollabPg = () => {
+  return {
+    type: RESTE_COLLAB_PG
+  }
+}
