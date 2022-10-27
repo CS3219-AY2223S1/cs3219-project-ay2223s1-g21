@@ -2,7 +2,6 @@ import { ormGetRandomQuestion as _getRandomQuestion } from "../model/question-or
 import CONSTANTS from "../util/constants.js";
 
 export async function getRandomQuestion(req, res) {
-  console.log("TEST", req.query);
   try {
     let { difficulty, exclude } = req.query;
 
