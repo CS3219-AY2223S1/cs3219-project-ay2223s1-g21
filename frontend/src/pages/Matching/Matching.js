@@ -72,8 +72,8 @@ export default function MatchingPage() {
   useEffect(() => {
     if (isAvaliable) {
       const socket = io(
-        `http://localhost:${process.env.REACT_APP_MATCHING_PORT}`
-      );
+          process.env.REACT_APP_MATCHING_SERVER_URL, 
+        );
       setSocket(socket);
 
       let cancelMatchTimer;
