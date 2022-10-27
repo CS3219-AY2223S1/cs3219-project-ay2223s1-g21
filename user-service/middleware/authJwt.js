@@ -13,7 +13,10 @@ const catchError = (err, res) => {
 
 export async function verifyToken(req, res, next) {
     const token = req.headers["access-token"];
-    const { id } = req.body;
+    let { id } = req.body;
+    if (!id) {
+        id = req.query.id
+    }
 
     if (id == null) {
         return res.status(403).send({ message: "No user id provided!" });

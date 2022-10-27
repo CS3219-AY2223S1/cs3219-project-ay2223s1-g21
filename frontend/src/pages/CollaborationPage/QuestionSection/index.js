@@ -7,8 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setTab } from "../../../redux/actions/collab";
 
 export default function QuestionSection() {
-  
-  const { selectedTab } = useSelector(state => state.collabReducer)
+  const { selectedTab, question } = useSelector((state) => state.collabReducer);
   const dispatch = useDispatch();
 
   return (
@@ -31,7 +30,7 @@ export default function QuestionSection() {
           Result
         </BarText>
       </Bar>
-      {selectedTab === "Description" && <Description />}
+      {selectedTab === "Description" && question && <Description />}
       {selectedTab === "Result" && <Result />}
     </>
   );

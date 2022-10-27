@@ -80,23 +80,22 @@ export async function login(req, res) {
 
         const refreshToken = await _createToken(user);
 
-        req.session.refreshToken = refreshToken;
         console.log("Login successful!");
-        return res.status(200).json({ id: user._id, email: email, token: token, message: "Login successful!" });
+        return res.status(200).json({ id: user._id, email: email, token: token, refreshToken: refreshToken, message: "Login successful!" });
     } catch (err) {
         return res.status(500).json({ message: `Login failed. Error: ${err}` });
     }
 }
 
 export async function refreshToken(req, res) {
-    const requestToken = req.session.refreshToken;
+    let { refreshToken } = req.query;
     
-    if (requestToken == null) {
+    if (refreshToken == null) {
         return res.status(400).json({ message: "Refresh Token is required!" });
     }
 
     try {
-        let refreshToken = await _getToken(requestToken);
+        refreshToken = await _getToken(refreshToken);
 
         if (!refreshToken) {
             return res.status(401).json({ message: "Refresh token does not exist in database!" });
@@ -278,8 +277,8 @@ export async function resetPassword(req, res) {
 
 export async function getHistory(req, res) {
     try {
-        const { id } = req.body;
-
+        const { id } = req.query;
+        console.log(id)
         if (id == null) {
             return res.status(400).json({ message: "id is missing" });
         }

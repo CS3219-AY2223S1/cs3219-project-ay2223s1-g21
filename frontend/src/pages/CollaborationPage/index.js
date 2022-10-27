@@ -17,16 +17,19 @@ import { useEffect } from "react";
 import { addResponseMessage, dropMessages, Widget } from "react-chat-widget";
 import "react-chat-widget/lib/styles.css";
 import "./chat.css";
-import { fetchQuestion } from "../../services/question_service";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  setQuestion,
   setIsCodeRunning,
   setTab,
   setCodeExecutionResult,
+  setQuestion,
+  resetCollabPg,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
+import {
+  handleLogoutAccount,
+  updateHistory,
+} from "../../services/user_service";
 import {
   getCompilationResult,
   requestCompilation,
@@ -45,12 +48,11 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { difficulty } = useSelector((state) => state.matchingReducer);
   const { curMode, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
-  const { userId } = useSelector((state) => state.authReducer);
-  const { roomId } = useSelector((state) => state.matchingReducer);
+  const { userId, jwtToken } = useSelector((state) => state.authReducer);
+  const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
 
@@ -97,19 +99,6 @@ export default function CollaborationPage() {
   }, [curMode, submitCompileReqCallback]);
 
   useEffect(() => {
-    // question fetch
-    dispatch(setIsLoading(true));
-    fetchQuestion(difficulty)
-      .then((res) => {
-        console.log(res);
-        dispatch(setQuestion(res.data[0]));
-        dispatch(setIsLoading(false));
-      })
-      .catch((err) => {
-        console.log(err);
-        dispatch(setIsLoading(false));
-      });
-
     // draggable event listeners
     const resizableEditorEle = embeddedEditorRef.current;
     const editorEleStyles = window.getComputedStyle(resizableEditorEle);
@@ -185,7 +174,7 @@ export default function CollaborationPage() {
       navigate("/home");
     }
     if (ioSocket && peer) {
-      ioSocket.emit("joinRoom", { roomId: roomId, userId: userId });
+      ioSocket.emit("joinRoom", { roomId, userId, difficulty });
 
       peer.on("connection", () => {
         console.log("Someone is connecting to me");
@@ -207,11 +196,21 @@ export default function CollaborationPage() {
           });
       });
 
+      ioSocket.on("joinSuccessFirst", () => {
+        ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+      });
+
       ioSocket.on("joinSuccess", () => {
         ioSocket.emit("startCall", {
           peerid: peer.id,
           roomId: roomId,
         });
+      });
+
+      ioSocket.on("recieveQn", (question) => {
+        console.log("Recieved Question");
+        dispatch(setQuestion(JSON.parse(question)));
+        updateHistory(userId, jwtToken, question);
       });
 
       ioSocket.on("callPeer", (peerId) => {
@@ -262,7 +261,12 @@ export default function CollaborationPage() {
   const handleExitSession = () => {
     ioSocket.emit("exitRoom", { roomId });
     dropMessages();
+    dispatch(resetCollabPg());
     navigate("/home");
+  };
+
+  const handleNewQuestion = () => {
+    ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
   };
 
   return (
@@ -288,6 +292,14 @@ export default function CollaborationPage() {
           style={{ marginLeft: "30px" }}
         >
           Exit Session
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleNewQuestion}
+          style={{ marginLeft: "30px" }}
+        >
+          New Question
         </Button>
         <Widget
           handleNewUserMessage={handleNewUserMessage}

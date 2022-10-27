@@ -16,10 +16,12 @@ import {
 import { setIsLoading } from "../../redux/actions/auth";
 import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
+import { handleCheckAvaliabilty } from "../../services/collab_service";
 
 export default function MatchingPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isAvaliable, setIsAvaiable] = useState(null);
   const [cancelTimer, setCancelTimer] = useState(3);
   const [matchTimer, setmatchTimer] = useState(30);
   const [foundMatch, setFoundMatch] = useState(false);
@@ -37,6 +39,8 @@ export default function MatchingPage() {
 
   const LOGIN_ERROR_MSG = "You are not authenticated. Please log in again.";
   const MATCH_ERROR_MSG = "Please try again. Some error occurred. ";
+  const ALREADY_IN_ROOM_ERROR_MSG =
+    "You are in another session. Please exit before finding a new match";
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
@@ -45,7 +49,6 @@ export default function MatchingPage() {
       dispatch(setLogout());
     });
   };
-
 
   const closeDialog = () => {
     if (feedbackMessage === LOGIN_ERROR_MSG) {
@@ -56,35 +59,39 @@ export default function MatchingPage() {
   };
 
   useEffect(() => {
-    const socket = io(
-      process.env.REACT_APP_MATCHING_SERVER_URL, 
-      {transports: ['websocket']} 
-    );
-    setSocket(socket);
-
-    let cancelMatchTimer;
-    if (socket) {
-      socket.emit("connection");
-      socket.on("connectionSuccess", (message) => {
-        setIsConnect(true);
-        cancelMatchTimer = timerCreator(setCancelTimer);
-      });
-    }
-
-    return () => {
-      socket.emit("cancelMatch", {
-        email: userEmail,
-        difficulty: difficulty,
-        jwtToken: jwtToken,
-        userId: userId,
-      });
-      socket.close();
-      console.log("Disconnect Socket");
-
-      clearInterval(cancelMatchTimer);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    handleCheckAvaliabilty(userId).then((response) => {
+      const { avaliability } = response.data;
+      if (!avaliability) {
+        setFeedbackMessage(ALREADY_IN_ROOM_ERROR_MSG);
+      } else {
+        setIsAvaiable(avaliability);
+      }
+    });
   }, []);
+
+  useEffect(() => {
+    if (isAvaliable) {
+      const socket = io(
+          process.env.REACT_APP_MATCHING_SERVER_URL, 
+        );
+      setSocket(socket);
+
+      let cancelMatchTimer;
+      if (socket) {
+        socket.emit("connection");
+        socket.on("connectionSuccess", (message) => {
+          setIsConnect(true);
+          cancelMatchTimer = timerCreator(setCancelTimer);
+        });
+      }
+
+      return () => {
+        socket.close();
+        clearInterval(cancelMatchTimer);
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }
+  }, [isAvaliable]);
 
   useEffect(() => {
     let normalMatchTimer;
@@ -119,7 +126,7 @@ export default function MatchingPage() {
       clearInterval(normalMatchTimer);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, cancelTimer]);
+  }, [isConnected, cancelTimer, userId, userEmail]);
 
   return (
     <>

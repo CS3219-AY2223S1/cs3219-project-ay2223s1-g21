@@ -1,11 +1,12 @@
-const { config } = require("dotenv");
-const express = require("express");
-const cors = require("cors");
-const { Server } = require("socket.io");
-const roomModel = require("./model/roomModel");
-const mongoose = require("mongoose");
+import express from "express";
+import cors from "cors";
+import { Server } from "socket.io";
+import roomModel from "./model/roomModel.js";
+import mongoose from "mongoose";
+import axios from "axios";
+import "dotenv/config";
+import { checkAvaliability } from "./controller/index.js";
 
-config();
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -32,6 +33,9 @@ const server = app.listen(PORT, async function () {
   }
 });
 
+app.get("/", (_, res) => res.send("Hello World from collab service"));
+app.get("/MatchingAvaliability", checkAvaliability);
+
 const ioSocket = new Server(server, { cors: { origin: process.env.CLIENT_DOMAIN } });
 
 // Socket io method
@@ -41,9 +45,8 @@ ioSocket.on("connection", function connection(socket) {
   ioSocket.emit("connectionSuccess", "welcome to the backend");
 
   socket.on("joinRoom", async (data) => {
+    console.log("Join Room", data);
     const { roomId, userId } = data;
-
-    console.log(roomId, !!!roomId);
 
     if (!!!roomId) {
       ioSocket.emit("badRequest");
@@ -57,24 +60,52 @@ ioSocket.on("connection", function connection(socket) {
       return;
     }
 
+    socket.join(roomId);
     // check if room exist
     const room = await roomModel.findOne({ roomId: roomId });
     if (room) {
       const copy = room.partipants;
       copy.push(userId);
       await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
+      ioSocket.to(socket.id).emit("joinSuccess");
+      if (room.question) {
+        ioSocket.to(socket.id).emit("recieveQn", room.question);
+      }
     } else {
       const newRoom = new roomModel({
         roomId: roomId,
         partipants: [userId],
       });
       await newRoom.save();
+      ioSocket.to(socket.id).emit("joinSuccessFirst");
     }
-    socket.join(roomId);
-    if (room) {
-      ioSocket.to(socket.id).emit("joinSuccess");
-    } else {
-      ioSocket.to(socket.id).emit("joinSuccessNew");
+  });
+
+  socket.on("TriggerFetchQn", async (data) => {
+    const { roomId, difficulty } = data;
+    console.log("Trigger Fetch Question");
+    try {
+      const room = await roomModel.findOne({ roomId: roomId });
+      const response = await axios.get(
+        process.env.REACT_APP_QUESTION_SERVER_URL +
+          "/question?difficulty=" +
+          difficulty,
+        {
+          params: { exclude: room.questionIds },
+        }
+      );
+
+      const question = response.data[0];
+      const copy = room.questionIds.length ? room.questionIds : [];
+      copy.push(question._id);
+
+      await roomModel.updateOne(
+        { roomId: roomId },
+        { question: JSON.stringify(question), questionIds: copy }
+      );
+      ioSocket.to(roomId).emit("recieveQn", JSON.stringify(question));
+    } catch (err) {
+      console.log("Error with fetching question", err);
     }
   });
 

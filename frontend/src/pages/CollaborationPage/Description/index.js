@@ -8,12 +8,11 @@ import {
   Difficulty,
 } from "./DescriptionElements";
 import InnerHtmlAdder from "../../../components/InnerHtmlAdder";
-import { question } from "./Data.js";
 import { useSelector } from "react-redux";
 import "./markup.css";
 
 export default function Description() {
-  // const { question } = useSelector((state) => state.collabReducer);
+  const { question } = useSelector((state) => state.collabReducer);
 
   return (
     <Container>
@@ -31,6 +30,13 @@ export default function Description() {
         return (
           <div key={i}>
             <ExampleTitle>Example {i + 1}</ExampleTitle>
+            {example.image && (
+              <img
+                style={{ maxWidth: "85%", margin: "20px 0 20px 0" }}
+                src={`data:image/png;base64, ${example.image}`}
+                alt="instruction"
+              />
+            )}
             <Example>
               <strong>Input:</strong> {example.input} <br />
               <strong>Output:</strong> {example.output}

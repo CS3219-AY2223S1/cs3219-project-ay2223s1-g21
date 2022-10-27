@@ -3,7 +3,8 @@
   padding: 0;
   height: 100%;
   width: 100%;
-  background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('../../assets/background.jpg');
+  background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    url("../../assets/background.jpg");
   background-position: center;
   background-size: cover;
   position: absolute;
@@ -21,41 +22,11 @@
   overflow: hidden;
 }
 
-
-.formButton {
-  width: 210px;
-  margin: 35px auto;
-  position: relative;
-  box-shadow: 0 0 20px 9px #6bcdfa42;
-  border-radius: 38px;
-}
-
-.button {
-  padding: 10px 30px;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  outline: none;
-  position: relative;
-  color: #e6ebfc;
-}
-
-.btnTransition {
-  top: 0;
-  left: 0;
-  position: absolute;
-  width: 100px;
-  height: 100%;
-  background: linear-gradient(to bottom, #00ffff 0%, #0099cc 65%);
-  border-radius: 30px;
-  transition: 0.5s;
-}
-
 .loginGrp {
   top: 180px;
   position: absolute;
   width: 280px;
-  transition: .5s;
+  transition: 0.5s;
   left: 50px;
 }
 
@@ -101,12 +72,11 @@
   margin-left: 5px;
 }
 
-
 .regGrp {
   top: 180px;
   position: absolute;
   width: 280px;
-  transition: .5s;
+  transition: 0.5s;
   left: 450px;
 }
 

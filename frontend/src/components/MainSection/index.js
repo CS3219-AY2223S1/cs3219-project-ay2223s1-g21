@@ -7,7 +7,7 @@ import {
   Difficulty,
   DifficultContainer,
   Title,
-  Button
+  Button,
 } from "./MainElements";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -19,25 +19,23 @@ const MainSection = () => {
   const navigate = useNavigate();
   const [curDifficulty, setCurDifficulty] = useState("");
 
-
   const handleChooseDifficulty = (difficulty) => {
     if (difficulty === curDifficulty) {
-      setCurDifficulty("");  
+      setCurDifficulty("");
     } else {
       setCurDifficulty(difficulty);
     }
-  }
+  };
 
   const handleOnClick = () => {
-    if(curDifficulty === "") {
-      return
+    if (curDifficulty === "") {
+      return;
     } else {
       dispatch(setDifficulty(curDifficulty));
       navigate("/matching");
     }
-  }
+  };
 
-  
   return (
     <MainContainer id="home">
       <BgContainer>
@@ -48,13 +46,29 @@ const MainSection = () => {
       <MainContent>
         <Title> Choose Your Poison </Title>
         <DifficultContainer>
-          <Difficulty state="easy" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("easy")}>Easy</Difficulty>
-          <Difficulty state="medium" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("medium")}>Medium</Difficulty>
-          <Difficulty state="hard" difficulty={curDifficulty} onClick={() => handleChooseDifficulty("hard")}>Hard</Difficulty>
+          <Difficulty
+            state="Easy"
+            difficulty={curDifficulty}
+            onClick={() => handleChooseDifficulty("Easy")}
+          >
+            Easy
+          </Difficulty>
+          <Difficulty
+            state="Medium"
+            difficulty={curDifficulty}
+            onClick={() => handleChooseDifficulty("Medium")}
+          >
+            Medium
+          </Difficulty>
+          <Difficulty
+            state="Hard"
+            difficulty={curDifficulty}
+            onClick={() => handleChooseDifficulty("Hard")}
+          >
+            Hard
+          </Difficulty>
         </DifficultContainer>
-        <Button onClick={() => handleOnClick()}>
-          Match 
-        </Button>
+        <Button onClick={() => handleOnClick()}>Match</Button>
       </MainContent>
     </MainContainer>
   );

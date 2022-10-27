@@ -1,17 +1,11 @@
 import {
   UPDATE_IS_CODE_RUNNING,
-  UPDATE_QUESTION,
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
+  UPDATE_QUESTION,
+  RESTE_COLLAB_PG,
 } from "../actionTypes";
-
-export const setQuestion = (question) => {
-  return {
-    type: UPDATE_QUESTION,
-    payload: question,
-  };
-};
 
 export const setIsCodeRunning = (isCodeRunning) => {
   return {
@@ -38,5 +32,17 @@ export const setMode = (mode) => {
   return {
     type: UPDATE_CURRENT_MODE,
     payload: mode,
+  };
+};
+
+export const setQuestion = (question) => {
+  return {
+    type: UPDATE_QUESTION,
+    payload: question,
+  };
+};
+export const resetCollabPg = () => {
+  return {
+    type: RESTE_COLLAB_PG,
   };
 };

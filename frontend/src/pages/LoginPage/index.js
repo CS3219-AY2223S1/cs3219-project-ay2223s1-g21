@@ -21,6 +21,9 @@ import {
 } from "../../redux/actions/auth";
 import { useNavigate, useLocation } from "react-router-dom";
 import silentLogin from "./silentLogin";
+import TransitionButton from "../../components/TransitionButton";
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 export default function LoginPage() {
   const location = useLocation();
@@ -86,7 +89,7 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-    const { statusCode, email, id, message, jwtToken } = await handleLogin(
+    const { statusCode, email, id, message, jwtToken, refreshToken } = await handleLogin(
       userEmail,
       userPassword
     );
@@ -95,6 +98,7 @@ export default function LoginPage() {
       dispatch(setUserId(id));
       dispatch(setUserEmail(email));
       dispatch(setJwtToken(jwtToken));
+      cookies.set('refreshToken', refreshToken, {path: '/', maxAge: '86400'});
       navigate("/home");
     } else {
       setDialogTitle("Login Failed!");
@@ -107,15 +111,7 @@ export default function LoginPage() {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.form}>
-        <div className={styles.formButton}>
-          <div ref={btnRef} className={styles.btnTransition} />
-          <button className={styles.button} onClick={handleToggle}>
-            Log in
-          </button>
-          <button className={styles.button} onClick={handleToggle}>
-            Sign Up
-          </button>
-        </div>
+        <TransitionButton btnRef={btnRef} name1={"Log In"} name2={"Sign Up"} handleToggle={handleToggle}/>
         <h2 className={styles.h2}> Welcome to PeerPrep!</h2>
         <form
           ref={loginRef}

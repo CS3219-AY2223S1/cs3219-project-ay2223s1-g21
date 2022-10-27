@@ -47,7 +47,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("findMatch", async (data) => {
-    console.log("Find Match");
+    console.log("Find Match", data);
     try {
       await fns.searchMatch(
         socket,
@@ -62,16 +62,10 @@ io.on("connection", function (socket) {
     }
   });
 
-  socket.on("cancelMatch", async (data) => {
+  socket.on("disconnect", async () => {
     console.log("Cancel Match");
     try {
-      await fns.cancelMatch(
-        socket,
-        data.email,
-        data.difficulty,
-        data.jwtToken,
-        data.userId
-      );
+      await fns.cancelMatch(socket.id);
     } catch (error) {
       console.error("server err", error);
     }

@@ -1,5 +1,7 @@
 import axios from "axios";
 import { setJwtToken, setUserEmail, setUserId } from "../redux/actions/auth";
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
 
 export const handleCreateNewAccount = async (email, password) => {
   const body = { email, password };
@@ -32,6 +34,7 @@ export const handleLogin = async (email, password) => {
   let emailResponse = "";
   let message = "";
   let token = "";
+  let refreshToken = "";
   console.log("request sent");
 
   await axios
@@ -42,6 +45,7 @@ export const handleLogin = async (email, password) => {
       message = res.data.message;
       id = res.data.id;
       token = res.data.token;
+      refreshToken = res.data.refreshToken;
       console.log("login response OK");
     })
     .catch((err) => {
@@ -50,21 +54,18 @@ export const handleLogin = async (email, password) => {
       console.log("Login error, " + err);
     });
 
-  return { statusCode, emailResponse, id, message, token };
+  return { statusCode, emailResponse, id, message, token, refreshToken };
 };
 
 export const handleLogoutAccount = () => {
   const LOG_OUT_ENDPT =
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/logout";
-  return axios
-    .post(LOG_OUT_ENDPT, null, { withCredentials: true })
+  return axios.post(LOG_OUT_ENDPT, null, { withCredentials: true });
 };
 
 export const refreshJwtToken = (dispatch) => {
   return axios
-    .get(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken", {
-      withCredentials: true,
-    })
+    .get(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken?refreshToken=" + cookies.get("refreshToken"))
     .then((res) => {
       dispatch(setUserEmail(res.data.email));
       dispatch(setUserId(res.data.id));
@@ -78,42 +79,69 @@ export const deleteAccount = (id, jwtToken) => {
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/delete",
     {
       headers: {
-        "access-token": jwtToken 
+        "access-token": jwtToken,
       },
       withCredentials: true,
-      data: { id }
-    },
-  )
+      data: { id },
+    }
+  );
 };
 
-export const changePassword = (id, currentPassword, newPassword, reNewPassword, jwtToken) => {
+export const changePassword = (
+  id,
+  currentPassword,
+  newPassword,
+  reNewPassword,
+  jwtToken
+) => {
   return axios.put(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/changepassword",
     { id, currentPassword, newPassword, reNewPassword },
     {
       withCredentials: true,
-      headers: { "access-token": jwtToken }
+      headers: { "access-token": jwtToken },
     }
-  )
-}
+  );
+};
 
 export const forgetPasswordRequest = (email) => {
   return axios.post(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/requestPasswordReset",
     { email },
     {
-      withCredentials: true
+      withCredentials: true,
     }
   );
-}
+};
 
 export const resetPasswordRequest = (userId, token, password) => {
   return axios.put(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/resetPassword",
     { userId, token, password },
     {
-      withCredentials: true
+      withCredentials: true,
     }
-  )
-}
+  );
+};
 
+export const updateHistory = (id, jwtToken, history) => {
+  return axios.put(
+    process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/updateHistory",
+    { id, history },
+    {
+      withCredentials: true,
+      headers: { "access-token": jwtToken },
+    }
+  );
+};
+
+export const getHistory = (jwtToken, id) => {
+  return axios.get(
+    process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/getHistory",
+    {
+      params: { id },
+      withCredentials: true,
+      headers: { "access-token": jwtToken },
+    }
+  );
+};
