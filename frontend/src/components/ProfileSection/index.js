@@ -155,7 +155,7 @@ const ProfileSection = () => {
         </DialogActions>
       </Dialog>
       <Dialog open={isSecondDialogOpen}>
-        <DialogTitle>Delete Accont Notification</DialogTitle>
+        <DialogTitle>Delete Acccont Notification</DialogTitle>
         <DialogContent>
           <DialogContentText>{secondDialogMsg}</DialogContentText>
         </DialogContent>

@@ -33,7 +33,7 @@ export const HistoryContainer = styled.div`
   overflow: hidden;
   border-radius: 5px;
   transition: 0.5s;
-  width: 480px;
+  width: 90%;
   position: absolute;
   left: 200%;
   transform: translateX(-50%);
