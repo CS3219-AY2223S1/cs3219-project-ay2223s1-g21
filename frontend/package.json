@@ -10,8 +10,8 @@
     "@syncedstore/react": "^0.4.1",
     "axios": "^0.27.2",
     "dompurify": "^2.4.0",
-    "peerjs": "^1.4.7",
     "node-sass": "^7.0.3",
+    "peerjs": "^1.4.7",
     "react": "^17.0.2",
     "react-ace": "^10.1.0",
     "react-chat-widget": "^3.1.4",
@@ -26,6 +26,7 @@
     "socket.io": "^4.5.2",
     "socket.io-client": "^4.5.1",
     "styled-components": "^5.3.5",
+    "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4",
     "ws": "^8.9.0",
     "y-webrtc": "^10.2.3"

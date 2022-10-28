@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import cookieSession from 'cookie-session';
 
 import { createUser, login, logout, deleteUser, changePassword, refreshToken, requestPasswordReset, resetPassword, getHistory, updateHistory } from './controller/user-controller.js';
 import { verifyToken } from './middleware/authJwt.js';
@@ -14,15 +13,6 @@ app.use(cors({
   origin: process.env.CLIENT_DOMAIN,
   credentials: true
 }));
-
-app.use(
-    cookieSession({
-      name: "peer-prep-session",
-      secret: process.env.COOKIE_SECRET,
-      httpOnly: true,
-      maxAge: 86400,   // 24 hour
-    })
-  );
 
 const router = express.Router()
 

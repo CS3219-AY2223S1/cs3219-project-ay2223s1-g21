@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const fns = require("./controllers/MatchingController");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.use(
   cors({
@@ -18,10 +18,19 @@ app.use(
   })
 );
 
+const PASSWORD = process.env.PASSWORD;
+const DB_NAME = process.env.DB_NAME;
+
+let ATLAS_URI = process.env.ENV == "DEV" ? process.env.DB_LOCAL_URI :
+  `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
+  || process.env.DB_LOCAL_URI;
+
 const server = app.listen(PORT, function () {
   try {
-    mongoose.connect("mongodb://localhost:27017/match-mongodb");
-    console.log("Connected to MongoDB");
+    mongoose.connect(ATLAS_URI,
+      { useNewUrlParser: true, useUnifiedTopology: true },
+      () => console.log(" Mongoose is connected"));
+    console.log("Connected to MongoDB: ", ATLAS_URI);
     console.log(`Match microservice listening on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
   } catch (err) {
@@ -29,7 +38,7 @@ const server = app.listen(PORT, function () {
   }
 });
 
-const io = require("socket.io")(server, { cors: { origin: "*" } });
+const io = require("socket.io")(server, { cors: { origin: process.env.CLIENT_DOMAIN } });
 
 io.on("connection", function (socket) {
   console.log("User connected: " + socket.id);
@@ -40,7 +49,7 @@ io.on("connection", function (socket) {
   });
 
   socket.on("findMatch", async (data) => {
-    console.log("Find Match");
+    console.log("Find Match", data);
     try {
       await fns.searchMatch(
         socket,

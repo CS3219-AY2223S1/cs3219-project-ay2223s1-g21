@@ -13,6 +13,7 @@ chai.should();
 //Set up in memory db
 beforeEach(async() => {     
     const mongoServer = await MongoMemoryServer.create({ instance: { storageEngine: 'wiredTiger'} });
+    console.log(mongoServer.getUri())
     mongoose.connect(mongoServer.getUri(), { useNewUrlParser: true, useUnifiedTopology: true })
 });
 

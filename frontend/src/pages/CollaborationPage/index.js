@@ -22,10 +22,14 @@ import {
   setIsCodeRunning,
   setTab,
   setCodeExecutionResult,
+  setQuestion,
   resetCollabPg,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
+import {
+  handleLogoutAccount,
+  updateHistory,
+} from "../../services/user_service";
 import {
   getCompilationResult,
   requestCompilation,
@@ -47,8 +51,8 @@ export default function CollaborationPage() {
   const { curMode, isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
-  const { userId } = useSelector((state) => state.authReducer);
-  const { roomId } = useSelector((state) => state.matchingReducer);
+  const { userId, jwtToken } = useSelector((state) => state.authReducer);
+  const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
 
@@ -129,7 +133,10 @@ export default function CollaborationPage() {
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
 
     // Socket io method
-    const socket = io(`http://localhost:3005`);
+    const socket = io(
+      process.env.REACT_APP_COLLAB_SERVER_URL, 
+      {transports: ['websocket']} 
+    );
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
     });
@@ -167,7 +174,7 @@ export default function CollaborationPage() {
       navigate("/home");
     }
     if (ioSocket && peer) {
-      ioSocket.emit("joinRoom", { roomId: roomId, userId: userId });
+      ioSocket.emit("joinRoom", { roomId, userId, difficulty });
 
       peer.on("connection", () => {
         console.log("Someone is connecting to me");
@@ -189,11 +196,21 @@ export default function CollaborationPage() {
           });
       });
 
+      ioSocket.on("joinSuccessFirst", () => {
+        ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+      });
+
       ioSocket.on("joinSuccess", () => {
         ioSocket.emit("startCall", {
           peerid: peer.id,
           roomId: roomId,
         });
+      });
+
+      ioSocket.on("recieveQn", (question) => {
+        console.log("Recieved Question");
+        dispatch(setQuestion(JSON.parse(question)));
+        updateHistory(userId, jwtToken, question);
       });
 
       ioSocket.on("callPeer", (peerId) => {
@@ -248,6 +265,10 @@ export default function CollaborationPage() {
     navigate("/home");
   };
 
+  const handleNewQuestion = () => {
+    ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+  };
+
   return (
     <PgContainer>
       <HeaderContainer>
@@ -271,6 +292,14 @@ export default function CollaborationPage() {
           style={{ marginLeft: "30px" }}
         >
           Exit Session
+        </Button>
+        <Button
+          variant="outlined"
+          color="error"
+          onClick={handleNewQuestion}
+          style={{ marginLeft: "30px" }}
+        >
+          New Question
         </Button>
         <Widget
           handleNewUserMessage={handleNewUserMessage}

@@ -3,7 +3,8 @@ import {
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
   UPDATE_CURRENT_MODE,
-  RESTE_COLLAB_PG
+  UPDATE_QUESTION,
+  RESTE_COLLAB_PG,
 } from "../actionTypes";
 
 export const setIsCodeRunning = (isCodeRunning) => {
@@ -34,8 +35,14 @@ export const setMode = (mode) => {
   };
 };
 
+export const setQuestion = (question) => {
+  return {
+    type: UPDATE_QUESTION,
+    payload: question,
+  };
+};
 export const resetCollabPg = () => {
   return {
-    type: RESTE_COLLAB_PG
-  }
-}
+    type: RESTE_COLLAB_PG,
+  };
+};
