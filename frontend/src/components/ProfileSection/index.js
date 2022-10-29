@@ -47,7 +47,7 @@ const ProfileSection = () => {
         setData(res.data.history);
       })
       .catch(console.log);
-  }, []);
+  }, [jwtToken, userId]);
 
   const closeDialog = () => {
     setIsDialogOpen(false);

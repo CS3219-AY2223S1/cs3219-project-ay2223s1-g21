@@ -14,7 +14,6 @@ import {
   Button,
 } from "@mui/material";
 import { setIsLoading } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
 import { handleCheckAvaliabilty } from "../../services/collab_service";
 
@@ -44,10 +43,8 @@ export default function MatchingPage() {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    handleLogoutAccount().then((res) => {
-      dispatch(setIsLoading(false));
-      dispatch(setLogout());
-    });
+    dispatch(setLogout());
+    dispatch(setIsLoading(false));      
   };
 
   const closeDialog = () => {
@@ -67,7 +64,7 @@ export default function MatchingPage() {
         setIsAvaiable(avaliability);
       }
     });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (isAvaliable) {
