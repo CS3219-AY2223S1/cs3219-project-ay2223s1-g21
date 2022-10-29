@@ -152,20 +152,6 @@ describe("POST /api/user/login", () => {
     });
 });
 
-describe("POST /api/user/login", () => {
-    it("valid user1 login after logout", (done) => {
-        chai.request(app)
-            .post('/api/user/login')
-            .send({ "email": email, "password": password })
-            .end((err, res) => {
-                res.should.have.status(200);
-                accessToken = res.body.token;
-                id = res.body.id;
-                done();
-            });
-    });
-});
-
 describe("POST /api/user/changepassword", () => {
     it("missing password", (done) => {
         chai.request(app)
