@@ -152,17 +152,6 @@ describe("POST /api/user/login", () => {
     });
 });
 
-describe("POST /api/user/logout", () => {
-    it("valid logout", (done) => {
-        chai.request(app)
-            .post('/api/user/logout')
-            .end((err, res) => {
-                res.should.have.status(200);
-                done();
-            });
-    });
-});
-
 describe("POST /api/user/login", () => {
     it("valid user1 login after logout", (done) => {
         chai.request(app)
