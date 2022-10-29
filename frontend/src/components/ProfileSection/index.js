@@ -22,7 +22,7 @@ import profileImg from "../../assets/profile.png";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
-import { setIsLoading } from "../../redux/actions/auth";
+import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { deleteAccount, getHistory } from "../../services/user_service";
 import History from "./History";
 import TransitionButton from "../TransitionButton";
@@ -47,7 +47,7 @@ const ProfileSection = () => {
         setData(res.data.history);
       })
       .catch(console.log);
-  }, []);
+  }, [jwtToken, userId]);
 
   const closeDialog = () => {
     setIsDialogOpen(false);
@@ -73,11 +73,11 @@ const ProfileSection = () => {
     dispatch(setIsLoading(false));
   };
 
-  const handleRefreshPage = () => {
+  const handleLogout = () => {
     dispatch(setIsLoading(true));
     setIsSecondDialogOpen(false);
+    dispatch(setLogout())
     dispatch(setIsLoading(false));
-    window.location.reload();
   };
   const profileRef = useRef();
   const historyRef = useRef();
@@ -155,12 +155,12 @@ const ProfileSection = () => {
         </DialogActions>
       </Dialog>
       <Dialog open={isSecondDialogOpen}>
-        <DialogTitle>Delete Accont Notification</DialogTitle>
+        <DialogTitle>Delete Acccont Notification</DialogTitle>
         <DialogContent>
           <DialogContentText>{secondDialogMsg}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleRefreshPage}>Ok</Button>
+          <Button onClick={handleLogout}>Ok</Button>
         </DialogActions>
       </Dialog>
     </Container>

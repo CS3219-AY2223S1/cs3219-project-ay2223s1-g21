@@ -44,6 +44,7 @@ export default function History({ rows }) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
+  
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", height: '80%'}}>
       <TableContainer id="tablePaper" sx={{ maxHeight: 440, height: 700 }}>
