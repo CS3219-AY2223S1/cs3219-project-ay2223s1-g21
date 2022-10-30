@@ -45,7 +45,7 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { curMode, isCodeRunning } = useSelector(
+  const { isCodeRunning } = useSelector(
     (state) => state.collabReducer
   );
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
@@ -84,7 +84,7 @@ export default function CollaborationPage() {
   useEffect(() => {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
-        submitCompileReqCallback(curMode, state.collab["code-" + roomId]);
+        submitCompileReqCallback(state.collab["lang-" + roomId], state.collab["code-" + roomId]);
       }
     };
 
@@ -93,7 +93,7 @@ export default function CollaborationPage() {
       document.removeEventListener("keydown", onCtrlEnterKeyDown);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [curMode, submitCompileReqCallback]);
+  }, [submitCompileReqCallback]);
 
   useEffect(() => {
     // draggable event listeners
@@ -290,7 +290,7 @@ export default function CollaborationPage() {
         </Button>
         <Button
           variant="outlined"
-          color="error"
+        
           onClick={handleNewQuestion}
           style={{ marginLeft: "30px" }}
         >

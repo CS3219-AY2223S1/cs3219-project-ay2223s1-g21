@@ -82,6 +82,7 @@ export const NavLinks = styled(LinkS)`
     border-bottom: 3px solid #00ffff;
     color: #00ffff;
   }
+
 `;
 
 export const NavBtn = styled.nav`

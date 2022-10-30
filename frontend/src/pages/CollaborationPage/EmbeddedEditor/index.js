@@ -35,13 +35,12 @@ import {
   setIsCodeRunning,
   setTab,
 } from "../../../redux/actions/collab";
-import { setMode } from "../../../redux/actions/collab";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
   const { roomId } = useSelector((state) => state.matchingReducer);
-  const { curMode } = useSelector((state) => state.collabReducer);
+  const { question } = useSelector((state) => state.collabReducer);
 
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
@@ -55,9 +54,11 @@ export default function EmbeddedEditor({ editorRef }) {
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
   };
+
   const handleCloseLang = (lang) => {
     setAnchorElLang(null);
-    dispatch(setMode(lang));
+    state.collab["code-" + roomId] = question[lang];
+    state.collab["lang-" + roomId] = lang;
   };
 
   const handleThemeSelect = (event) => {
@@ -95,20 +96,23 @@ export default function EmbeddedEditor({ editorRef }) {
   const state = useSyncedStore(store);
 
   useEffect(() => {
-    state.collab["code-" + roomId] = `console.log("Hello World!");`;
+    if(question) {
+      state.collab["code-" + roomId] = question["javascript"];
+      state.collab["lang-" + roomId] = `javascript`;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [question]);
 
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
         <Tooltip title="Click or press Ctrl + Enter to run your code.">
-          <RunCodeButton onClick={() => submitCompileRequest(curMode,  state.collab["code-" + roomId])}>
+          <RunCodeButton onClick={() => submitCompileRequest(state.collab["lang-" + roomId],  state.collab["code-" + roomId])}>
             Run Code
           </RunCodeButton>
         </Tooltip>
         <Tooltip title="Select a programming language.">
-          <BarItem onClick={handleLangSelect}> {curMode} </BarItem>
+          <BarItem onClick={handleLangSelect}> {state.collab["lang-" + roomId]} </BarItem>
         </Tooltip>
         <Menu
           id="fade-menu"
@@ -117,7 +121,7 @@ export default function EmbeddedEditor({ editorRef }) {
           }}
           anchorEl={anchorElLang}
           open={openLang}
-          onClose={() => handleCloseLang(curMode)}
+          onClose={() => handleCloseLang(state.collab["lang-" + roomId])}
           TransitionComponent={Fade}
         >
           <MenuItem onClick={() => handleCloseLang("javascript")}>
@@ -166,7 +170,7 @@ export default function EmbeddedEditor({ editorRef }) {
           margin: "0px",
         }}
         placeholder="Start Coding"
-        mode={curMode}
+        mode={state.collab["lang-" + roomId]}
         theme={curTheme}
         name="basic-code-editor"
         onChange={(currentCode) => {

@@ -2,7 +2,6 @@ import {
   UPDATE_IS_CODE_RUNNING,
   UPDATE_TAB,
   UPDATE_EXECUTION_RESULT,
-  UPDATE_CURRENT_MODE,
   UPDATE_QUESTION,
   RESTE_COLLAB_PG,
 } from "../actionTypes";
@@ -25,13 +24,6 @@ export const setTab = (tab) => {
   return {
     type: UPDATE_TAB,
     payload: tab,
-  };
-};
-
-export const setMode = (mode) => {
-  return {
-    type: UPDATE_CURRENT_MODE,
-    payload: mode,
   };
 };
 
