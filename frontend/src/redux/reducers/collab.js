@@ -1,5 +1,4 @@
 import {
-  UPDATE_CURRENT_MODE,
   UPDATE_EXECUTION_RESULT,
   UPDATE_IS_CODE_RUNNING,
   UPDATE_TAB,
@@ -11,7 +10,6 @@ const initialState = {
   isCodeRunning: false,
   selectedTab: "Description",
   codeResult: "Press Run Code or Ctrl + Enter to run your code.",
-  curMode: "javascript",
   question: null,
 };
 
@@ -36,12 +34,6 @@ export default function collabReducer(state = initialState, action) {
       return {
         ...state,
         selectedTab: action.payload,
-      };
-
-    case UPDATE_CURRENT_MODE:
-      return {
-        ...state,
-        curMode: action.payload,
       };
 
     case UPDATE_QUESTION:
