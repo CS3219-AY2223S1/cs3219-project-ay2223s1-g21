@@ -26,7 +26,7 @@ export default function MatchingScreen({matchTimer, foundMatch}) {
           <span class="e-text"> {matchTimer > 0 && matchTimer} </span>
         </div>
       </div>
-      <span class="description"> {foundMatch ? "Match Found!" : matchTimer > 0 ? string : "No Match"} </span>
+      <span class="description"> {foundMatch ? "Matched!" : matchTimer > 0 ? string : "No Match"} </span>
       {!matchTimer && !foundMatch && <span class="okay" onClick={() => navigate("/home")}> Go Back Home </span>}
     </PageContainer>
   );
