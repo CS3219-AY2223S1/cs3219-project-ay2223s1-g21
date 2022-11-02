@@ -180,11 +180,12 @@
   @include animation("textColour 1s alternate linear infinite");
   position: absolute;
   box-sizing: border-box;
-  width: 140px;
-  height: 140px;
-  left: 51.5%;
-  top: 70%;
-  transform: translate(-51%, -50%);
+  width: 100px;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 5em;
+  left: 0;
+  right: 0;
 }
 
 .okay {
@@ -204,7 +205,7 @@
   transform: translate(-51%, -50%);
   border: 1px solid #00ffff;
 
-  &:hover{
+  &:hover {
     color: #fff;
     border: 1px solid #fff;
   }

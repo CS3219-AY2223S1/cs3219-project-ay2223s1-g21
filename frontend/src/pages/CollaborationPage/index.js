@@ -299,6 +299,8 @@ export default function CollaborationPage() {
         <Widget
           handleNewUserMessage={handleNewUserMessage}
           subtitle="Chat here"
+          emojis={true}
+          senderPlaceHolder={"Type your message here..."}
         />
       </FooterContainer>
       <audio ref={voiceChatRef}></audio>
