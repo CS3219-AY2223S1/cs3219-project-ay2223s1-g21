@@ -87,14 +87,14 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-    const { statusCode, email, id, message, token } = await handleLogin(
+    const { statusCode, emailResponse, id, message, token } = await handleLogin(
       userEmail,
       userPassword
     );
     if (statusCode === 200) {
       dispatch(setIsLoading(false));
       dispatch(setUserId(id));
-      dispatch(setUserEmail(email));
+      dispatch(setUserEmail(emailResponse));
       dispatch(setJwtToken(token));
       navigate("/home");
     } else {
