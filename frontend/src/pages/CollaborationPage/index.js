@@ -35,11 +35,12 @@ import {
   requestCompilation,
 } from "../../services/compile_service";
 import io from "socket.io-client";
-import { connect, disconnect } from "./store";
 import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
 import { useSyncedStore } from "@syncedstore/react";
+import { getYjsValue } from "@syncedstore/core";
 import { store } from "./store";
+import { WebrtcProvider } from "y-webrtc";
 
 export default function CollaborationPage() {
   const navigate = useNavigate();
@@ -144,8 +145,15 @@ export default function CollaborationPage() {
     const peer = new Peer(`${roomId}-${userId}`);
     console.log("Peer Id :", peer.id);
     setPeer(peer);
+    const webrtcProvider = new WebrtcProvider("peerprep-" + roomId,  getYjsValue(store))
+    webrtcProvider.connect();
 
-    connect();
+    window.onbeforeunload = function(e) {
+      return () => {
+        webrtcProvider.disconnect()
+      }
+    };
+
     return () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
 
@@ -153,13 +161,13 @@ export default function CollaborationPage() {
       console.log("Disconnect Socket");
       socket.close();
       peer.destroy();
-      disconnect();
+      webrtcProvider.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const state = useSyncedStore(store);
-  
+ 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
     handleLogoutAccount().then((res) => {
@@ -171,7 +179,6 @@ export default function CollaborationPage() {
   useEffect(() => {
     dispatch(setIsLoading(true))
     if (ioSocket && !ioSocket.connected) {
-      disconnect();
       navigate("/home");
     }
     if (ioSocket && peer) {
@@ -233,7 +240,6 @@ export default function CollaborationPage() {
 
       ioSocket.on("alreadyInRoom", () => {
         console.log("Already in Room");
-        disconnect();
         navigate("/home");
       });
 
