@@ -27,9 +27,8 @@ import {
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import {
-    handleLogoutAccount,
-    updateHistory,
-  } from "../../services/user_service";
+  updateHistory,
+} from "../../services/user_service";
 import {
   getCompilationResult,
   requestCompilation,
@@ -49,9 +48,7 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { isCodeRunning } = useSelector(
-    (state) => state.collabReducer
-  );
+  const { isCodeRunning } = useSelector((state) => state.collabReducer);
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
@@ -88,7 +85,10 @@ export default function CollaborationPage() {
   useEffect(() => {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
-        submitCompileReqCallback(state.collab["lang-" + roomId], state.collab["code-" + roomId]);
+        submitCompileReqCallback(
+          state.collab["lang-" + roomId],
+          state.collab["code-" + roomId]
+        );
       }
     };
 
@@ -134,10 +134,9 @@ export default function CollaborationPage() {
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
 
     // Socket io method
-    const socket = io(
-        process.env.REACT_APP_COLLAB_SERVER_URL, 
-        {transports: ['websocket']} 
-      );
+    const socket = io(process.env.REACT_APP_COLLAB_SERVER_URL, {
+      transports: ["websocket"],
+    });
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
     });
@@ -145,13 +144,16 @@ export default function CollaborationPage() {
     const peer = new Peer(`${roomId}-${userId}`);
     console.log("Peer Id :", peer.id);
     setPeer(peer);
-    const webrtcProvider = new WebrtcProvider("peerprep-" + roomId,  getYjsValue(store))
+    const webrtcProvider = new WebrtcProvider(
+      "peerprep-" + roomId,
+      getYjsValue(store)
+    );
     webrtcProvider.connect();
 
-    window.onbeforeunload = function(e) {
+    window.onbeforeunload = function (e) {
       return () => {
-        webrtcProvider.disconnect()
-      }
+        webrtcProvider.disconnect();
+      };
     };
 
     return () => {
@@ -167,17 +169,16 @@ export default function CollaborationPage() {
   }, []);
 
   const state = useSyncedStore(store);
- 
+
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    handleLogoutAccount().then((res) => {
-        dispatch(setIsLoading(false));
-        dispatch(setLogout());
-      });
+
+    dispatch(setIsLoading(false));
+    dispatch(setLogout());
   };
 
   useEffect(() => {
-    dispatch(setIsLoading(true))
+    dispatch(setIsLoading(true));
     if (ioSocket && !ioSocket.connected) {
       navigate("/home");
     }
@@ -219,7 +220,7 @@ export default function CollaborationPage() {
         console.log("Recieved Question");
         dispatch(setQuestion(JSON.parse(question)));
         updateHistory(userId, jwtToken, JSON.parse(question));
-        dispatch(setIsLoading(false))
+        dispatch(setIsLoading(false));
       });
 
       ioSocket.on("callPeer", (peerId) => {
@@ -274,7 +275,7 @@ export default function CollaborationPage() {
   };
 
   const handleNewQuestion = () => {
-    dispatch(setIsLoading(true))
+    dispatch(setIsLoading(true));
     ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
   };
 
@@ -304,7 +305,6 @@ export default function CollaborationPage() {
         </Button>
         <Button
           variant="outlined"
-        
           onClick={handleNewQuestion}
           style={{ marginLeft: "30px" }}
         >

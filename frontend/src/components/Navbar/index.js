@@ -14,8 +14,6 @@ import { animateScroll as scroll } from "react-scroll";
 import { useDispatch } from "react-redux";
 import { setLogout, setIsLoading } from "../../redux/actions/auth";
 
-import { handleLogoutAccount } from "../../services/user_service";
-
 const Navbar = (props) => {
   const { toggle } = props;
   const [scrollNav, setScrollNav] = useState(() => false);
@@ -45,10 +43,8 @@ const Navbar = (props) => {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    handleLogoutAccount().then(res => {
-        dispatch(setIsLoading(false));
-        dispatch(setLogout());
-    });
+    dispatch(setIsLoading(false));
+    dispatch(setLogout());
   };
 
   return (

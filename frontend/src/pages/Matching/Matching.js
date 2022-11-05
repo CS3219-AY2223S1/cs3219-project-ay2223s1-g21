@@ -14,7 +14,6 @@ import {
   Button,
 } from "@mui/material";
 import { setIsLoading } from "../../redux/actions/auth";
-import { handleLogoutAccount } from "../../services/user_service";
 import { setLogout } from "../../redux/actions/auth";
 import { handleCheckAvaliabilty } from "../../services/collab_service";
 
@@ -44,10 +43,8 @@ export default function MatchingPage() {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    handleLogoutAccount().then((res) => {
-        dispatch(setIsLoading(false));
-        dispatch(setLogout());
-      });    
+    dispatch(setIsLoading(false));
+    dispatch(setLogout());
   };
 
   const closeDialog = () => {
@@ -71,9 +68,7 @@ export default function MatchingPage() {
 
   useEffect(() => {
     if (isAvaliable) {
-      const socket = io(
-          process.env.REACT_APP_MATCHING_SERVER_URL, 
-        );
+      const socket = io(process.env.REACT_APP_MATCHING_SERVER_URL);
       setSocket(socket);
 
       let cancelMatchTimer;
