@@ -1,7 +1,5 @@
 import axios from "axios";
 import { setJwtToken, setUserEmail, setUserId } from "../redux/actions/auth";
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
 
 export const handleCreateNewAccount = async (email, password) => {
   const body = { email, password };
@@ -34,7 +32,6 @@ export const handleLogin = async (email, password) => {
   let emailResponse = "";
   let message = "";
   let token = "";
-  let refreshToken = "";
   console.log("request sent");
 
   await axios
@@ -45,7 +42,6 @@ export const handleLogin = async (email, password) => {
       message = res.data.message;
       id = res.data.id;
       token = res.data.token;
-      refreshToken = res.data.refreshToken;
       console.log("login response OK");
     })
     .catch((err) => {
@@ -54,13 +50,21 @@ export const handleLogin = async (email, password) => {
       console.log("Login error, " + err);
     });
 
-  return { statusCode, emailResponse, id, message, token, refreshToken };
+  return { statusCode, emailResponse, id, message, token };
+};
+
+export const handleLogoutAccount = () => {
+    const LOG_OUT_ENDPT =
+      process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/logout";
+    return axios.post(LOG_OUT_ENDPT, null, { withCredentials: true });
 };
 
 
 export const refreshJwtToken = (dispatch) => {
   return axios
-    .get(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken?refreshToken=" + cookies.get("refreshToken"))
+    .get(process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/refreshtoken", {
+      withCredentials: true,
+    })
     .then((res) => {
       dispatch(setUserEmail(res.data.email));
       dispatch(setUserId(res.data.id));
