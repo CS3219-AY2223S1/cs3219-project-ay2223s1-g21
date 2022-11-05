@@ -37,11 +37,9 @@ import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "./store";
-<<<<<<< Updated upstream
-=======
+import { getYjsValue } from "@syncedstore/core";
 // import { WebrtcProvider } from "y-webrtc";
 import { WebsocketProvider } from 'y-websocket'
->>>>>>> Stashed changes
 
 export default function CollaborationPage() {
   const navigate = useNavigate();
@@ -145,8 +143,6 @@ export default function CollaborationPage() {
     const peer = new Peer(`${roomId}-${userId}`);
     console.log("Peer Id :", peer.id);
     setPeer(peer);
-<<<<<<< Updated upstream
-=======
     // const webrtcProvider = new WebrtcProvider(
     //   "peerprep-" + roomId,
     //   getYjsValue(store)
@@ -167,7 +163,6 @@ export default function CollaborationPage() {
         webrtcProvider.disconnect();
       };
     };
->>>>>>> Stashed changes
 
     connect();
     return () => {

@@ -22,12 +22,7 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import silentLogin from "./silentLogin";
 import TransitionButton from "../../components/TransitionButton";
-<<<<<<< Updated upstream
 import Cookies from 'universal-cookie';
-=======
-import Cookies from "universal-cookie";
-
->>>>>>> Stashed changes
 const cookies = new Cookies();
 
 export default function LoginPage() {
@@ -94,24 +89,15 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-<<<<<<< Updated upstream
     const { statusCode, email, id, message, jwtToken, refreshToken } = await handleLogin(
-=======
-    const { statusCode, emailResponse, id, message, token, refreshToken } = await handleLogin(
->>>>>>> Stashed changes
       userEmail,
       userPassword
     );
     if (statusCode === 200) {
       dispatch(setIsLoading(false));
       dispatch(setUserId(id));
-<<<<<<< Updated upstream
       dispatch(setUserEmail(email));
       dispatch(setJwtToken(jwtToken));
-=======
-      dispatch(setUserEmail(emailResponse));
-      dispatch(setJwtToken(token));
->>>>>>> Stashed changes
       cookies.set('refreshToken', refreshToken, {path: '/', maxAge: '86400'});
       navigate("/home");
     } else {
