@@ -122,7 +122,7 @@ export const resetPasswordRequest = (userId, token, password) => {
 export const updateHistory = (id, jwtToken, history) => {
   return axios.put(
     process.env.REACT_APP_AUTH_SERVER_URL + "/api/user/updateHistory",
-    { id, history },
+    { id, history: { history } },
     {
       withCredentials: true,
       headers: { "access-token": jwtToken },
