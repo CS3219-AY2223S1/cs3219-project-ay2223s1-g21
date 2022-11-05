@@ -107,7 +107,6 @@ export default function CollaborationPage() {
 
     // Right resize
     const onMouseMoveRightResize = (event) => {
-      dispatch(setIsLoading(true))
       event.preventDefault();
       const dx = 1.5 * (x - event.clientX);
       width = width + dx;
