@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "env-cmd -f frontend-v2.env react-scripts build",
+    "build": "env-cmd -f deploy.env react-scripts build",
     "test": "react-scripts test",
     "lint": "npx eslint ."
   },

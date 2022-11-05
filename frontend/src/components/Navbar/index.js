@@ -13,13 +13,12 @@ import { useEffect, useState } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import { useDispatch } from "react-redux";
 import { setLogout, setIsLoading } from "../../redux/actions/auth";
+
 import { handleLogoutAccount } from "../../services/user_service";
-import lifeGoesOn from "../../assets/homeScreenBgm.mp3";
 
 const Navbar = (props) => {
   const { toggle } = props;
   const [scrollNav, setScrollNav] = useState(() => false);
-  const [isPlaying, setIsPlaying] = useState(false);
   const dispatch = useDispatch();
 
   const curUrlIsProfileOrChangePassword =
@@ -34,12 +33,6 @@ const Navbar = (props) => {
     }
   };
 
-  const playMusic = () => {
-    if (!isPlaying) {
-      setIsPlaying(true);
-      new Audio(lifeGoesOn).play();
-    }
-  };
 
   useEffect(() => {
     window.addEventListener("scroll", changeNav);
@@ -94,7 +87,6 @@ const Navbar = (props) => {
                     duration={500}
                     spy={true}
                     offset={-80}
-                    onClick={playMusic}
                   >
                     FAQs
                   </NavLinks>

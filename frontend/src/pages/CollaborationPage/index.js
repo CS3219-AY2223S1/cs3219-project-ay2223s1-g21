@@ -146,7 +146,6 @@ export default function CollaborationPage() {
     setPeer(peer);
 
     connect();
-
     return () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
 
@@ -170,6 +169,7 @@ export default function CollaborationPage() {
   };
 
   useEffect(() => {
+    dispatch(setIsLoading(true))
     if (ioSocket && !ioSocket.connected) {
       disconnect();
       navigate("/home");
@@ -211,7 +211,8 @@ export default function CollaborationPage() {
       ioSocket.on("recieveQn", (question) => {
         console.log("Recieved Question");
         dispatch(setQuestion(JSON.parse(question)));
-        updateHistory(userId, jwtToken, question);
+        updateHistory(userId, jwtToken, JSON.parse(question));
+        dispatch(setIsLoading(false))
       });
 
       ioSocket.on("callPeer", (peerId) => {
@@ -267,6 +268,7 @@ export default function CollaborationPage() {
   };
 
   const handleNewQuestion = () => {
+    dispatch(setIsLoading(true))
     ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
   };
 

@@ -29,7 +29,7 @@ export const getCompileResult = async (req, res) => {
     const { url } = req.body;
     if (url) {
       const result = await getCompileResponse(url);
-      return res.send(result);
+      return res.status(200).send(result.toString());
     }
     return res.status(400).json({ message: "Please provide a url." });
   } catch (err) {
