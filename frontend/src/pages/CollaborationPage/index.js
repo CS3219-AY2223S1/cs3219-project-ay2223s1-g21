@@ -85,6 +85,7 @@ export default function CollaborationPage() {
   useEffect(() => {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
+        console.log(state.collab)
         submitCompileReqCallback(
           state.collab["lang-" + roomId],
           state.collab["code-" + roomId]
@@ -148,6 +149,15 @@ export default function CollaborationPage() {
       "peerprep-" + roomId,
       getYjsValue(store)
     );
+    webrtcProvider.on('synced', synced => {
+      // NOTE: This is only called when a different browser connects to this client
+      // Windows of the same browser communicate directly with each other
+      // Although this behavior might be subject to change.
+      // It is better not to expect a synced event when using y-webrtc
+      console.log('peers synced!', synced)
+    })
+
+
     webrtcProvider.connect();
 
     window.onbeforeunload = function (e) {

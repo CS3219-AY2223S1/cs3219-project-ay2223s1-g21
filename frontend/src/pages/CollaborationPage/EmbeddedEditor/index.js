@@ -174,6 +174,7 @@ export default function EmbeddedEditor({ editorRef }) {
         theme={curTheme}
         name="basic-code-editor"
         onChange={(currentCode) => {
+          console.log(state.collab)
           state.collab["code-" + roomId] = currentCode;
         }}
         fontSize={15}
