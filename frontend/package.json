@@ -29,7 +29,8 @@
     "universal-cookie": "^4.0.4",
     "web-vitals": "^2.1.4",
     "ws": "^8.9.0",
-    "y-webrtc": "^10.2.3"
+    "y-webrtc": "^10.2.3",
+    "y-websocket": "^1.4.5"
   },
   "scripts": {
     "start": "react-scripts start",

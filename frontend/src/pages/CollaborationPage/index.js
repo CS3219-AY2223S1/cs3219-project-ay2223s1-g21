@@ -37,6 +37,11 @@ import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "./store";
+<<<<<<< Updated upstream
+=======
+// import { WebrtcProvider } from "y-webrtc";
+import { WebsocketProvider } from 'y-websocket'
+>>>>>>> Stashed changes
 
 export default function CollaborationPage() {
   const navigate = useNavigate();
@@ -140,6 +145,29 @@ export default function CollaborationPage() {
     const peer = new Peer(`${roomId}-${userId}`);
     console.log("Peer Id :", peer.id);
     setPeer(peer);
+<<<<<<< Updated upstream
+=======
+    // const webrtcProvider = new WebrtcProvider(
+    //   "peerprep-" + roomId,
+    //   getYjsValue(store)
+    // );
+    // webrtcProvider.on('synced', synced => {
+    //   // NOTE: This is only called when a different browser connects to this client
+    //   // Windows of the same browser communicate directly with each other
+    //   // Although this behavior might be subject to change.
+    //   // It is better not to expect a synced event when using y-webrtc
+    //   console.log('peers synced!', synced)
+    // })
+
+    const webrtcProvider = new WebsocketProvider('wss://demos.yjs.dev',  "peerprep-" + roomId, getYjsValue(store))
+    webrtcProvider.connect();
+
+    window.onbeforeunload = function (e) {
+      return () => {
+        webrtcProvider.disconnect();
+      };
+    };
+>>>>>>> Stashed changes
 
     connect();
     return () => {

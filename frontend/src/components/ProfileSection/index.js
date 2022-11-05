@@ -78,6 +78,10 @@ const ProfileSection = () => {
     setIsSecondDialogOpen(false);
     dispatch(setLogout())
     dispatch(setIsLoading(false));
+<<<<<<< Updated upstream
+=======
+    dispatch(setLogout());
+>>>>>>> Stashed changes
   };
   const profileRef = useRef();
   const historyRef = useRef();
