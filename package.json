@@ -4,7 +4,7 @@
     "user-service": "cd user-service && npm start",
     "matching-service": "cd matching-service && npm start",
     "compile-service": "cd compile-service && npm start",
-    "collab-service": "cd collab-service && npm run dev",
+    "collab-service": "cd collab-service && npm run start",
     "question-service": "cd question-service && npm start",
     "frontend": "cd frontend && npm start",
     "start": "concurrently --kill-others \"npm run user-service\" \"npm run matching-service\" \"npm run compile-service\" \"npm run frontend\" \"npm run collab-service\" \"npm run question-service\""
