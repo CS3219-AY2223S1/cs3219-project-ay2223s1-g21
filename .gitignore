@@ -1,6 +1,5 @@
 node_modules/
 frontend/.env
-build/
 *node_modules
 *.env
 *.pem
