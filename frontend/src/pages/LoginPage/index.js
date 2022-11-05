@@ -87,7 +87,7 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-    const { statusCode, email, id, message, jwtToken } = await handleLogin(
+    const { statusCode, email, id, message, token } = await handleLogin(
       userEmail,
       userPassword
     );
@@ -95,7 +95,7 @@ export default function LoginPage() {
       dispatch(setIsLoading(false));
       dispatch(setUserId(id));
       dispatch(setUserEmail(email));
-      dispatch(setJwtToken(jwtToken));
+      dispatch(setJwtToken(token));
       navigate("/home");
     } else {
       setDialogTitle("Login Failed!");
