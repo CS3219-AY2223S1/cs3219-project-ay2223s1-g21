@@ -15,7 +15,6 @@ app.use(cors({
   credentials: true
 }));
 
-if (process.env.ENV == "DEV") {
 app.use(
     cookieSession({
       name: "peer-prep-session",
@@ -23,21 +22,7 @@ app.use(
       httpOnly: true,
       maxAge: 86400,   // 24 hour
     })
-);
-} else {
-app.use(
-    cookieSession({
-        name: "peer-prep-session",
-        secret: process.env.COOKIE_SECRET,
-        httpOnly: true,
-        maxAge: 86400,   // 24 hour
-        sameSite: 'None',
-        secure: true
-    })
-);
-}
-
-
+  );
 
 const router = express.Router()
 
