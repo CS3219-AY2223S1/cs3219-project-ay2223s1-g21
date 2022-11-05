@@ -5,11 +5,8 @@ import {
   UPDATE_USER_ID,
   LOG_OUT_ACCOUNT,
 } from "../actionTypes";
-import Cookies from 'universal-cookie';
 
 export const setLogout = () => {
-  const cookies = new Cookies();
-  cookies.remove("refreshToken");
   return {
     type: LOG_OUT_ACCOUNT
   }

@@ -22,8 +22,6 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import silentLogin from "./silentLogin";
 import TransitionButton from "../../components/TransitionButton";
-import Cookies from 'universal-cookie';
-const cookies = new Cookies();
 
 export default function LoginPage() {
   const location = useLocation();
@@ -89,7 +87,7 @@ export default function LoginPage() {
     const userEmail = e.target[0].value;
     const userPassword = e.target[1].value;
     dispatch(setIsLoading(true));
-    const { statusCode, email, id, message, jwtToken, refreshToken } = await handleLogin(
+    const { statusCode, email, id, message, jwtToken } = await handleLogin(
       userEmail,
       userPassword
     );
@@ -98,7 +96,6 @@ export default function LoginPage() {
       dispatch(setUserId(id));
       dispatch(setUserEmail(email));
       dispatch(setJwtToken(jwtToken));
-      cookies.set('refreshToken', refreshToken, {path: '/', maxAge: '86400'});
       navigate("/home");
     } else {
       setDialogTitle("Login Failed!");

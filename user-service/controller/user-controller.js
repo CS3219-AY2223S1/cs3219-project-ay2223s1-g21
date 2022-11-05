@@ -79,23 +79,24 @@ export async function login(req, res) {
         });
 
         const refreshToken = await _createToken(user);
+        req.session.refreshToken = refreshToken;
 
         console.log("Login successful!");
-        return res.status(200).json({ id: user._id, email: email, token: token, refreshToken: refreshToken, message: "Login successful!" });
+        return res.status(200).json({ id: user._id, email: email, token: token, message: "Login successful!" });
     } catch (err) {
         return res.status(500).json({ message: `Login failed. Error: ${err}` });
     }
 }
 
 export async function refreshToken(req, res) {
-    let { refreshToken } = req.query;
+    const requestToken = req.session.refreshToken;
     
-    if (refreshToken == null) {
+    if (requestToken == null) {
         return res.status(400).json({ message: "Refresh Token is required!" });
     }
 
     try {
-        refreshToken = await _getToken(refreshToken);
+        let refreshToken = await _getToken(requestToken);
 
         if (!refreshToken) {
             return res.status(401).json({ message: "Refresh token does not exist in database!" });
@@ -117,6 +118,17 @@ export async function refreshToken(req, res) {
         return res.status(500).send({ message: `Refresh token failed. Error: ${err}` });
     }
 };
+
+export async function logout(req, res) {
+    try {
+        req.session = null;
+        console.log("Logout successful!");
+        return res.status(200).json({ message: "Signed out succesfull!" });
+    } catch (err) {
+        return res.status(500).json({ message: `Logout failure. Error: ${err}` });
+    }
+}
+
   
 export async function deleteUser(req, res) {
     try {
@@ -127,6 +139,7 @@ export async function deleteUser(req, res) {
         }
 
         await _deleteUser(id);
+        req.session = null;
         console.log("Delete user successful!");
         return res.status(200).json({ message: "Deleted user successfully!" });
     } catch (err) {
