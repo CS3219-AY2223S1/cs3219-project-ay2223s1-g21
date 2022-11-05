@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { animateScroll as scroll } from "react-scroll";
 import { useDispatch } from "react-redux";
 import { setLogout, setIsLoading } from "../../redux/actions/auth";
+import { handleLogoutAccount } from "../../services/user_service";
 import lifeGoesOn from "../../assets/homeScreenBgm.mp3";
 
 const Navbar = (props) => {
@@ -51,8 +52,10 @@ const Navbar = (props) => {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    dispatch(setIsLoading(false));
-    dispatch(setLogout());
+    handleLogoutAccount().then(res => {
+        dispatch(setIsLoading(false));
+        dispatch(setLogout());
+    });
   };
 
   return (
@@ -68,9 +71,7 @@ const Navbar = (props) => {
             </h3>
           </MobileIcon>
           <NavMenu>
-            <NavLinkR
-              to={!curUrlIsProfileOrChangePassword ? "/profile" : "/home"}
-            >
+            <NavLinkR to={!curUrlIsProfileOrChangePassword ? "/profile" : "/home"}>
               {!curUrlIsProfileOrChangePassword ? "Profile" : "Home"}
             </NavLinkR>
             {!curUrlIsProfileOrChangePassword && (

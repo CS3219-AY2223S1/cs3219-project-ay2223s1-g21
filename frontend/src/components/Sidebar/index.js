@@ -8,6 +8,7 @@ import {
   SidebarProfile,
   SidebarLogout,
 } from "./SidebarElements";
+import { handleLogoutAccount } from "../../services/user_service";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { useDispatch } from "react-redux";
 
@@ -16,8 +17,10 @@ const Sidebar = ({ isOpen, toggle, isProfilePage }) => {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    dispatch(setIsLoading(false));
-    dispatch(setLogout());
+    handleLogoutAccount().then((res) => {
+        dispatch(setIsLoading(false));
+        dispatch(setLogout());
+      });
   };
 
   return (
@@ -27,26 +30,10 @@ const Sidebar = ({ isOpen, toggle, isProfilePage }) => {
       </Icon>
       <SidebarWrapper>
         <SidebarMenu>
-          {isProfilePage && (
-            <SidebarProfile onClick={toggle} to="/home">
-              Home
-            </SidebarProfile>
-          )}
-          {!isProfilePage && (
-            <SidebarProfile onClick={toggle} to="/profile">
-              Profile
-            </SidebarProfile>
-          )}
-          {!isProfilePage && (
-            <SidebarLink onClick={toggle} to="about">
-              About
-            </SidebarLink>
-          )}
-          {!isProfilePage && (
-            <SidebarLink onClick={toggle} to="faq">
-              FAQs
-            </SidebarLink>
-          )}
+          {isProfilePage && <SidebarProfile onClick={toggle} to="/home">Home</SidebarProfile>}
+          {!isProfilePage && (<SidebarProfile onClick={toggle} to="/profile">Profile</SidebarProfile>)}
+          {!isProfilePage && <SidebarLink onClick={toggle} to="about">About</SidebarLink>}
+          {!isProfilePage && <SidebarLink onClick={toggle} to="faq">FAQs</SidebarLink>}
           <SidebarLogout onClick={handleLogout}>Logout</SidebarLogout>
         </SidebarMenu>
       </SidebarWrapper>

@@ -1,7 +1,8 @@
 import express from 'express';
 import cors from 'cors';
+import cookieSession from 'cookie-session';
 
-import { createUser, login, deleteUser, changePassword, refreshToken, requestPasswordReset, resetPassword, getHistory, updateHistory } from './controller/user-controller.js';
+import { createUser, login, logout, deleteUser, changePassword, refreshToken, requestPasswordReset, resetPassword, getHistory, updateHistory } from './controller/user-controller.js';
 import { verifyToken } from './middleware/authJwt.js';
 
 const app = express();
@@ -14,12 +15,22 @@ app.use(cors({
   credentials: true
 }));
 
+app.use(
+    cookieSession({
+      name: "peer-prep-session",
+      secret: process.env.COOKIE_SECRET,
+      httpOnly: true,
+      maxAge: 86400,   // 24 hour
+    })
+  );
+
 const router = express.Router()
 
 // Controller will contain all the User-defined Routes
 router.get('/', (_, res) => res.send('Hello World from user-service'))
 router.post('/signup', createUser)
 router.post('/login', login)
+router.post('/logout', logout)
 router.delete('/delete', [verifyToken], deleteUser)
 router.put('/changepassword', [verifyToken], changePassword)
 router.get('/refreshtoken', refreshToken)

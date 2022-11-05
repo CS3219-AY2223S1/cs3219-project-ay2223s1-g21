@@ -26,7 +26,10 @@ import {
   resetCollabPg,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
-import { updateHistory } from "../../services/user_service";
+import {
+    handleLogoutAccount,
+    updateHistory,
+  } from "../../services/user_service";
 import {
   getCompilationResult,
   requestCompilation,
@@ -130,9 +133,10 @@ export default function CollaborationPage() {
     resizerEle.addEventListener("mousedown", onMouseDownRightResize);
 
     // Socket io method
-    const socket = io(process.env.REACT_APP_COLLAB_SERVER_URL, {
-      transports: ["websocket"],
-    });
+    const socket = io(
+        process.env.REACT_APP_COLLAB_SERVER_URL, 
+        {transports: ['websocket']} 
+      );
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
     });
@@ -159,8 +163,10 @@ export default function CollaborationPage() {
   
   const handleLogout = () => {
     dispatch(setIsLoading(true));
-    dispatch(setIsLoading(false));
-    dispatch(setLogout());
+    handleLogoutAccount().then((res) => {
+        dispatch(setIsLoading(false));
+        dispatch(setLogout());
+      });
   };
 
   useEffect(() => {
