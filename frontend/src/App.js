@@ -25,15 +25,7 @@ function App() {
             path="/home"
             element={<PrivateRoute component={Home} fromUrl={"/home"} />}
           />
-          <Route
-            path="/change_password"
-            element={
-              <PrivateRoute
-                component={ChangePasswordPage}
-                fromUrl={"/change_password"}
-              />
-            }
-          />
+          <Route path="/change_password" element={<ChangePasswordPage />} />
           <Route
             path="/profile"
             element={<PrivateRoute component={Profile} fromUrl={"/profile"} />}
