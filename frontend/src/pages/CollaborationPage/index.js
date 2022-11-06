@@ -32,11 +32,14 @@ import {
   requestCompilation,
 } from "../../services/compile_service";
 import io from "socket.io-client";
-import { connect, disconnect } from "./store";
+// import { connect, disconnect } from "./store";
 import { useNavigate } from "react-router-dom";
 import { Peer } from "peerjs";
 import { useSyncedStore } from "@syncedstore/react";
 import { store } from "./store";
+import { getYjsValue } from "@syncedstore/core";
+import { WebrtcProvider } from "y-webrtc";
+// import { WebsocketProvider } from 'y-websocket'
 
 export default function CollaborationPage() {
   const navigate = useNavigate();
@@ -50,6 +53,7 @@ export default function CollaborationPage() {
   const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
   const [ioSocket, setIoSocket] = useState(null);
+  const [webRtc, setWebRtc] = useState(null);
 
   const submitCompileRequest = async (curMode, curCode) => {
     if (!isCodeRunning) {
@@ -138,11 +142,66 @@ export default function CollaborationPage() {
       setIoSocket(socket);
     });
 
-    const peer = new Peer(`${roomId}-${userId}`);
+    const peer = new Peer(`${roomId}-${userId}`, { config: { iceServers: [{
+        urls: [ "stun:ss-turn2.xirsys.com" ]
+     }, {
+        username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+        credential: "349d4154-5d83-11ed-854f-0242ac140004",
+        urls: [
+            "turn:ss-turn2.xirsys.com:80?transport=udp",
+            "turn:ss-turn2.xirsys.com:3478?transport=udp",
+            "turn:ss-turn2.xirsys.com:80?transport=tcp",
+            "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+            "turns:ss-turn2.xirsys.com:443?transport=tcp",
+            "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+        ]
+     }]}});
     console.log("Peer Id :", peer.id);
     setPeer(peer);
+    const webrtcProvider = new WebrtcProvider(
+      "peerprep-" + roomId,
+      getYjsValue(store),
+      {
+        peerOpts: {
+            config: { 
+                iceServers: [{
+                    urls: [ "stun:ss-turn2.xirsys.com" ]
+                 }, {
+                    username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+                    credential: "349d4154-5d83-11ed-854f-0242ac140004",
+                    urls: [
+                        "turn:ss-turn2.xirsys.com:80?transport=udp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                        "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+                    ]
+                 }]
+            }
+        }
+    }
+    );
+    setWebRtc(webrtcProvider);
 
-    connect();
+    webrtcProvider.on('synced', synced => {
+      // NOTE: This is only called when a different browser connects to this client
+      // Windows of the same browser communicate directly with each other
+      // Although this behavior might be subject to change.
+      // It is better not to expect a synced event when using y-webrtc
+      console.log('peers synced!', synced)
+    })
+
+    // const webrtcProvider = new WebsocketProvider('wss://demos.yjs.dev',  "peerprep-" + roomId, getYjsValue(store))
+    webrtcProvider.connect();
+
+    window.onbeforeunload = function (e) {
+      return () => {
+        webrtcProvider.disconnect();
+      };
+    };
+
+    // connect();
     return () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
 
@@ -150,7 +209,8 @@ export default function CollaborationPage() {
       console.log("Disconnect Socket");
       socket.close();
       peer.destroy();
-      disconnect();
+      webrtcProvider.disconnect();
+    //   disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -166,7 +226,7 @@ export default function CollaborationPage() {
   useEffect(() => {
     dispatch(setIsLoading(true));
     if (ioSocket && !ioSocket.connected) {
-      disconnect();
+      webRtc.disconnect();
       navigate("/home");
     }
     if (ioSocket && peer) {
@@ -235,7 +295,7 @@ export default function CollaborationPage() {
 
       ioSocket.on("alreadyInRoom", () => {
         console.log("Already in Room");
-        disconnect();
+        webRtc.disconnect();
         navigate("/home");
       });
 
