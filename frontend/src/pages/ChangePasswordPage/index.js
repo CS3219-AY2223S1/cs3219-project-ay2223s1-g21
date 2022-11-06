@@ -76,7 +76,7 @@ export default function ChangePasswordPage() {
   return (
     <>
       <PageContainer>
-        <Navbar />
+        <Navbar curUrl={"/change_password"} />
         <Form>
           <FormGrp onSubmit={handleChangePassword}>
             <FormTitle> Change Password Form </FormTitle>

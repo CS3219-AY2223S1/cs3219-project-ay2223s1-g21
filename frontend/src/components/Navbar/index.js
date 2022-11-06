@@ -15,13 +15,12 @@ import { useDispatch } from "react-redux";
 import { setLogout, setIsLoading } from "../../redux/actions/auth";
 
 const Navbar = (props) => {
-  const { toggle } = props;
+  const { toggle, curUrl } = props;
   const [scrollNav, setScrollNav] = useState(() => false);
   const dispatch = useDispatch();
 
   const curUrlIsProfileOrChangePassword =
-    window.location.pathname === "/profile" ||
-    window.location.pathname === "/change_password";
+    curUrl === "/profile" || curUrl === "/change_password";
 
   const changeNav = () => {
     if (window.scrollY >= 80) {
@@ -30,7 +29,6 @@ const Navbar = (props) => {
       setScrollNav(false);
     }
   };
-
 
   useEffect(() => {
     window.addEventListener("scroll", changeNav);

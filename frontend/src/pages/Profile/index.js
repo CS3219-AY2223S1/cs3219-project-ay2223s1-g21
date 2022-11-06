@@ -12,7 +12,7 @@ const Profile = () => {
   return (
     <>
       <Sidebar isOpen={isOpen} toggle={toggle} isProfilePage={true} />
-      <Navbar toggle={toggle} />
+      <Navbar toggle={toggle} curUrl={"/profile"} />
       <ProfileSection />
     </>
   );
