@@ -5,7 +5,7 @@ import roomModel from "./model/roomModel.js";
 import mongoose from "mongoose";
 import axios from "axios";
 import "dotenv/config";
-import { checkAvaliability } from "./controller/index.js";
+import { UNAUTHORIZED, verifyToken } from "./utilities/authJwt.js";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -40,7 +40,14 @@ const server = app.listen(PORT, async function () {
 });
 
 app.get("/", (_, res) => res.send("Hello World from collab service"));
-app.get("/MatchingAvaliability", checkAvaliability);
+app.get("/MatchingAvaliability", async (req, res) => {
+  const { userId } = req.query;
+  if (!userId) {
+    return res.status(400).json({ message: `Missing User Id` });
+  }
+  const userRoom = await roomModel.findOne({ partipants: userId });
+  return res.status(200).json({ avaliability: !!!userRoom });
+});
 
 const ioSocket = new Server(server, {
   cors: { origin: process.env.CLIENT_DOMAIN },
@@ -54,7 +61,14 @@ ioSocket.on("connection", function connection(socket) {
 
   socket.on("joinRoom", async (data) => {
     console.log("Join Room", data);
-    const { roomId } = data;
+    const { roomId, jwtToken, userId } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
 
     if (!!!roomId) {
       ioSocket.emit("badRequest");
@@ -90,8 +104,17 @@ ioSocket.on("connection", function connection(socket) {
   });
 
   socket.on("TriggerFetchQn", async (data) => {
-    const { roomId, difficulty } = data;
-    console.log("Trigger Fetch Question");
+    const { roomId, difficulty, jwtToken, userId } = data;
+    console.log("Trigger Fetch Question", data);
+
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
+
     try {
       const room = await roomModel.findOne({ roomId: roomId });
       const response = await axios.get(
@@ -118,19 +141,44 @@ ioSocket.on("connection", function connection(socket) {
   });
 
   socket.on("startCall", (data) => {
-    const { peerid, roomId } = data;
     console.log("start call", data);
+    const { peerid, roomId, jwtToken, userId } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
+
     ioSocket.to(roomId).emit("callPeer", peerid);
   });
 
   socket.on("sendChatMsg", (data) => {
-    const { roomId, userId, newMessage } = data;
     console.log("New Chat Message", data);
+
+    const { roomId, userId, newMessage, jwtToken } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
     ioSocket.to(roomId).emit("newChatMsg", { userId, newMessage });
   });
 
   socket.on("exitRoom", async (data) => {
-    const { roomId } = data;
+    console.log("Exit Room", data);
+    const { roomId, jwtToken, userId } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
+
     const room = await roomModel.findOne({ roomId: roomId });
 
     const copy = room.partipants.filter((x) => x != socket.id);
