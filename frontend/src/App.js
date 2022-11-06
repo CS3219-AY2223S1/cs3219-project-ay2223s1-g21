@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import ChangePasswordPage from "./pages/ChangePasswordPage";
 import Home from "./pages/Home";
 import LoadingScreen from "./pages/LoadingScreen";

@@ -108,6 +108,10 @@ export default function LoginPage() {
     }
   };
 
+  const navigateToChangePassword = () => {
+    navigate("/forget_password");
+  }
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.form}>
@@ -134,9 +138,9 @@ export default function LoginPage() {
           />
           <div className={styles.chkbox}>
             {/* <input type="checkbox"/> */}
-            <a href="/forget_password" className={styles.spn}>
+            <span className={styles.spn} onClick={navigateToChangePassword}>
               Forget Password
-            </a>
+            </span>
           </div>
 
           <button type="submit" className={styles.submit} disabled={isLoading}>
