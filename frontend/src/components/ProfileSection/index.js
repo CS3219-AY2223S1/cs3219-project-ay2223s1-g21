@@ -79,6 +79,7 @@ const ProfileSection = () => {
     dispatch(setLogout())
     dispatch(setIsLoading(false));
   };
+  
   const profileRef = useRef();
   const historyRef = useRef();
   const btnRef = useRef();
