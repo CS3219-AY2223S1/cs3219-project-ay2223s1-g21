@@ -149,19 +149,20 @@ export default function CollaborationPage() {
       getYjsValue(store),
       {
         peerOpts: {
-            iceServers: [{
-                urls: [ "stun:ss-turn2.xirsys.com" ]
-            }, {
-                username: process.env.TURN_USERNAME,
-                credential: process.env.TURN_CREDENTIAL,
-                urls: [
-                    "turn:ss-turn2.xirsys.com:80?transport=udp",
-                    "turn:ss-turn2.xirsys.com:3478?transport=udp",
-                    "turn:ss-turn2.xirsys.com:80?transport=tcp",
-                    "turn:ss-turn2.xirsys.com:3478?transport=tcp",
-                    "turns:ss-turn2.xirsys.com:443?transport=tcp",
-                    "turns:ss-turn2.xirsys.com:5349?transport=tcp"
-                ]}]
+            config: { iceServers: [{
+                    urls: [ "stun:ss-turn2.xirsys.com" ]
+                }, {
+                    username: process.env.TURN_USERNAME,
+                    credential: process.env.TURN_CREDENTIAL,
+                    urls: [
+                        "turn:ss-turn2.xirsys.com:80?transport=udp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                        "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+                    ]}]
+            }
         }
     }
     );
