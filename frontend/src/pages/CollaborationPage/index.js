@@ -45,9 +45,7 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { isCodeRunning } = useSelector(
-    (state) => state.collabReducer
-  );
+  const { isCodeRunning } = useSelector((state) => state.collabReducer);
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
@@ -84,7 +82,10 @@ export default function CollaborationPage() {
   useEffect(() => {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
-        submitCompileReqCallback(state.collab["lang-" + roomId], state.collab["code-" + roomId]);
+        submitCompileReqCallback(
+          state.collab["lang-" + roomId],
+          state.collab["code-" + roomId]
+        );
       }
     };
 
@@ -155,7 +156,7 @@ export default function CollaborationPage() {
   }, []);
 
   const state = useSyncedStore(store);
-  
+
   const handleLogout = () => {
     dispatch(setIsLoading(true));
     dispatch(setIsLoading(false));
@@ -163,13 +164,13 @@ export default function CollaborationPage() {
   };
 
   useEffect(() => {
-    dispatch(setIsLoading(true))
+    dispatch(setIsLoading(true));
     if (ioSocket && !ioSocket.connected) {
       disconnect();
       navigate("/home");
     }
     if (ioSocket && peer) {
-      ioSocket.emit("joinRoom", { roomId, userId, difficulty });
+      ioSocket.emit("joinRoom", { roomId, jwtToken, userId });
 
       peer.on("connection", () => {
         console.log("Someone is connecting to me");
@@ -192,13 +193,20 @@ export default function CollaborationPage() {
       });
 
       ioSocket.on("joinSuccessFirst", () => {
-        ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+        ioSocket.emit("TriggerFetchQn", {
+          roomId,
+          difficulty,
+          jwtToken,
+          userId,
+        });
       });
 
       ioSocket.on("joinSuccess", () => {
         ioSocket.emit("startCall", {
           peerid: peer.id,
           roomId: roomId,
+          jwtToken,
+          userId,
         });
       });
 
@@ -206,7 +214,7 @@ export default function CollaborationPage() {
         console.log("Recieved Question");
         dispatch(setQuestion(JSON.parse(question)));
         updateHistory(userId, jwtToken, JSON.parse(question));
-        dispatch(setIsLoading(false))
+        dispatch(setIsLoading(false));
       });
 
       ioSocket.on("callPeer", (peerId) => {
@@ -251,19 +259,24 @@ export default function CollaborationPage() {
   }, [ioSocket, peer]);
 
   const handleNewUserMessage = (newMessage) => {
-    ioSocket.emit("sendChatMsg", { roomId, userId, newMessage });
+    ioSocket.emit("sendChatMsg", {
+      roomId,
+      userId,
+      newMessage,
+      jwtToken,
+    });
   };
 
   const handleExitSession = () => {
-    ioSocket.emit("exitRoom", { roomId });
+    ioSocket.emit("exitRoom", { roomId, jwtToken, userId });
     dropMessages();
     dispatch(resetCollabPg());
     navigate("/home");
   };
 
   const handleNewQuestion = () => {
-    dispatch(setIsLoading(true))
-    ioSocket.emit("TriggerFetchQn", { roomId, difficulty });
+    dispatch(setIsLoading(true));
+    ioSocket.emit("TriggerFetchQn", { roomId, difficulty, jwtToken, userId });
   };
 
   return (
@@ -292,7 +305,6 @@ export default function CollaborationPage() {
         </Button>
         <Button
           variant="outlined"
-        
           onClick={handleNewQuestion}
           style={{ marginLeft: "30px" }}
         >
