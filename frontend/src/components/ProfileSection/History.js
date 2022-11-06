@@ -44,18 +44,26 @@ export default function History({ rows }) {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
-  
+
+  const openNewTabUrl = (url) => {
+    window.open(url, "_blank").focus();
+  };
+
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden", height: '80%'}}>
+    <Paper sx={{ width: "100%", overflow: "hidden", height: "80%" }}>
       <TableContainer id="tablePaper" sx={{ maxHeight: 440, height: 700 }}>
         <Table stickyHeader aria-label="sticky table">
-          <TableHead >
+          <TableHead>
             <TableRow>
               {columns.map((column) => (
                 <TableCell
                   key={column.id}
                   align={column.align}
-                  style={{ minWidth: column.minWidth, backgroundColor: '#000', color: '#fff' }}
+                  style={{
+                    minWidth: column.minWidth,
+                    backgroundColor: "#000",
+                    color: "#fff",
+                  }}
                 >
                   {column.label}
                 </TableCell>
@@ -71,7 +79,19 @@ export default function History({ rows }) {
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (
-                        <TableCell key={column.id} align={column.align}>
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          style={
+                            column.id === "title" ? {
+                              cursor: "pointer",
+                              textDecoration: "underline",
+                            } : {}
+                          }
+                          onClick={() =>
+                            column.id === "title" && openNewTabUrl(row.link)
+                          }
+                        >
                           {column.format && typeof value === "number"
                             ? column.format(value)
                             : value}
