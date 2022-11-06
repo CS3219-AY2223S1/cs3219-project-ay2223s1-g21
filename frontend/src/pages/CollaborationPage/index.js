@@ -149,19 +149,31 @@ export default function CollaborationPage() {
       getYjsValue(store),
       {
         peerOpts: {
-            config: { iceServers: [{
-                    urls: [ "stun:ss-turn2.xirsys.com" ]
-                }, {
-                    username: process.env.TURN_USERNAME,
-                    credential: process.env.TURN_CREDENTIAL,
-                    urls: [
-                        "turn:ss-turn2.xirsys.com:80?transport=udp",
-                        "turn:ss-turn2.xirsys.com:3478?transport=udp",
-                        "turn:ss-turn2.xirsys.com:80?transport=tcp",
-                        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
-                        "turns:ss-turn2.xirsys.com:443?transport=tcp",
-                        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
-                    ]}]
+            config: { 
+                iceServers: [
+                    {
+                      url: 'stun:global.stun.twilio.com:3478?transport=udp',
+                      urls: 'stun:global.stun.twilio.com:3478?transport=udp'
+                    },
+                    {
+                      url: 'turn:global.turn.twilio.com:3478?transport=udp',
+                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      urls: 'turn:global.turn.twilio.com:3478?transport=udp',
+                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                    },
+                    {
+                      url: 'turn:global.turn.twilio.com:3478?transport=tcp',
+                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
+                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                    },
+                    {
+                      url: 'turn:global.turn.twilio.com:443?transport=tcp',
+                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      urls: 'turn:global.turn.twilio.com:443?transport=tcp',
+                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                    }
+                  ]
             }
         }
     }
