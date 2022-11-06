@@ -18,15 +18,19 @@ const PORT = process.env.PORT || 3005;
 const PASSWORD = process.env.PASSWORD;
 const DB_NAME = process.env.DB_NAME;
 
-let ATLAS_URI = process.env.ENV == "DEV" ? process.env.DB_LOCAL_URI :
-  `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`
-  || process.env.DB_LOCAL_URI;
+let ATLAS_URI =
+  process.env.ENV == "DEV"
+    ? process.env.DB_LOCAL_URI
+    : `mongodb+srv://username:${PASSWORD}@peerprep-cluster.wcw5ljh.mongodb.net/${DB_NAME}?retryWrites=true&w=majority` ||
+      process.env.DB_LOCAL_URI;
 
 const server = app.listen(PORT, async function () {
   try {
-    mongoose.connect(ATLAS_URI,
+    mongoose.connect(
+      ATLAS_URI,
       { useNewUrlParser: true, useUnifiedTopology: true },
-      () => console.log(" Mongoose is connected"));
+      () => console.log(" Mongoose is connected")
+    );
     console.log("Connected to MongoDB: ", ATLAS_URI);
     console.log(`Collab microservice listening on port ${PORT}`);
     console.log(`http://localhost:${PORT}`);
@@ -38,7 +42,9 @@ const server = app.listen(PORT, async function () {
 app.get("/", (_, res) => res.send("Hello World from collab service"));
 app.get("/MatchingAvaliability", checkAvaliability);
 
-const ioSocket = new Server(server, { cors: { origin: process.env.CLIENT_DOMAIN } });
+const ioSocket = new Server(server, {
+  cors: { origin: process.env.CLIENT_DOMAIN },
+});
 
 // Socket io method
 ioSocket.on("connection", function connection(socket) {
@@ -48,7 +54,7 @@ ioSocket.on("connection", function connection(socket) {
 
   socket.on("joinRoom", async (data) => {
     console.log("Join Room", data);
-    const { roomId, userId } = data;
+    const { roomId } = data;
 
     if (!!!roomId) {
       ioSocket.emit("badRequest");
@@ -56,7 +62,7 @@ ioSocket.on("connection", function connection(socket) {
     }
 
     // check if user is already in an room
-    const userRoom = await roomModel.findOne({ partipants: userId });
+    const userRoom = await roomModel.findOne({ partipants: socket.id });
     if (userRoom) {
       ioSocket.emit("alreadyInRoom");
       return;
@@ -67,7 +73,7 @@ ioSocket.on("connection", function connection(socket) {
     const room = await roomModel.findOne({ roomId: roomId });
     if (room) {
       const copy = room.partipants;
-      copy.push(userId);
+      copy.push(socket.id);
       await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
       ioSocket.to(socket.id).emit("joinSuccess");
       if (room.question) {
@@ -76,7 +82,7 @@ ioSocket.on("connection", function connection(socket) {
     } else {
       const newRoom = new roomModel({
         roomId: roomId,
-        partipants: [userId],
+        partipants: [socket.id],
       });
       await newRoom.save();
       ioSocket.to(socket.id).emit("joinSuccessFirst");
@@ -125,7 +131,29 @@ ioSocket.on("connection", function connection(socket) {
 
   socket.on("exitRoom", async (data) => {
     const { roomId } = data;
-    await roomModel.findOneAndDelete({ roomId: roomId });
+    const room = await roomModel.findOne({ roomId: roomId });
+
+    const copy = room.partipants.filter((x) => x != socket.id);
+    if (copy.length) {
+      await roomModel.updateOne({ roomId: roomId }, { partipants: copy });
+    } else {
+      await roomModel.deleteOne({ roomId: roomId });
+    }
     ioSocket.to(roomId).emit("leaveRoom");
+  });
+
+  socket.on("disconnect", async () => {
+    const room = await roomModel.findOne({ partipants: socket.id });
+
+    if (!room) {
+      return;
+    }
+
+    const copy = room.partipants.filter((x) => x != socket.id);
+    if (copy.length) {
+      await roomModel.updateOne({ roomId: room.roomId }, { partipants: copy });
+    } else {
+      await roomModel.deleteOne({ roomId: room.roomId });
+    }
   });
 });
