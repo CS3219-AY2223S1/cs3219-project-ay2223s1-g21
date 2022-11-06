@@ -141,7 +141,20 @@ export default function CollaborationPage() {
       setIoSocket(socket);
     });
 
-    const peer = new Peer(`${roomId}-${userId}`);
+    const peer = new Peer(`${roomId}-${userId}`, { config: { iceServers: [{
+        urls: [ "stun:ss-turn2.xirsys.com" ]
+     }, {
+        username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+        credential: "349d4154-5d83-11ed-854f-0242ac140004",
+        urls: [
+            "turn:ss-turn2.xirsys.com:80?transport=udp",
+            "turn:ss-turn2.xirsys.com:3478?transport=udp",
+            "turn:ss-turn2.xirsys.com:80?transport=tcp",
+            "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+            "turns:ss-turn2.xirsys.com:443?transport=tcp",
+            "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+        ]
+     }]}});
     console.log("Peer Id :", peer.id);
     setPeer(peer);
     const webrtcProvider = new WebrtcProvider(
@@ -150,30 +163,20 @@ export default function CollaborationPage() {
       {
         peerOpts: {
             config: { 
-                iceServers: [
-                    {
-                      url: 'stun:global.stun.twilio.com:3478?transport=udp',
-                      urls: 'stun:global.stun.twilio.com:3478?transport=udp'
-                    },
-                    {
-                      url: 'turn:global.turn.twilio.com:3478?transport=udp',
-                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
-                      urls: 'turn:global.turn.twilio.com:3478?transport=udp',
-                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
-                    },
-                    {
-                      url: 'turn:global.turn.twilio.com:3478?transport=tcp',
-                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
-                      urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
-                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
-                    },
-                    {
-                      url: 'turn:global.turn.twilio.com:443?transport=tcp',
-                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
-                      urls: 'turn:global.turn.twilio.com:443?transport=tcp',
-                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
-                    }
-                  ]
+                iceServers: [{
+                    urls: [ "stun:ss-turn2.xirsys.com" ]
+                 }, {
+                    username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+                    credential: "349d4154-5d83-11ed-854f-0242ac140004",
+                    urls: [
+                        "turn:ss-turn2.xirsys.com:80?transport=udp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                        "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
+                    ]
+                 }]
             }
         }
     }
