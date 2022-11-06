@@ -157,21 +157,21 @@ export default function CollaborationPage() {
                     },
                     {
                       url: 'turn:global.turn.twilio.com:3478?transport=udp',
-                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
                       urls: 'turn:global.turn.twilio.com:3478?transport=udp',
-                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
                     },
                     {
                       url: 'turn:global.turn.twilio.com:3478?transport=tcp',
-                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
                       urls: 'turn:global.turn.twilio.com:3478?transport=tcp',
-                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
                     },
                     {
                       url: 'turn:global.turn.twilio.com:443?transport=tcp',
-                      username: '3e8d21084949d95e2aab3b3319f90673d30cff21079e2defa9412df8c2eb86f5',
+                      username: 'ecf13c2bbdca89541a3ed8320647fe39ecf97c10cfd29c3d360cafc1bdd56f64',
                       urls: 'turn:global.turn.twilio.com:443?transport=tcp',
-                      credential: 'bv3yc+LQEkKuRZyzCoprfONkK7DsY+IKyFeCoud81/0='
+                      credential: 'c8R/P7qJ6N5O0CmJgDfNm2JYoYsmYqGqnBHR/9NTni4='
                     }
                   ]
             }
