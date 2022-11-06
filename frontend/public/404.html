@@ -12,7 +12,8 @@
     <div id="root"></div>
     <script>
     var path = window.location.pathname;
-    path = path[0] + "#" + path;
+    var searchString = window.location.search;
+    path = searchString ? path[0] + "#" + path + searchString : path[0] + "#" + path;
     var url = window.location.protocol + "//" + window.location.hostname + path;
     //document.write("Redirecting To: "+url);
     window.location.href=url;
