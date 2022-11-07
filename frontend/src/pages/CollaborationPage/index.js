@@ -183,6 +183,7 @@ export default function CollaborationPage() {
               },
             ],
           },
+          trickle: false,
         },
       }
     );
