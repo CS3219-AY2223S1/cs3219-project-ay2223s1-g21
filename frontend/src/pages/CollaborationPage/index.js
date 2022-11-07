@@ -25,6 +25,7 @@ import {
   setQuestion,
   resetCollabPg,
   setSocket,
+  setCode,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { updateHistory } from "../../services/user_service";
@@ -50,7 +51,7 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { isCodeRunning, code, codeLang } = useSelector(
+  const { isCodeRunning, code, lang } = useSelector(
     (state) => state.collabReducer
   );
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
@@ -85,6 +86,8 @@ export default function CollaborationPage() {
   const submitCompileReqCallback = useCallback(submitCompileRequest, [
     dispatch,
     isCodeRunning,
+    lang,
+    code,
   ]);
 
   useEffect(() => {
@@ -92,7 +95,7 @@ export default function CollaborationPage() {
       if (event.keyCode === 13 && event.ctrlKey) {
         submitCompileReqCallback(
           process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
-            ? codeLang
+            ? lang
             : state.collab["lang-" + roomId],
           process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
             ? code
@@ -297,6 +300,7 @@ export default function CollaborationPage() {
         dispatch(setQuestion(JSON.parse(question)));
         updateHistory(userId, jwtToken, JSON.parse(question));
         dispatch(setIsLoading(false));
+        dispatch(setCode(JSON.parse(question[lang])));
       });
 
       ioSocket.on("callPeer", (peerId) => {
