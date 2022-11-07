@@ -195,14 +195,7 @@ export default function CollaborationPage() {
     // const webrtcProvider = new WebsocketProvider('wss://demos.yjs.dev',  "peerprep-" + roomId, getYjsValue(store))
     webrtcProvider.connect();
 
-    window.onbeforeunload = function (e) {
-      return () => {
-        webrtcProvider.disconnect();
-      };
-    };
-
-    // connect();
-    return () => {
+    const shutDownProto = () => {
       resizerEle.removeEventListener("mousedown", onMouseDownRightResize);
 
       //socket io cleanup
@@ -210,8 +203,14 @@ export default function CollaborationPage() {
       socket.close();
       peer.destroy();
       webrtcProvider.disconnect();
-    //   disconnect();
     };
+
+    window.onbeforeunload = function (e) {
+      return shutDownProto;
+    };
+
+    
+    return shutDownProto;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -219,6 +218,7 @@ export default function CollaborationPage() {
 
   const handleLogout = () => {
     dispatch(setIsLoading(true));
+    webRtc.disconnect()
     dispatch(setIsLoading(false));
     dispatch(setLogout());
   };
@@ -227,8 +227,10 @@ export default function CollaborationPage() {
     dispatch(setIsLoading(true));
     if (ioSocket && !ioSocket.connected) {
       webRtc.disconnect();
+      dispatch(setIsLoading(false));
       navigate("/home");
     }
+    
     if (ioSocket && peer) {
       ioSocket.emit("joinRoom", { roomId, jwtToken, userId });
 
@@ -296,6 +298,7 @@ export default function CollaborationPage() {
       ioSocket.on("alreadyInRoom", () => {
         console.log("Already in Room");
         webRtc.disconnect();
+        dispatch(setIsLoading(false));
         navigate("/home");
       });
 
@@ -312,6 +315,7 @@ export default function CollaborationPage() {
       });
 
       ioSocket.on("badRequest", () => {
+        dispatch(setIsLoading(false));
         navigate("/home");
       });
     }
@@ -331,6 +335,7 @@ export default function CollaborationPage() {
     ioSocket.emit("exitRoom", { roomId, jwtToken, userId });
     dropMessages();
     dispatch(resetCollabPg());
+    webRtc.disconnect();
     navigate("/home");
   };
 
