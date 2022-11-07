@@ -4,6 +4,9 @@ import {
   UPDATE_TAB,
   UPDATE_QUESTION,
   RESTE_COLLAB_PG,
+  UPDATE_IO_SOCKET,
+  UPDATE_LANG,
+  UPDATE_CODE,
 } from "../actionTypes";
 
 const initialState = {
@@ -11,6 +14,9 @@ const initialState = {
   selectedTab: "Description",
   codeResult: "Press Run Code or Ctrl + Enter to run your code.",
   question: null,
+  code: "",
+  lang: "",
+  socket: null,
 };
 
 export default function collabReducer(state = initialState, action) {
@@ -40,6 +46,24 @@ export default function collabReducer(state = initialState, action) {
       return {
         ...state,
         question: action.payload,
+      };
+
+    case UPDATE_IO_SOCKET:
+      return {
+        ...state,
+        socket: action.payload,
+      };
+
+    case UPDATE_LANG:
+      return {
+        ...state,
+        lang: action.payload,
+      };
+
+    case UPDATE_CODE:
+      return {
+        ...state,
+        code: action.payload,
       };
 
     default:

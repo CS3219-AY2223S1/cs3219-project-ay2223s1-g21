@@ -31,6 +31,7 @@ import {
   getCompilationResult,
 } from "../../../services/compile_service";
 import {
+  setCode,
   setCodeExecutionResult,
   setIsCodeRunning,
   setTab,
@@ -39,26 +40,48 @@ import { useSyncedStore } from "@syncedstore/react";
 import { store } from "../store";
 
 export default function EmbeddedEditor({ editorRef }) {
+  const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const { roomId } = useSelector((state) => state.matchingReducer);
   const { question } = useSelector((state) => state.collabReducer);
 
   const [curTheme, setCurTheme] = useState("tomorrow_night");
   const [anchorElLang, setAnchorElLang] = useState(null);
   const [anchorElTheme, setAnchorElTheme] = useState(null);
+  const [text, setText] = useState("");
+  const [codeLang, setCodeLang] = useState("");
 
   const openLang = Boolean(anchorElLang);
   const openTheme = Boolean(anchorElTheme);
   const dispatch = useDispatch();
-  const { isCodeRunning } = useSelector((state) => state.collabReducer);
+  const { isCodeRunning, socket } = useSelector((state) => state.collabReducer);
 
   const handleLangSelect = (event) => {
     setAnchorElLang(event.currentTarget);
   };
 
-  const handleCloseLang = (lang) => {
+  const handleCloseLang = async (lang) => {
     setAnchorElLang(null);
-    state.collab["code-" + roomId] = question[lang];
-    state.collab["lang-" + roomId] = lang;
+    if (process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET") {
+      setText(question[lang]);
+      setCodeLang(lang);
+      socket.emit("CollabTextUpdate", {
+        roomId,
+        currentCode: question[lang],
+        jwtToken,
+        userId,
+      });
+      socket.emit("CollabLangUpdate", {
+        roomId,
+        lang,
+        jwtToken,
+        userId,
+      });
+    } else {
+      state.collab["code-" + roomId] = question[lang];
+      state.collab["lang-" + roomId] = lang;
+    }
+    dispatch(setCodeLang(lang));
+    dispatch(setCode(question[lang]));
   };
 
   const handleThemeSelect = (event) => {
@@ -95,24 +118,84 @@ export default function EmbeddedEditor({ editorRef }) {
 
   const state = useSyncedStore(store);
 
-  useEffect(() => {
-    if(question) {
-      state.collab["code-" + roomId] = question["javascript"];
-      state.collab["lang-" + roomId] = `javascript`;
+  useEffect(async () => {
+    if (question) {
+      if (process.env.REACT_APP_COLLAB_TEXT_METHOD === "YJS") {
+        state.collab["code-" + roomId] = question["javascript"];
+        state.collab["lang-" + roomId] = `javascript`;
+      } else {
+        setText(question["javascript"]);
+        setCodeLang("javascript");
+      }
+      dispatch(setCode(question["javascript"]));
+      dispatch(setCodeLang("javascript"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("textUpdate", async (data) => {
+        const { userId: senderId, currentCode } = data;
+        if (senderId !== userId) {
+          setText(currentCode);
+          dispatch(setCode(currentCode));
+        }
+      });
+
+      socket.on("langUpdate", async (data) => {
+        const { userId: senderId, lang } = data;
+        if (senderId !== userId) {
+          setCodeLang(lang);
+          dispatch(setCodeLang(lang));
+        }
+      });
+    }
+  }, [socket]);
+
+  const yjsUpdateText = (currentCode) => {
+    state.collab["code-" + roomId] = currentCode;
+  };
+
+  const socketUpdateText = async (currentCode) => {
+    if (socket) {
+      setText(currentCode);
+      socket.emit("CollabTextUpdate", {
+        roomId,
+        currentCode,
+        jwtToken,
+        userId,
+      });
+      dispatch(setCode(currentCode));
+    }
+  };
 
   return (
     <EditorContainer ref={editorRef}>
       <Bar>
         <Tooltip title="Click or press Ctrl + Enter to run your code.">
-          <RunCodeButton onClick={() => submitCompileRequest(state.collab["lang-" + roomId],  state.collab["code-" + roomId])}>
+          <RunCodeButton
+            onClick={() =>
+              submitCompileRequest(
+                process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+                  ? codeLang
+                  : state.collab["lang-" + roomId],
+                process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+                  ? text
+                  : state.collab["code-" + roomId]
+              )
+            }
+          >
             Run Code
           </RunCodeButton>
         </Tooltip>
         <Tooltip title="Select a programming language.">
-          <BarItem onClick={handleLangSelect}> {state.collab["lang-" + roomId]} </BarItem>
+          <BarItem onClick={handleLangSelect}>
+            {" "}
+            {process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+              ? codeLang
+              : state.collab["lang-" + roomId]}{" "}
+          </BarItem>
         </Tooltip>
         <Menu
           id="fade-menu"
@@ -121,7 +204,13 @@ export default function EmbeddedEditor({ editorRef }) {
           }}
           anchorEl={anchorElLang}
           open={openLang}
-          onClose={() => handleCloseLang(state.collab["lang-" + roomId])}
+          onClose={() =>
+            handleCloseLang(
+              process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+                ? codeLang
+                : state.collab["lang-" + roomId]
+            )
+          }
           TransitionComponent={Fade}
         >
           <MenuItem onClick={() => handleCloseLang("javascript")}>
@@ -170,17 +259,27 @@ export default function EmbeddedEditor({ editorRef }) {
           margin: "0px",
         }}
         placeholder="Start Coding"
-        mode={state.collab["lang-" + roomId]}
+        mode={
+          process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+            ? codeLang
+            : state.collab["lang-" + roomId]
+        }
         theme={curTheme}
         name="basic-code-editor"
-        onChange={(currentCode) => {
-          state.collab["code-" + roomId] = currentCode;
-        }}
+        onChange={
+          process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+            ? socketUpdateText
+            : yjsUpdateText
+        }
         fontSize={15}
         showPrintMargin={true}
         showGutter={true}
         highlightActiveLine={true}
-        value={state.collab["code-" + roomId]}
+        value={
+          process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+            ? text
+            : state.collab["code-" + roomId]
+        }
         setOptions={{
           enableBasicAutocompletion: true,
           enableLiveAutocompletion: true,

@@ -24,6 +24,7 @@ import {
   setCodeExecutionResult,
   setQuestion,
   resetCollabPg,
+  setSocket,
 } from "../../redux/actions/collab";
 import { setIsLoading, setLogout } from "../../redux/actions/auth";
 import { updateHistory } from "../../services/user_service";
@@ -39,6 +40,7 @@ import { useSyncedStore } from "@syncedstore/react";
 import { store } from "./store";
 import { getYjsValue } from "@syncedstore/core";
 import { WebrtcProvider } from "y-webrtc";
+import { UPDATE_IO_SOCKET } from "../../redux/actionTypes";
 // import { WebsocketProvider } from 'y-websocket'
 
 export default function CollaborationPage() {
@@ -48,7 +50,9 @@ export default function CollaborationPage() {
   const embeddedEditorRef = useRef(null);
   const voiceChatRef = useRef(null);
   const dispatch = useDispatch();
-  const { isCodeRunning } = useSelector((state) => state.collabReducer);
+  const { isCodeRunning, code, codeLang } = useSelector(
+    (state) => state.collabReducer
+  );
   const { userId, jwtToken } = useSelector((state) => state.authReducer);
   const { roomId, difficulty } = useSelector((state) => state.matchingReducer);
   const [peer, setPeer] = useState(false);
@@ -87,8 +91,12 @@ export default function CollaborationPage() {
     const onCtrlEnterKeyDown = (event) => {
       if (event.keyCode === 13 && event.ctrlKey) {
         submitCompileReqCallback(
-          state.collab["lang-" + roomId],
-          state.collab["code-" + roomId]
+          process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+            ? codeLang
+            : state.collab["lang-" + roomId],
+          process.env.REACT_APP_COLLAB_TEXT_METHOD === "SOCKET"
+            ? code
+            : state.collab["code-" + roomId]
         );
       }
     };
@@ -140,22 +148,31 @@ export default function CollaborationPage() {
     });
     socket.on("connectionSuccess", () => {
       setIoSocket(socket);
+      dispatch(setSocket(socket));
     });
 
-    const peer = new Peer(`${roomId}-${userId}`, { config: { iceServers: [{
-        urls: [ "stun:ss-turn2.xirsys.com" ]
-     }, {
-        username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
-        credential: "349d4154-5d83-11ed-854f-0242ac140004",
-        urls: [
-            "turn:ss-turn2.xirsys.com:80?transport=udp",
-            "turn:ss-turn2.xirsys.com:3478?transport=udp",
-            "turn:ss-turn2.xirsys.com:80?transport=tcp",
-            "turn:ss-turn2.xirsys.com:3478?transport=tcp",
-            "turns:ss-turn2.xirsys.com:443?transport=tcp",
-            "turns:ss-turn2.xirsys.com:5349?transport=tcp"
-        ]
-     }]}});
+    const peer = new Peer(`${roomId}-${userId}`, {
+      config: {
+        iceServers: [
+          {
+            urls: ["stun:ss-turn2.xirsys.com"],
+          },
+          {
+            username:
+              "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+            credential: "349d4154-5d83-11ed-854f-0242ac140004",
+            urls: [
+              "turn:ss-turn2.xirsys.com:80?transport=udp",
+              "turn:ss-turn2.xirsys.com:3478?transport=udp",
+              "turn:ss-turn2.xirsys.com:80?transport=tcp",
+              "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+              "turns:ss-turn2.xirsys.com:443?transport=tcp",
+              "turns:ss-turn2.xirsys.com:5349?transport=tcp",
+            ],
+          },
+        ],
+      },
+    });
     console.log("Peer Id :", peer.id);
     setPeer(peer);
     const webrtcProvider = new WebrtcProvider(
@@ -163,34 +180,38 @@ export default function CollaborationPage() {
       getYjsValue(store),
       {
         peerOpts: {
-            config: { 
-                iceServers: [{
-                    urls: [ "stun:ss-turn2.xirsys.com" ]
-                 }, {
-                    username: "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
-                    credential: "349d4154-5d83-11ed-854f-0242ac140004",
-                    urls: [
-                        "turn:ss-turn2.xirsys.com:80?transport=udp",
-                        "turn:ss-turn2.xirsys.com:3478?transport=udp",
-                        "turn:ss-turn2.xirsys.com:80?transport=tcp",
-                        "turn:ss-turn2.xirsys.com:3478?transport=tcp",
-                        "turns:ss-turn2.xirsys.com:443?transport=tcp",
-                        "turns:ss-turn2.xirsys.com:5349?transport=tcp"
-                    ]
-                 }]
-            }
-        }
-    }
+          config: {
+            iceServers: [
+              {
+                urls: ["stun:ss-turn2.xirsys.com"],
+              },
+              {
+                username:
+                  "KPLaQwFEAY6GycEfX75qQuEgYo7UR6wA7V1Lxcsi-QVQWD5RZmXgEW0VnNI5ikc1AAAAAGNnKhJhbHZpbnRtaA==",
+                credential: "349d4154-5d83-11ed-854f-0242ac140004",
+                urls: [
+                  "turn:ss-turn2.xirsys.com:80?transport=udp",
+                  "turn:ss-turn2.xirsys.com:3478?transport=udp",
+                  "turn:ss-turn2.xirsys.com:80?transport=tcp",
+                  "turn:ss-turn2.xirsys.com:3478?transport=tcp",
+                  "turns:ss-turn2.xirsys.com:443?transport=tcp",
+                  "turns:ss-turn2.xirsys.com:5349?transport=tcp",
+                ],
+              },
+            ],
+          },
+        },
+      }
     );
     setWebRtc(webrtcProvider);
 
-    webrtcProvider.on('synced', synced => {
+    webrtcProvider.on("synced", (synced) => {
       // NOTE: This is only called when a different browser connects to this client
       // Windows of the same browser communicate directly with each other
       // Although this behavior might be subject to change.
       // It is better not to expect a synced event when using y-webrtc
-      console.log('peers synced!', synced)
-    })
+      console.log("peers synced!", synced);
+    });
 
     // const webrtcProvider = new WebsocketProvider('wss://demos.yjs.dev',  "peerprep-" + roomId, getYjsValue(store))
     webrtcProvider.connect();
@@ -210,7 +231,7 @@ export default function CollaborationPage() {
       socket.close();
       peer.destroy();
       webrtcProvider.disconnect();
-    //   disconnect();
+      //   disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -225,6 +246,7 @@ export default function CollaborationPage() {
 
   useEffect(() => {
     dispatch(setIsLoading(true));
+
     if (ioSocket && !ioSocket.connected) {
       webRtc.disconnect();
       navigate("/home");
@@ -315,6 +337,10 @@ export default function CollaborationPage() {
         navigate("/home");
       });
     }
+
+    return () => {
+      dispatch(setIsLoading(false));
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ioSocket, peer]);
 
