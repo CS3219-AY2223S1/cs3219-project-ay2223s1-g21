@@ -300,7 +300,7 @@ export default function CollaborationPage() {
         dispatch(setQuestion(JSON.parse(question)));
         updateHistory(userId, jwtToken, JSON.parse(question));
         dispatch(setIsLoading(false));
-        dispatch(setCode(JSON.parse(question[lang])));
+        dispatch(setCode(JSON.parse(question)[lang]));
       });
 
       ioSocket.on("callPeer", (peerId) => {

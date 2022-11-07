@@ -56,7 +56,7 @@ export const setCode = (code) => {
   };
 };
 
-export const setCodeLang = (lang) => {
+export const setLang = (lang) => {
   return {
     type: UPDATE_LANG,
     payload: lang,

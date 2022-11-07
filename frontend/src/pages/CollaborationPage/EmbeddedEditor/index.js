@@ -34,6 +34,7 @@ import {
   setCode,
   setCodeExecutionResult,
   setIsCodeRunning,
+  setLang,
   setTab,
 } from "../../../redux/actions/collab";
 import { useSyncedStore } from "@syncedstore/react";
@@ -80,7 +81,7 @@ export default function EmbeddedEditor({ editorRef }) {
       state.collab["code-" + roomId] = question[lang];
       state.collab["lang-" + roomId] = lang;
     }
-    dispatch(setCodeLang(lang));
+    dispatch(setLang(lang));
     dispatch(setCode(question[lang]));
   };
 
@@ -128,7 +129,7 @@ export default function EmbeddedEditor({ editorRef }) {
         setCodeLang("javascript");
       }
       dispatch(setCode(question["javascript"]));
-      dispatch(setCodeLang("javascript"));
+      dispatch(setLang("javascript"));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question]);
@@ -147,7 +148,7 @@ export default function EmbeddedEditor({ editorRef }) {
         const { userId: senderId, lang } = data;
         if (senderId !== userId) {
           setCodeLang(lang);
-          dispatch(setCodeLang(lang));
+          dispatch(setLang(lang));
         }
       });
     }
