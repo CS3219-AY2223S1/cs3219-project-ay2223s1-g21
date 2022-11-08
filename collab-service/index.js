@@ -137,6 +137,7 @@ ioSocket.on("connection", function connection(socket) {
       ioSocket.to(roomId).emit("recieveQn", JSON.stringify(question));
     } catch (err) {
       console.log("Error with fetching question", err);
+      ioSocket.to(roomId).emit("noQnLeft");
     }
   });
 
