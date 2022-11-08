@@ -61,6 +61,12 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
     !matchExists ||
     moment().diff(moment(matchExists.timeCreated), "seconds") >= 30
   ) {
+    if (matchExists) {
+      console.log(
+        "There is another match but expired , not deleted yet",
+        moment().diff(moment(matchExists.timeCreated), "seconds")
+      );
+    }
     const match = new Match({
       email: email,
       difficulty: difficulty,
