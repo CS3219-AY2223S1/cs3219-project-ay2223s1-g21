@@ -345,6 +345,10 @@ export default function CollaborationPage() {
       ioSocket.on("badRequest", () => {
         navigate("/home");
       });
+
+      ioSocket.on("unauthorized", () => {
+        navigate("/home");
+      });
     }
 
     return () => {
