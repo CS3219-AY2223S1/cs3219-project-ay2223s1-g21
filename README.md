@@ -51,11 +51,15 @@ If you'd like to, you can allow PeerPrep to access your microphone for voice col
 
 ![image](https://user-images.githubusercontent.com/61351392/200530310-dc2e0fdd-900d-4837-85d5-7c927960fa0e.png)
 
-### Compile your code :hammer:
+### Compile and run your code :hammer: :running:
 
 Click on "Run Code" to compile your current code.
 
 ![image](https://user-images.githubusercontent.com/61351392/200531430-a0f8c652-3040-4256-9ff7-b8d926e8c30d.png)
+
+Example: Compiling and running in Java
+
+![image](https://user-images.githubusercontent.com/61351392/200549508-fc36d16a-729c-4ff2-92cb-4a35d0a25ac0.png)
 
 
 ## End Session :checkered_flag:
@@ -66,19 +70,20 @@ Click on "Exit Session" to exit the session when you are done.
 
 
 
+<br/>
+<br/>
 
 
 
+# Instructions to set up PeerPrep locally (Alternative):
 
-#Instructions to set up PeerPrep locally:
+1) Clone this repository.
+2) Insert .env [files](https://drive.google.com/drive/folders/1eGl4Dy_cTGdeMJbe7e5YZyZ98Et9aq6J) into the microservices directories respectively.
+3) cd into each of the microservices directory and run `npm i`, you should have 6 terminals opened (total 6 microservices).
+4) Run `npm start` on each of the terminal.
+5) You are ready to use PeerPrep locally!
 
-## User Service
-1. Rename `.env.sample` file to `.env`.
-2. Create a Cloud DB URL using Mongo Atlas.
-3. Enter the DB URL created as `DB_CLOUD_URI` in `.env` file.
-4. Install npm packages using `npm i`.
-5. Run User Service using `npm run dev`.
+**Note:** questions are not fetched from localhost since the local database would be empty and you would have to insert questions manually. For convenience,
+only the question service is hosted in the cloud and all other microservices can be ran locally.
 
-## Frontend
-1. Install npm packages using `npm i`.
-2. Run Frontend using `npm start`.
+
