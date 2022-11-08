@@ -78,7 +78,7 @@ Click on "Exit Session" to exit the session when you are done.
 # Instructions to set up PeerPrep locally (Alternative):
 
 1) Clone this repository.
-2) Insert .env [files](https://drive.google.com/drive/folders/1eGl4Dy_cTGdeMJbe7e5YZyZ98Et9aq6J) into the microservices directories respectively.
+2) Insert *-README.env [files](https://drive.google.com/drive/folders/1eGl4Dy_cTGdeMJbe7e5YZyZ98Et9aq6J) into the microservices directories respectively.
 3) cd into each of the microservices directory and run `npm i`, you should have 6 terminals opened (total 6 microservices).
 4) Run `npm start` on each of the terminal.
 5) You are ready to use PeerPrep locally!
