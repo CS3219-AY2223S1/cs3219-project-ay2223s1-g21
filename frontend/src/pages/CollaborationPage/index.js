@@ -302,6 +302,12 @@ export default function CollaborationPage() {
         dispatch(setIsLoading(false));
       });
 
+      ioSocket.on("noQnLeft", () => {
+        console.log("No more questions");
+        alert("There is no more questions for this difficutly");
+        dispatch(setIsLoading(false));
+      });
+
       ioSocket.on("callPeer", (peerId) => {
         if (peerId !== peer.id) {
           navigator.mediaDevices
