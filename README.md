@@ -38,9 +38,8 @@ Monokai             |   Tomorrow     |          Terminal
 :-------------------------:|:-------------------------:|:-------------------------:
 ![image](https://user-images.githubusercontent.com/61351392/200513586-43f4ac11-daf6-4262-81e2-310f07c2b4e3.png) |  ![image](https://user-images.githubusercontent.com/61351392/200513688-8e72bfb4-09dc-485c-a1ea-875f85d1399a.png) | ![image](https://user-images.githubusercontent.com/61351392/200513793-c8c917b0-2d4f-4e58-af15-eb55aa7083f8.png)
 
-
-
 ### Connect to voice 
+If you'd like to, you can allow PeerPrep to access your microphone for voice collaboration with your Peer.
 
 ### Real Time Collaboration
 
