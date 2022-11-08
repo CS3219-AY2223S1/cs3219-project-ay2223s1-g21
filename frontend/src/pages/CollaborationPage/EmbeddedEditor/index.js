@@ -125,6 +125,7 @@ export default function EmbeddedEditor({ editorRef }) {
         state.collab["code-" + roomId] = question["javascript"];
         state.collab["lang-" + roomId] = `javascript`;
       } else {
+        console.log("Using SOCKET for concurrent editting")
         setText(question["javascript"]);
         setCodeLang("javascript");
       }
