@@ -71,6 +71,19 @@ Click on "Exit Session" to exit the session when you are done.
 
 
 <br/>
+
+## What if you forgot your ![image](https://user-images.githubusercontent.com/61351392/200607856-4d2864ab-be6c-4f24-a4a8-d923a45937be.png)
+passcode :frowning:
+
+### Fill up the Forget Password Form :smile:
+![image](https://user-images.githubusercontent.com/61351392/200604972-cc428deb-8b46-4ed8-97ee-c618c8b02008.png)
+
+### Check your email to reset 📫
+![image](https://user-images.githubusercontent.com/61351392/200605834-723db486-4f19-4b82-8342-9db4ec8f0a55.png)
+
+
+
+
 <br/>
 
 
