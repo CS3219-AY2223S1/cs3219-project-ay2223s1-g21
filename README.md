@@ -12,16 +12,28 @@ Sign up for an account at the [registration page](https://frontend-swougile5q-uc
 After registering, navigate to the Log In page and login.
 
 ## Select Difficulty
-When you are logged in, select a difficulty level and click on 'Match' to start searching for a match.
+When you are logged in, select a difficulty level.
 
-For example, we indicate here that we want to be matched on an **Easy** difficulty question.
-![image](https://user-images.githubusercontent.com/61351392/200509283-1ce4c7ae-502f-4d20-b4c2-476431a8333e.png)
+For example, we indicate that we want to be matched on a question with **Medium** difficulty.
+
+![image](https://user-images.githubusercontent.com/61351392/200509487-837c424d-0403-43ae-9dfc-d6c4a45019c3.png)
 
 ## Find Match
+Click on "Match" to start searching for a peer to prepare for your coding interview!
+
+![image](https://user-images.githubusercontent.com/61351392/200510675-2d1393ab-16cb-4039-87ec-a45394eb25c7.png)
 
 ## After Matched
+![image](https://user-images.githubusercontent.com/61351392/200511140-67380655-b2a1-4195-9b96-0a2caef8258a.png)
 
 ### Toggle between Programming Languages
+You can choose your desired language by toggling between `Java`, `JavaScript` and `Python`.
+
+JavaScript             |   Java     |          Python
+:-------------------------:|:-------------------------:|:-------------------------:
+![image](https://user-images.githubusercontent.com/61351392/200511723-041bf0a3-02b6-4c3e-b720-bb8efb38a47c.png)  |  ![image](https://user-images.githubusercontent.com/61351392/200512807-5538ed96-0fb4-426a-bcf7-87aa1816ead3.png) | ![image](https://user-images.githubusercontent.com/61351392/200512967-ab354e80-6826-4794-9664-06253283010c.png)
+
+
 
 ### Connect to voice 
 
