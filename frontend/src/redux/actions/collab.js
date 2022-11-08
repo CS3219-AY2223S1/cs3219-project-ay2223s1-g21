@@ -4,6 +4,9 @@ import {
   UPDATE_EXECUTION_RESULT,
   UPDATE_QUESTION,
   RESTE_COLLAB_PG,
+  UPDATE_IO_SOCKET,
+  UPDATE_CODE,
+  UPDATE_LANG,
 } from "../actionTypes";
 
 export const setIsCodeRunning = (isCodeRunning) => {
@@ -36,5 +39,26 @@ export const setQuestion = (question) => {
 export const resetCollabPg = () => {
   return {
     type: RESTE_COLLAB_PG,
+  };
+};
+
+export const setSocket = (socket) => {
+  return {
+    type: UPDATE_IO_SOCKET,
+    payload: socket,
+  };
+};
+
+export const setCode = (code) => {
+  return {
+    type: UPDATE_CODE,
+    payload: code,
+  };
+};
+
+export const setLang = (lang) => {
+  return {
+    type: UPDATE_LANG,
+    payload: lang,
   };
 };

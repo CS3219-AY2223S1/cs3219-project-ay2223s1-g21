@@ -204,4 +204,32 @@ ioSocket.on("connection", function connection(socket) {
       await roomModel.deleteOne({ roomId: room.roomId });
     }
   });
+
+  socket.on("CollabTextUpdate", async (data) => {
+    console.log("Text Update", data);
+    const { roomId, currentCode, jwtToken, userId } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
+
+    ioSocket.to(roomId).emit("textUpdate", { userId, currentCode });
+  });
+
+  socket.on("CollabLangUpdate", async (data) => {
+    console.log("Language Update", data);
+    const { roomId, lang, jwtToken, userId } = data;
+    const authRes = verifyToken(jwtToken, userId);
+
+    if (authRes.status === UNAUTHORIZED) {
+      socket.emit("unauthorized", authRes);
+      console.log("Unauthorized", authRes);
+      return;
+    }
+
+    ioSocket.to(roomId).emit("langUpdate", { userId, lang });
+  });
 });

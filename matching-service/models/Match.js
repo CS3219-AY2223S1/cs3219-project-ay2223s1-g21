@@ -5,7 +5,6 @@ const MatchSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
   },
   difficulty: {
     type: String,
@@ -14,6 +13,7 @@ const MatchSchema = new mongoose.Schema({
   socketId: {
     type: String,
     required: true,
+    unique: true,
   },
   timeCreated: {
     type: Date,
