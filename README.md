@@ -33,6 +33,11 @@ JavaScript             |   Java     |          Python
 :-------------------------:|:-------------------------:|:-------------------------:
 ![image](https://user-images.githubusercontent.com/61351392/200511723-041bf0a3-02b6-4c3e-b720-bb8efb38a47c.png)  |  ![image](https://user-images.githubusercontent.com/61351392/200512807-5538ed96-0fb4-426a-bcf7-87aa1816ead3.png) | ![image](https://user-images.githubusercontent.com/61351392/200512967-ab354e80-6826-4794-9664-06253283010c.png)
 
+### Toggle between Color Themes
+Monokai             |   Tomorrow     |          Terminal
+:-------------------------:|:-------------------------:|:-------------------------:
+![image](https://user-images.githubusercontent.com/61351392/200513586-43f4ac11-daf6-4262-81e2-310f07c2b4e3.png) |  ![image](https://user-images.githubusercontent.com/61351392/200513688-8e72bfb4-09dc-485c-a1ea-875f85d1399a.png) | ![image](https://user-images.githubusercontent.com/61351392/200513793-c8c917b0-2d4f-4e58-af15-eb55aa7083f8.png)
+
 
 
 ### Connect to voice 
