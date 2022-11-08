@@ -45,7 +45,7 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   const dupRequest = await Match.findOne({ email: email });
   if (
     dupRequest &&
-    moment().subtract(moment(dupRequest.timeCreated), "seconds") < 30
+    moment().diff(moment(dupRequest.timeCreated), "seconds") < 30
   ) {
     var res = {
       status: responseStatus.BAD_REQUEST,
@@ -59,7 +59,7 @@ async function searchMatch(socket, io, email, difficulty, jwtToken, userId) {
   const matchExists = await Match.findOne({ difficulty: difficulty });
   if (
     !matchExists ||
-    moment().subtract(moment(matchExists.timeCreated), "seconds") > 30
+    moment().diff(moment(matchExists.timeCreated), "seconds") >= 30
   ) {
     const match = new Match({
       email: email,
