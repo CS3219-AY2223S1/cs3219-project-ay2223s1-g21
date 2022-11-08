@@ -78,10 +78,12 @@ Click on "Exit Session" to exit the session when you are done.
 # Instructions to set up PeerPrep locally (Alternative):
 
 1) Clone this repository.
-2) Insert *-README.env [files](https://drive.google.com/drive/folders/1eGl4Dy_cTGdeMJbe7e5YZyZ98Et9aq6J) into the microservices directories respectively.
-3) cd into each of the microservices directory and run `npm i`, you should have 6 terminals opened (total 6 microservices).
-4) Run `npm start` on each of the terminal.
-5) You are ready to use PeerPrep locally!
+2) Download and insert *.env [files](https://drive.google.com/drive/folders/1KxUd3-2lc4JIn_M_GqeS9pQX_nGJxZYW?usp=sharing) into the microservices directories respectively.
+3) Rename the *.env files to just .env
+4) Open each .env file. Replace the variables surrounded by << >> with the respective information.
+5) cd into each of the microservices directory and run `npm i`, you should have 6 terminals opened (total 6 microservices).
+6) Run `npm start` on each of the terminal.
+7) You are ready to use PeerPrep locally!
 
 **Note:** questions are not fetched from localhost since the local database would be empty and you would have to insert questions manually. For convenience,
 only the question service is hosted in the cloud and all other microservices can be ran locally.
