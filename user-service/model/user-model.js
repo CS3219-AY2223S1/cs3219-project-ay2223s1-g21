@@ -1,7 +1,9 @@
 import mongoose from 'mongoose';
-var Schema = mongoose.Schema
+import bcrypt from 'bcrypt';
+
+const Schema = mongoose.Schema
 let UserModelSchema = new Schema({
-    username: {
+    email: {
         type: String,
         required: true,
         unique: true,
@@ -9,7 +11,19 @@ let UserModelSchema = new Schema({
     password: {
         type: String,
         required: true,
+    },
+    history: {
+        type: Array,
     }
 })
+
+UserModelSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) {
+        return next();
+    }
+    const hash = await bcrypt.hash(this.password, parseInt(process.env.SALT_ROUNDS));
+    this.password = hash;
+    next();
+});
 
 export default mongoose.model('UserModel', UserModelSchema)

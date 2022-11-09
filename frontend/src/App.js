@@ -1,20 +1,66 @@
-import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
-import SignupPage from './components/SignupPage';
-import {Box} from "@mui/material";
+import { useSelector } from "react-redux";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import ChangePasswordPage from "./pages/ChangePasswordPage";
+import Home from "./pages/Home";
+import LoadingScreen from "./pages/LoadingScreen";
+import LoginPage from "./pages/LoginPage";
+import PrivateRoute from "./components/PrivateRoute";
+import MatchingPage from "./pages/Matching/Matching";
+import Profile from "./pages/Profile";
+import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/PasswordReset";
+import CollaborationPage from "./pages/CollaborationPage";
 
 function App() {
-    return (
-        <div className="App">
-            <Box display={"flex"} flexDirection={"column"} padding={"4rem"}>
-                <Router>
-                    <Routes>
-                        <Route exact path="/" element={<Navigate replace to="/signup" />}></Route>
-                        <Route path="/signup" element={<SignupPage/>}/>
-                    </Routes>
-                </Router>
-            </Box>
-        </div>
-    );
+  const { isLoading } = useSelector((state) => state.authReducer);
+
+  return (
+    <div className="App">
+      <Router>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/passwordReset" element={<ResetPassword />} />
+          <Route path="/forget_password" element={<ForgetPassword />} />
+          <Route
+            path="/home"
+            element={<PrivateRoute component={Home} fromUrl={"/home"} />}
+          />
+          <Route
+            path="/change_password"
+            element={
+              <PrivateRoute
+                component={ChangePasswordPage}
+                fromUrl={"/change_password"}
+              />
+            }
+          />
+          <Route
+            path="/profile"
+            element={<PrivateRoute component={Profile} fromUrl={"/profile"} />}
+          />
+          <Route
+            path="/matching"
+            element={<PrivateRoute component={MatchingPage} />}
+          />
+          <Route
+            exact
+            path="/collab/:interviewId"
+            element={
+              <PrivateRoute
+                component={CollaborationPage}
+                fromUrl={"/collab/:interviewId"}
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={<PrivateRoute component={Home} fromUrl={"/home"} />}
+          />
+        </Routes>
+      </Router>
+      {isLoading && <LoadingScreen />}
+    </div>
+  );
 }
 
 export default App;
